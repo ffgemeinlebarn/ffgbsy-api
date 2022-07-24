@@ -1,0 +1,47 @@
+{
+    "name": "jakob.fyi/ffgbsy",
+    "description": "A Slim Framework skeleton application for rapid development",
+    "keywords": [],
+    "homepage": "http://github.com/slimphp/Slim-Skeleton",
+    "license": "MIT",
+    "authors": [{
+        "name": "Jakob Vesely",
+        "email": "dev@jakob.fyi",
+        "homepage": "https://www.jakob.fyi"
+    }],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-json": "*",
+        "monolog/monolog": "^2.6",
+        "php-di/php-di": "^6.4",
+        "slim/psr7": "^1.5",
+        "slim/slim": "^4.10"
+    },
+    "require-dev": {
+        "jangregor/phpstan-prophecy": "^1.0.0",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpstan/extension-installer": "^1.1.0",
+        "phpstan/phpstan": "^1.7",
+        "phpunit/phpunit": "^9.5.20",
+        "squizlabs/php_codesniffer": "^3.6"
+    },
+    "config": {
+        "process-timeout": 0,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "FFGBSY\\Application\\": "src/app/",
+            "FFGBSY\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public",
+        "test": "phpunit"
+    }
+}
