@@ -16,7 +16,6 @@
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':ip', $data['ip'], PDO::PARAM_STR);
             $sth->bindParam(':port', $data['port'], PDO::PARAM_INT);
-            $sth->bindParam(':mac', $data['mac'], PDO::PARAM_STR);
             $sth->execute();
 
             return $this->read($this->db->lastInsertId());
@@ -39,12 +38,11 @@
 
         public function update($data)
         {
-            $sth = $this->db->prepare("UPDATE drucker SET name = :name, ip = :ip, port = :port, mac = :mac WHERE id = :id");
+            $sth = $this->db->prepare("UPDATE drucker SET name = :name, ip = :ip, port = :port WHERE id = :id");
             $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':ip', $data['ip'], PDO::PARAM_STR);
             $sth->bindParam(':port', $data['port'], PDO::PARAM_INT);
-            $sth->bindParam(':mac', $data['mac'], PDO::PARAM_STR);
             $sth->execute();
             
             return $this->read($data['id']);
