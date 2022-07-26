@@ -10,6 +10,8 @@ use FFGBSY\Controller\AufnehmerController;
 use FFGBSY\Controller\TischkategorienController;
 use FFGBSY\Controller\TischeController;
 use FFGBSY\Controller\DruckerController;
+use FFGBSY\Controller\GrundprodukteController;
+use FFGBSY\Controller\ProduktbereicheController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -61,6 +63,26 @@ return function (App $app)
     $app->group('/drucker', function (Group $group)
     {
         $controller = DruckerController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
+        $group->get(PATH_ID, "$controller:readSingle");
+        $group->put(PATH_ID, "$controller:update");
+        $group->delete(PATH_ID, "$controller:delete");
+    });
+
+    $app->group('/grundprodukte', function (Group $group)
+    {
+        $controller = GrundprodukteController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
+        $group->get(PATH_ID, "$controller:readSingle");
+        $group->put(PATH_ID, "$controller:update");
+        $group->delete(PATH_ID, "$controller:delete");
+    });
+
+    $app->group('/produktbereiche', function (Group $group)
+    {
+        $controller = ProduktbereicheController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");
