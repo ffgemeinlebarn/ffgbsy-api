@@ -57,6 +57,11 @@
             return intval($str);
         }
 
+        final protected function asDecimal($str)
+        {
+            return floatval($str);
+        }
+        
         final protected function asNumberOrNull($str)
         {
             return $str == null ? null : intval($str);
