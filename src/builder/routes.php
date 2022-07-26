@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use FFGBSY\Controller\AufnehmerController;
 use FFGBSY\Controller\TischkategorienController;
+use FFGBSY\Controller\TischeController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -39,6 +40,16 @@ return function (App $app)
     $app->group('/tischkategorien', function (Group $group)
     {
         $controller = TischkategorienController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
+        $group->get(PATH_ID, "$controller:readSingle");
+        $group->put(PATH_ID, "$controller:update");
+        $group->delete(PATH_ID, "$controller:delete");
+    });
+
+    $app->group('/tische', function (Group $group)
+    {
+        $controller = TischeController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");

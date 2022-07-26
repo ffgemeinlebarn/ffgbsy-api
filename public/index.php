@@ -5,6 +5,7 @@
     use FFGBSY\Application\ResponseEmitter\ResponseEmitter;
     use FFGBSY\Services\AufnehmerService;
     use FFGBSY\Services\TischkategorienService;
+    use FFGBSY\Services\TischeService;
 
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
@@ -33,7 +34,8 @@
 
     $containerBuilder->addDefinitions([
         'aufnehmer' => fn (ContainerInterface $c) => new AufnehmerService($c),
-        'tischkategorien' => fn (ContainerInterface $c) => new TischkategorienService($c)
+        'tischkategorien' => fn (ContainerInterface $c) => new TischkategorienService($c),
+        'tische' => fn (ContainerInterface $c) => new TischeService($c)
     ]);
 
     $container = $containerBuilder->build();
