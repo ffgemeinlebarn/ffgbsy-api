@@ -12,7 +12,35 @@
     {
         public function create($data)
         {
-            $sth = $this->db->prepare("INSERT INTO produkte (name, formal_name, einzahl, einheit, preis, produktkategorien_id, drucker_id_level_2, aktiv, sortierindex, produkteinteilungen_id, grundprodukte_id, grundprodukte_multiplikator) VALUES (:name, :formal_name, :einzahl, :einheit, :preis, :produktkategorien_id, :drucker_id_level_2, :aktiv, :sortierindex, :produkteinteilungen_id, :grundprodukte_id, :grundprodukte_multiplikator)");
+            $sth = $this->db->prepare(
+                "INSERT INTO produkte (
+                    name, 
+                    formal_name, 
+                    einzahl, 
+                    einheit, 
+                    preis, 
+                    produktkategorien_id, 
+                    drucker_id_level_2, 
+                    aktiv, 
+                    sortierindex, 
+                    produkteinteilungen_id, 
+                    grundprodukte_id, 
+                    grundprodukte_multiplikator
+                ) VALUES (
+                    :name, 
+                    :formal_name, 
+                    :einzahl, 
+                    :einheit, 
+                    :preis, 
+                    :produktkategorien_id, 
+                    :drucker_id_level_2, 
+                    :aktiv, 
+                    :sortierindex, 
+                    :produkteinteilungen_id, 
+                    :grundprodukte_id, 
+                    :grundprodukte_multiplikator
+                )"
+            );
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':formal_name', $data['formal_name'], PDO::PARAM_STR);
             $sth->bindParam(':einzahl', $data['einzahl'], PDO::PARAM_INT);
@@ -34,7 +62,7 @@
         {
             if ($id != null)
             {
-                $sth = $this->db->prepare("SELECT * FROM produkte WHERE id=:id");
+                $sth = $this->db->prepare("SELECT * FROM produkte WHERE id = :id");
                 $sth->bindParam(':id', $id, PDO::PARAM_INT);
                 return $this->singleRead($sth);
             }
@@ -51,20 +79,20 @@
                 "UPDATE 
                     produkte 
                 SET 
-                    name=:name, 
-                    formal_name=:formal_name, 
-                    einzahl=:einzahl, 
-                    einheit=:einheit, 
-                    preis=:preis, 
-                    produktkategorien_id=:produktkategorien_id, 
-                    drucker_id_level_2=:drucker_id_level_2, 
-                    aktiv=:aktiv, 
-                    sortierindex=:sortierindex, 
-                    produkteinteilungen_id=:produkteinteilungen_id, 
-                    grundprodukte_id=:grundprodukte_id, 
-                    grundprodukte_multiplikator=:grundprodukte_multiplikator 
+                    name = :name, 
+                    formal_name = :formal_name, 
+                    einzahl = :einzahl, 
+                    einheit = :einheit, 
+                    preis = :preis, 
+                    produktkategorien_id = :produktkategorien_id, 
+                    drucker_id_level_2 = :drucker_id_level_2, 
+                    aktiv = :aktiv, 
+                    sortierindex = :sortierindex, 
+                    produkteinteilungen_id = :produkteinteilungen_id, 
+                    grundprodukte_id = :grundprodukte_id, 
+                    grundprodukte_multiplikator = :grundprodukte_multiplikator 
                 WHERE 
-                    id=:id
+                    id = :id
                 "
             );
             $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
