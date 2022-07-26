@@ -162,7 +162,7 @@ CREATE TABLE `grundprodukte` (
 CREATE TABLE `produktbereiche` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `farbe` varchar(30) DEFAULT NULL,
+  `color` varchar(30) DEFAULT NULL,
   `drucker_id_level_0` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

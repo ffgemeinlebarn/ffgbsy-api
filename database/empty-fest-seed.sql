@@ -103,7 +103,7 @@ INSERT INTO `grundprodukte` (`id`, `name`, `bestand`, `einheit`) VALUES
 -- Dumping data for table `produktbereiche`
 --
 
-INSERT INTO `produktbereiche` (`id`, `name`, `farbe`, `drucker_id_level_0`) VALUES
+INSERT INTO `produktbereiche` (`id`, `name`, `color`, `drucker_id_level_0`) VALUES
 (1, 'Getränke', '#FFB700', 1),
 (2, 'Speisen', '#0772A1', NULL),
 (3, 'Mehlspeisen & Kaffee', '#FF3100', 5);

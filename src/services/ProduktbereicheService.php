@@ -12,9 +12,9 @@
     {
         public function create($data)
         {
-            $sth = $this->db->prepare("INSERT INTO produktbereiche (name, farbe, drucker_id_level_0) VALUES (:name, :farbe, :drucker_id_level_0)");
+            $sth = $this->db->prepare("INSERT INTO produktbereiche (name, color, drucker_id_level_0) VALUES (:name, :color, :drucker_id_level_0)");
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
-            $sth->bindParam(':farbe', $data['farbe'], PDO::PARAM_STR);
+            $sth->bindParam(':color', $data['color'], PDO::PARAM_STR);
             $sth->bindParam(':drucker_id_level_0', $data['drucker_id_level_0'], PDO::PARAM_INT);
             $sth->execute();
 
@@ -38,10 +38,10 @@
 
         public function update($data)
         {
-            $sth = $this->db->prepare("UPDATE produktbereiche SET name=:name, farbe=:farbe, drucker_id_level_0=:drucker_id_level_0 WHERE id=:id");
+            $sth = $this->db->prepare("UPDATE produktbereiche SET name=:name, color=:color, drucker_id_level_0=:drucker_id_level_0 WHERE id=:id");
             $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
-            $sth->bindParam(':farbe', $data['farbe'], PDO::PARAM_STR);
+            $sth->bindParam(':color', $data['color'], PDO::PARAM_STR);
             $sth->bindParam(':drucker_id_level_0', $data['drucker_id_level_0'], PDO::PARAM_INT);
             $sth->execute();
             
