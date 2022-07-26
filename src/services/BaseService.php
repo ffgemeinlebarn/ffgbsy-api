@@ -30,6 +30,7 @@
             }
             else
             {
+                // sonarlint
             }
         }
 
@@ -47,12 +48,18 @@
             }
             else
             {
+                // sonarlint
             }
         }
 
         final protected function asNumber($str)
         {
             return intval($str);
+        }
+
+        final protected function asNumberOrNull($str)
+        {
+            return $str == null ? null : intval($str);
         }
 
         final protected function asBool($str)
