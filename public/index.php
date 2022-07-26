@@ -11,9 +11,10 @@
     use FFGBSY\Services\ProduktbereicheService;
     use FFGBSY\Services\ProduktkategorienService;
     use FFGBSY\Services\ProdukteService;
+    use FFGBSY\Services\ProdukteinteilungenService;
     use FFGBSY\Services\EigenschaftenService;
     use FFGBSY\Services\BestellungenService;
-
+    
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
     use Slim\Factory\ServerRequestCreatorFactory;
@@ -47,6 +48,7 @@
         'grundprodukte' => fn (ContainerInterface $c) => new GrundprodukteService($c),
         'produktbereiche' => fn (ContainerInterface $c) => new ProduktbereicheService($c),
         'produktkategorien' => fn (ContainerInterface $c) => new ProduktkategorienService($c),
+        'produkteinteilungen' => fn (ContainerInterface $c) => new ProdukteinteilungenService($c),
         'produkte' => fn (ContainerInterface $c) => new ProdukteService($c),
         'eigenschaften' => fn (ContainerInterface $c) => new EigenschaftenService($c),
         'bestellungen' => fn (ContainerInterface $c) => new BestellungenService($c)

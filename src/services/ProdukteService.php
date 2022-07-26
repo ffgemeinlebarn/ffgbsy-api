@@ -12,16 +12,17 @@
     {
         public function create($data)
         {
-            $sth = $this->db->prepare("INSERT INTO produkte (name, formal_name, einzahl, einheit, preis, produktkategorien_id, drucker_id_level_2, aktiv, sortierindex, grundprodukte_id, grundprodukte_multiplikator) VALUES (:name, :formal_name, :einzahl, :einheit, :preis, :produktkategorien_id, :drucker_id_level_2, :aktiv, :sortierindex, :grundprodukte_id, :grundprodukte_multiplikator)");
+            $sth = $this->db->prepare("INSERT INTO produkte (name, formal_name, einzahl, einheit, preis, produktkategorien_id, drucker_id_level_2, aktiv, sortierindex, produkteinteilungen_id, grundprodukte_id, grundprodukte_multiplikator) VALUES (:name, :formal_name, :einzahl, :einheit, :preis, :produktkategorien_id, :drucker_id_level_2, :aktiv, :sortierindex, :produkteinteilungen_id, :grundprodukte_id, :grundprodukte_multiplikator)");
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':formal_name', $data['formal_name'], PDO::PARAM_STR);
             $sth->bindParam(':einzahl', $data['einzahl'], PDO::PARAM_INT);
             $sth->bindParam(':einheit', $data['einheit'], PDO::PARAM_STR);
             $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
-            $sth->bindParam(':produktkategorien_id', $data['produktkategorien']['id'], PDO::PARAM_INT);
+            $sth->bindParam(':produktkategorien_id', $data['produktkategorie']['id'], PDO::PARAM_INT);
             $sth->bindParam(':drucker_id_level_2', $data['drucker_id_level_2'], PDO::PARAM_INT);
             $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
+            $sth->bindParam(':produkteinteilungen_id', $data['produkteinteilung']['id'], PDO::PARAM_INT);
             $sth->bindParam(':grundprodukte_id', $data['grundprodukt']['id'], PDO::PARAM_STR);
             $sth->bindParam(':grundprodukte_multiplikator', $data['grundprodukte_multiplikator'], PDO::PARAM_INT);
             $sth->execute();
@@ -59,6 +60,7 @@
                     drucker_id_level_2=:drucker_id_level_2, 
                     aktiv=:aktiv, 
                     sortierindex=:sortierindex, 
+                    produkteinteilungen_id=:produkteinteilungen_id, 
                     grundprodukte_id=:grundprodukte_id, 
                     grundprodukte_multiplikator=:grundprodukte_multiplikator 
                 WHERE 
@@ -71,10 +73,11 @@
             $sth->bindParam(':einzahl', $data['einzahl'], PDO::PARAM_INT);
             $sth->bindParam(':einheit', $data['einheit'], PDO::PARAM_STR);
             $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
-            $sth->bindParam(':produktkategorien_id', $data['produktkategorien']['id'], PDO::PARAM_INT);
+            $sth->bindParam(':produktkategorien_id', $data['produktkategorie']['id'], PDO::PARAM_INT);
             $sth->bindParam(':drucker_id_level_2', $data['drucker_id_level_2'], PDO::PARAM_INT);
             $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
+            $sth->bindParam(':produkteinteilungen_id', $data['produkteinteilung']['id'], PDO::PARAM_INT);
             $sth->bindParam(':grundprodukte_id', $data['grundprodukt']['id'], PDO::PARAM_STR);
             $sth->bindParam(':grundprodukte_multiplikator', $data['grundprodukte_multiplikator'], PDO::PARAM_INT);
             $sth->execute();
@@ -100,6 +103,7 @@
             $obj->drucker_id_level_2 = $this->asNumberOrNull($obj->drucker_id_level_2);
             $obj->aktiv = $this->asBool($obj->aktiv);
             $obj->sortierindex = $this->asNumber($obj->sortierindex);
+            $obj->produkteinteilungen_id = $this->asNumber($obj->produkteinteilungen_id);
             $obj->grundprodukte_id = $this->asNumber($obj->grundprodukte_id);
             $obj->grundprodukte_multiplikator = $this->asNumber($obj->grundprodukte_multiplikator);
             return $obj;

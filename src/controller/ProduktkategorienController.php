@@ -22,6 +22,7 @@ final class ProduktkategorienController extends BaseController
     public function create(Request $request, Response $response): Response
     {
         $data = $this->produktkategorienService->create($request->getParsedBody());
+        $data->produktbereich = $this->produktbereicheService->read($data->produktbereiche_id);
         return $this->responseAsJson($response, $data);
     }
 
@@ -29,6 +30,12 @@ final class ProduktkategorienController extends BaseController
     {
         $this->request = $request;
         $data = $this->produktkategorienService->read();
+
+        foreach($data as $item)
+        {
+            $data->produktbereich = $this->produktbereicheService->read($data->produktbereiche_id);
+        }
+
         return $this->responseAsJson($response, $data);
     }
 
