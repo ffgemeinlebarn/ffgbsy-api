@@ -14,6 +14,7 @@
 
     const LINE_AND_BREAK = "------------------------------------------------\n";
     const SHORT_LINE_AND_BREAK = "------------\n";
+    const PRINTER_TIMEOUT = 3;
 
     final class BonsService extends BaseService
     {
@@ -29,6 +30,13 @@
             $this->bestellungenService = $container->get('bestellungen');
             $this->constantsService = $container->get('constants');
             parent::__construct($container);
+        }
+
+        public function readByBestellung($bestellungId)
+        {
+            $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE bestellungen_id = :bestellungen_id ORDER BY timestamp_gedruckt DESC");
+            $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
+            return $this->multiRead($sth);
         }
         
         public function printBonsByBestellung($bestellungId)
@@ -59,6 +67,8 @@
 
                 $this->printBonById($bonId);
             }
+
+            return $this->readByBestellung($bestellungId);
         }
 
         public function printBonById($bonId)
@@ -75,11 +85,13 @@
             $bestellung = $this->bestellungenService->read($bestellungId);
             $bestellpositionen = $this->bestellpositionenService->readByBestellungAndDrucker($bestellungId, $druckerId);
 
-            $connector = new NetworkPrintConnector($drucker->ip, $drucker->port);
-            $printer = new Printer($connector);
+            $printer = null;
 
             try
-            {
+            {    
+                $connector = new NetworkPrintConnector($drucker->ip, $drucker->port, PRINTER_TIMEOUT);
+                $printer = new Printer($connector);
+
                 $printer->selectPrintMode();
                 $printer->setFont(Printer::FONT_A);
                 $printer->setDoubleStrike(true);
@@ -99,15 +111,33 @@
 
                 $printer->cut();
 
-            }
-            catch (Exception $e)
-            {
-                print_r($e);
+                // Set Result of Bon Printing
+                $result = true;
+                $message = null;
 
+                $sth = $this->db->prepare("UPDATE bons_druck SET result = :result, result_message = :result_message WHERE id = :id");
+                $sth->bindParam(':id', $bonId, PDO::PARAM_INT);
+                $sth->bindParam(':result', $result, PDO::PARAM_INT);
+                $sth->bindParam(':result_message', $message, PDO::PARAM_STR);
+                $sth->execute();
+            }
+            catch (\Exception $e)
+            {
+                $result = false;
+                $message = $e->getMessage();
+
+                $sth = $this->db->prepare("UPDATE bons_druck SET result = :result, result_message = :result_message WHERE id = :id");
+                $sth->bindParam(':id', $bonId, PDO::PARAM_INT);
+                $sth->bindParam(':result', $result, PDO::PARAM_INT);
+                $sth->bindParam(':result_message', $message, PDO::PARAM_STR);
+                $sth->execute();
             }
             finally
             {
-                $printer->close();
+                if ($printer)
+                {
+                    $printer->close();
+                }
             }
         }
 
@@ -253,8 +283,19 @@
             $printer->setTextSize(2,2);
             $printer->text(SHORT_LINE_AND_BREAK);
         }
-    }
 
+        protected function singleMap($obj)
+        {
+            $obj->id = $this->asNumber($obj->id);
+            $obj->drucker_id = $this->asNumber($obj->drucker_id);
+            $obj->drucker = $this->druckerService->read($obj->drucker_id);
+            $obj->bestellungen_id = $this->asNumber($obj->bestellungen_id);
+            $obj->storno_id = $this->asNumberOrNull($obj->storno_id);
+            $obj->laufnummer = $this->asNumber($obj->laufnummer);
+            $obj->result = $this->asBool($obj->result);
+            return $obj;
+        }
+    }
 
     function formatEuro($value, $symbol_bool = true, $symbol_after = true, $symbol_blank = false)
     {
