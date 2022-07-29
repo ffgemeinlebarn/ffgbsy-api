@@ -12,17 +12,22 @@
     use Mike42\Escpos\Printer;
     use Mike42\Escpos\EscposImage;
 
+    const LINE_AND_BREAK = "------------------------------------------------\n";
+    const SHORT_LINE_AND_BREAK = "------------\n";
+
     final class BonsService extends BaseService
     {
         private $druckerService = null;
         private $bestellpositionenService = null;
         private $bestellungenService = null;
+        private $constantsService = null;
 
         public function __construct(ContainerInterface $container)
         {
             $this->druckerService = $container->get('drucker');
             $this->bestellpositionenService = $container->get('bestellpositionen');
             $this->bestellungenService = $container->get('bestellungen');
+            $this->constantsService = $container->get('constants');
             parent::__construct($container);
         }
         
@@ -110,13 +115,13 @@
         {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setTextSize(2,2);
-            $printer->text("FF Fest Gemeinlebarn\n");
+            $printer->text("{$this->constantsService->get('event_name')}\n");
             $printer->setTextSize(1,1);
-            $printer->text("13. bis 15. August 2022\n");
+            $printer->text("{$this->constantsService->get('event_date')}\n");
             $printer->feed(1);
-            $printer->text("Freiwillige Feuerwehr Gemeinlebarn\n");
-            $printer->text("Ortsstraße 10, 3133 Gemeinlebarn\n");
-            $printer->text("gemeinlebarn@feuerwehr.gv.at\n");
+            $printer->text("{$this->constantsService->get('organisation_name')}\n");
+            $printer->text("{$this->constantsService->get('organisation_address')}\n");
+            $printer->text("{$this->constantsService->get('organisation_email')}\n");
             $printer->feed(2);
         }
 
@@ -124,13 +129,13 @@
         {
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->setTextSize(1,1);
-            $printer->text("------------------------------------------------\n");
+            $printer->text(LINE_AND_BREAK);
 
             $printer->setTextSize(2,2);
             $printer->text("Tisch: {$tisch->reihe} {$tisch->nummer}\n");
 
             $printer->setTextSize(1,1);
-            $printer->text("------------------------------------------------\n");
+            $printer->text(LINE_AND_BREAK);
             $printer->feed(2);
         }
 
@@ -144,7 +149,7 @@
             $printer->setTextSize(1,1);
             $printer->setEmphasis(true);
             $printer->text("Artikel                           Einzel  Gesamt\n");
-            $printer->text("------------------------------------------------\n");
+            $printer->text(LINE_AND_BREAK);
             $printer->setEmphasis(false);
 
             foreach($bestellpositionen as $position)
@@ -186,7 +191,7 @@
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->setDoubleStrike(true);
             $printer->setTextSize(1,1);
-            $printer->text("------------------------------------------------\n");
+            $printer->text(LINE_AND_BREAK);
 
             $printer->setTextSize(2,2);
             $printer->text("SUMME");
@@ -196,7 +201,7 @@
             $printer->text("\n");
 
             $printer->setTextSize(1,1);
-            $printer->text("------------------------------------------------\n");
+            $printer->text(LINE_AND_BREAK);
             $printer->feed(2);
         }
 
@@ -214,7 +219,7 @@
             $printer->text("ID:        {$bestellung->id}\n");
             $printer->text("Begonnen:  {$begonnen} Uhr\n");
             $printer->text("Gesendet:  {$beendet} Uhr\n");
-            $printer->text("Aufnehmer: {$bestellung->aufnehmer->vorname} {$bestellung->aufnehmer->nachname}\n");
+            $printer->text("Aufnehmer: {$bestellung->aufnehmer->name}\n");
             $printer->text("Gerät:     {$bestellung->ip}\n\n");
         }
 
@@ -238,15 +243,15 @@
             $printer->setDoubleStrike(true);
             $printer->text("Laufnummer/Reihenfolge:\n");
             $printer->setTextSize(2,2);
-            $printer->text("------------\n");
+            $printer->text(SHORT_LINE_AND_BREAK);
             $printer->setTextSize(2,1);
             $printer->text("{$bon->drucker->name}\n");
             $printer->setTextSize(2,2);
-            $printer->text("------------\n");
+            $printer->text(SHORT_LINE_AND_BREAK);
             $printer->setTextSize(3,3);
             $printer->text("{$bon->laufnummer}\n");
             $printer->setTextSize(2,2);
-            $printer->text("------------\n");
+            $printer->text(SHORT_LINE_AND_BREAK);
         }
     }
 

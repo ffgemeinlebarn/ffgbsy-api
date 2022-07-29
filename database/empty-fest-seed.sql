@@ -19,22 +19,21 @@ SET time_zone = "+00:00";
 -- Dumping data for table `aufnehmer`
 --
 
-INSERT INTO `aufnehmer` (`id`, `vorname`, `nachname`, `aktiv`, `zoom_level`) VALUES
-(1, 'Jakob', 'Vesely', 1, 1),
-(2, 'Matthias', 'Hintenberger', 1, 1),
-(3, 'Michael', 'Redl', 1, 1),
-(4, 'Anne', 'Pfiel', 1, 3),
-(5, 'Andreas', 'Strohmayer', 1, 3),
-(6, 'Elisabeth', 'Marik', 1, 3),
-(7, 'Heinrich', 'Redl jun.', 1, 1),
-(8, 'Heinrich', 'Redl sen.', 1, 2),
-(9, 'Kathrin', 'Redl-Swift', 0, 0),
-(10, 'Kathrin', 'Strohmayer', 0, 1),
-(11, 'Kathrin', 'Bauer', 1, 2),
-(12, 'Marlene', 'Kaller', 1, 3),
-(13, 'Bernhard', 'Feuchtinger', 0, 1),
-(14, 'Andreas', 'Pfiel', 1, 3),
-(15, 'Marcel', 'Czech', 1, 1);
+INSERT INTO `aufnehmer` (`id`, `vorname`, `nachname`, `name`, `aktiv`, `zoom_level`) VALUES
+(1, 'Jakob', 'Vesely', 'Jakob', 1, 1),
+(2, 'Matthias', 'Hintenberger', 'Matthias', 1, 1),
+(3, 'Michael', 'Redl', 'Michi', 1, 1),
+(4, 'Anne', 'Pfiel', 'Anne', 1, 3),
+(5, 'Andreas', 'Strohmayer', 'Andi', 1, 3),
+(6, 'Elisabeth', 'Marik', 'Elisabeth', 1, 3),
+(7, 'Heinrich', 'Redl jun.', 'Heinz jun.', 1, 1),
+(8, 'Heinrich', 'Redl sen.', 'Heinz sen.', 1, 2),
+(9, 'Kathrin', 'Redl-Swift', 'Kathrin R.', 0, 0),
+(10, 'Kathrin', 'Strohmayer', 'Kathrin S.', 0, 1),
+(11, 'Kathrin', 'Bauer', 'Kathrin B.', 1, 2),
+(12, 'Marlene', 'Kaller', 'Marlene', 1, 3),
+(13, 'Andreas', 'Pfiel', 'Andreas', 1, 3),
+(14, 'Marcel', 'Czech', 'Marcel', 1, 1);
 
 --
 -- Dumping data for table `constants`
