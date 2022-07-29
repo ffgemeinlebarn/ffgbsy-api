@@ -58,10 +58,10 @@
 
                 $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);                
 
-                $bestellung->summe = 0.00;
+                $bestellung->summe_ohne_eigenschaften = 0;
                 foreach($bestellung->bestellpositionen as $position)
                 {
-                    $bestellung->summe += $position->summe;
+                    $bestellung->summe_ohne_eigenschaften += $position->summe_ohne_eigenschaften;
                     $position->produkt = $this->produkteService->read($position->produkte_id);
                 }
                 
@@ -95,12 +95,26 @@
             return false;
         }
 
+        public function getAffectedDruckerIds($bestellungId)
+        {
+            $ids = [];
+            foreach($this->bestellpositionenService->readByBestellung($bestellungId) as $position)
+            {
+                if (!in_array($position->drucker_id, $ids))
+                {
+                    $ids[] = $position->drucker_id;
+                }
+            }
+
+            return $ids;
+        }
+
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
             $obj->tische_id = $this->asNumber($obj->tische_id);
             $obj->aufnehmer_id = $this->asNumber($obj->aufnehmer_id);
-            $obj->summe = $this->asDecimal($obj->summe);
+            $obj->summe_ohne_eigenschaften = $this->asDecimal($obj->summe_ohne_eigenschaften);
             return $obj;
         }
     }

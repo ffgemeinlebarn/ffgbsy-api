@@ -72,11 +72,63 @@
 
         public function readByBestellposition($bestellpositionId)
         {
-            $sth = $this->db->prepare("SELECT * FROM eigenschaften LEFT JOIN bestellpositionen_eigenschaften ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id WHERE bestellpositionen_eigenschaften.bestellpositionen_id = :bestellpositionen_id");
+            $sth = $this->db->prepare(
+                "SELECT 
+                    * 
+                FROM 
+                    eigenschaften 
+                LEFT JOIN 
+                    bestellpositionen_eigenschaften ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id 
+                WHERE 
+                    bestellpositionen_eigenschaften.bestellpositionen_id = :bestellpositionen_id AND
+                    bestellpositionen_eigenschaften.in_produkt_enthalten = 0 AND
+                    bestellpositionen_eigenschaften.aktiv = 1
+            ");
             $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
             $sth->execute();
 
-            return $sth->fetchAll(PDO::FETCH_OBJ);
+            $mit = [];
+            foreach($sth->fetchAll(PDO::FETCH_OBJ) as $item)
+            {
+                array_push($mit, $this->singleMapOfBestellposition($item));
+            }
+            
+            $sth = $this->db->prepare(
+                "SELECT 
+                    * 
+                FROM 
+                    eigenschaften 
+                LEFT JOIN 
+                    bestellpositionen_eigenschaften ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id 
+                WHERE 
+                    bestellpositionen_eigenschaften.bestellpositionen_id = :bestellpositionen_id AND
+                    bestellpositionen_eigenschaften.in_produkt_enthalten = 1 AND
+                    bestellpositionen_eigenschaften.aktiv = 0
+            ");
+            $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
+            $sth->execute();
+
+            $ohne = [];
+            foreach($sth->fetchAll(PDO::FETCH_OBJ) as $item)
+            {
+                array_push($ohne, $this->singleMapOfBestellposition($item));
+            }
+
+            $return = new \stdClass();
+            $return->mit = $mit;
+            $return->ohne = $ohne;
+
+            return $return;
+        }
+
+        protected function singleMapOfBestellposition($obj)
+        {
+            $obj->id = $this->asNumber($obj->id);
+            $obj->preis = $this->asDecimal($obj->preis);
+            $obj->sortierindex = $this->asNumber($obj->sortierindex);
+            $obj->in_produkt_enthalten = $this->asBool($obj->in_produkt_enthalten);
+            $obj->aktiv = $this->asBool($obj->aktiv);
+            return $obj;
         }
 
         protected function singleMap($obj)

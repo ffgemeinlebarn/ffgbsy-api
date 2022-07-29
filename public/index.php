@@ -15,6 +15,7 @@
     use FFGBSY\Services\EigenschaftenService;
     use FFGBSY\Services\BestellungenService;
     use FFGBSY\Services\BestellpositionenService;
+    use FFGBSY\Services\BonsService;
     
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
@@ -53,7 +54,8 @@
         'produkte' => fn (ContainerInterface $c) => new ProdukteService($c),
         'eigenschaften' => fn (ContainerInterface $c) => new EigenschaftenService($c),
         'bestellungen' => fn (ContainerInterface $c) => new BestellungenService($c),
-        'bestellpositionen' => fn (ContainerInterface $c) => new BestellpositionenService($c)
+        'bestellpositionen' => fn (ContainerInterface $c) => new BestellpositionenService($c),
+        'bons' => fn (ContainerInterface $c) => new BonsService($c)
     ]);
 
     $container = $containerBuilder->build();

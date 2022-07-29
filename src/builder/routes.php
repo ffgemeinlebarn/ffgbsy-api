@@ -16,6 +16,7 @@ use FFGBSY\Controller\ProduktkategorienController;
 use FFGBSY\Controller\ProdukteController;
 use FFGBSY\Controller\EigenschaftenController;
 use FFGBSY\Controller\BestellungenController;
+use FFGBSY\Controller\BonsController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -130,5 +131,11 @@ return function (App $app)
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");
+    });
+
+    $app->group('/bons', function (Group $group)
+    {
+        $controller = BonsController::class;
+        $group->post('/druck/bestellung/{id}', "$controller:createFromBestellung");
     });
 };

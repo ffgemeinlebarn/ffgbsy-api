@@ -43,12 +43,19 @@
             $sth = $this->db->prepare(
                 "SELECT 
                     bestellpositionen.*,
-                    (produkte.preis * bestellpositionen.anzahl) AS summe,
-                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storono
+                    (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
+                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storono,
+                    produktbereiche.drucker_id_level_0,
+                    produktkategorien.drucker_id_level_1,
+                    produkte.drucker_id_level_2
                 FROM 
                     bestellpositionen 
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
+                LEFT JOIN 
+                    produktkategorien ON produktkategorien.id = produkte.produktkategorien_id
+                LEFT JOIN 
+                    produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 LEFT JOIN
                     bestellpositionen_storno ON bestellpositionen_storno.bestellpositionen_id = bestellpositionen.id
                 WHERE
@@ -63,12 +70,19 @@
             $sth = $this->db->prepare(
                 "SELECT 
                     bestellpositionen.*,
-                    (produkte.preis * bestellpositionen.anzahl) AS summe,
-                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storono
+                    (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
+                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storono,
+                    produktbereiche.drucker_id_level_0,
+                    produktkategorien.drucker_id_level_1,
+                    produkte.drucker_id_level_2
                 FROM 
                     bestellpositionen 
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
+                LEFT JOIN 
+                    produktkategorien ON produktkategorien.id = produkte.produktkategorien_id
+                LEFT JOIN 
+                    produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 LEFT JOIN
                     bestellpositionen_storno ON bestellpositionen_storno.bestellpositionen_id = bestellpositionen.id
                 WHERE 
@@ -80,15 +94,72 @@
             return $this->multiRead($sth);
         }
 
+        public function calculateSummeByBestellpositionen($bestellpositionen): float
+        {
+            $summe = 0;
+
+            foreach($bestellpositionen as $position)
+            {
+                $summe += $position->summe_ohne_eigenschaften;
+
+                foreach($position->eigenschaften->mit as $eigenschaft)
+                {
+                    $summe += $position->anzahl * $eigenschaft->preis;
+                }
+
+                foreach($position->eigenschaften->ohne as $eigenschaft)
+                {
+                    $summe -= $position->anzahl * $eigenschaft->preis;
+                }
+            }
+
+            return $summe;
+        }
+
+        public function readByBestellungAndDrucker($bestellungId, $druckerId)
+        {
+            $positionen = $this->readByBestellung($bestellungId);
+            $filteredPositions = [];
+
+            foreach($positionen as $position)
+            {
+                if ($position->drucker_id == $druckerId)
+                {
+                    array_push($filteredPositions, $position);
+                }
+            }
+
+            return $filteredPositions;
+        }
+
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
             $obj->anzahl = $this->asNumber($obj->anzahl);
             $obj->anzahl_storono = $this->asNumber($obj->anzahl_storono);
             $obj->produkte_id = $this->asNumber($obj->produkte_id);
+            $obj->produkt = $this->produkteService->read($obj->produkte_id);
             $obj->bestellungen_id = $this->asNumber($obj->bestellungen_id);
             $obj->eigenschaften = $this->eigenschaftenService->readByBestellposition($obj->id);
-            $obj->summe = $this->asDecimal($obj->summe);
+            $obj->summe_ohne_eigenschaften = $this->asDecimal($obj->summe_ohne_eigenschaften);
+
+            $obj->drucker_id_level_0 = $this->asNumberOrNull($obj->drucker_id_level_0);
+            $obj->drucker_id_level_1 = $this->asNumberOrNull($obj->drucker_id_level_1);
+            $obj->drucker_id_level_2 = $this->asNumberOrNull($obj->drucker_id_level_2);
+            
+            if ($obj->drucker_id_level_2 != null)
+            {
+                $obj->drucker_id = $obj->drucker_id_level_2;
+            }
+            else if ($obj->drucker_id_level_1 != null)
+            {
+                $obj->drucker_id = $obj->drucker_id_level_1;
+            }
+            else
+            {
+                $obj->drucker_id = $obj->drucker_id_level_0;
+            }
+
             return $obj;
         }
     }
