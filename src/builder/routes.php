@@ -15,6 +15,7 @@ use FFGBSY\Controller\ProduktbereicheController;
 use FFGBSY\Controller\ProduktkategorienController;
 use FFGBSY\Controller\ProdukteController;
 use FFGBSY\Controller\EigenschaftenController;
+use FFGBSY\Controller\BestellungenController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -121,5 +122,13 @@ return function (App $app)
         $group->get(PATH_ID, "$controller:readSingle");
         $group->put(PATH_ID, "$controller:update");
         $group->delete(PATH_ID, "$controller:delete");
+    });
+
+    $app->group('/bestellungen', function (Group $group)
+    {
+        $controller = BestellungenController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
+        $group->get(PATH_ID, "$controller:readSingle");
     });
 };

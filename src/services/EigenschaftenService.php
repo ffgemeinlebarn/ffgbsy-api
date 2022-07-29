@@ -55,6 +55,30 @@
             return $sth->execute();
         }
 
+        public function addToBestellposition($bestellpositionId, $data)
+        {
+            if(boolval($data['in_produkt_enthalten']) != boolval($data['aktiv']))
+            {
+                $sth = $this->db->prepare("INSERT INTO bestellpositionen_eigenschaften (bestellpositionen_id, eigenschaften_id, in_produkt_enthalten, aktiv) VALUES (:bestellpositionen_id, :eigenschaften_id, :in_produkt_enthalten, :aktiv)");
+                $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
+                $sth->bindParam(':eigenschaften_id', $data['id'], PDO::PARAM_INT);
+                $sth->bindParam(':in_produkt_enthalten', $data['in_produkt_enthalten'], PDO::PARAM_INT);
+                $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
+                $sth->execute();
+            }
+
+            return $this->readByBestellposition($bestellpositionId);
+        }
+
+        public function readByBestellposition($bestellpositionId)
+        {
+            $sth = $this->db->prepare("SELECT * FROM eigenschaften LEFT JOIN bestellpositionen_eigenschaften ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id WHERE bestellpositionen_eigenschaften.bestellpositionen_id = :bestellpositionen_id");
+            $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
+            $sth->execute();
+
+            return $sth->fetchAll(PDO::FETCH_OBJ);
+        }
+
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);

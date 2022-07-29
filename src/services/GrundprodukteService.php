@@ -57,6 +57,57 @@
             return $result;
         }
 
+        public function checkAvailablityByProduktId($produktId, $anzahl = 1)
+        {
+            $sth = $this->db->prepare(
+                "SELECT 
+                    produkte.grundprodukte_multiplikator,
+                    grundprodukte.bestand
+                FROM 
+                    produkte 
+                LEFT JOIN 
+                    grundprodukte ON grundprodukte.id = produkte.grundprodukte_id
+                WHERE 
+                produkte.id = :id");
+            $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
+            $sth->execute();
+
+            $data = $sth->fetch(PDO::FETCH_OBJ);
+
+            return $data->bestand == NULL || ($data->grundprodukte_multiplikator * $anzahl) <= $data->bestand;
+        }
+
+        public function reduceByProduktId($produktId, $anzahl = 1)
+        {
+            $sth = $this->db->prepare(
+                "SELECT 
+                    produkte.grundprodukte_multiplikator,
+                    grundprodukte.bestand
+                FROM 
+                    produkte 
+                LEFT JOIN 
+                    grundprodukte ON grundprodukte.id = produkte.grundprodukte_id
+                WHERE 
+                    produkte.id = :id");
+            $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
+            $sth->execute();
+
+            $grundprodukt = $sth->fetch(PDO::FETCH_OBJ);
+            $neuerBestand = $grundprodukt->bestand - ($grundprodukt->grundprodukte_multiplikator * $anzahl);
+
+            $sth = $this->db->prepare(
+                "UPDATE
+                    grundprodukte (bestand)
+                VALUES
+                    (:bestand)
+                WHERE 
+                    id = :id");
+            $sth->bindParam(':bestand', $neuerBestand, PDO::PARAM_INT);
+            $sth->bindParam(':id', $grundprodukt->id, PDO::PARAM_INT);
+            
+            return $sth->execute();
+        }
+
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
