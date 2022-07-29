@@ -52,9 +52,7 @@
         {
             $sth = $this->db->prepare("DELETE FROM grundprodukte WHERE id = :id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
-            $result = $sth->execute();
-            
-            return $result;
+            return $sth->execute();
         }
 
         public function checkAvailablityByProduktId($produktId, $anzahl = 1)

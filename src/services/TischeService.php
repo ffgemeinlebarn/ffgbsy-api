@@ -54,9 +54,7 @@
         {
             $sth = $this->db->prepare("DELETE FROM tische WHERE id = :id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
-            $result = $sth->execute();
-            
-            return $result;
+            return $sth->execute();
         }
 
         protected function singleMap($obj)
