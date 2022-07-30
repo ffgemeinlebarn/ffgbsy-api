@@ -55,7 +55,7 @@
                 $sth = $this->db->prepare("SELECT * FROM bestellungen WHERE id = :id");
                 $sth->bindParam(':id', $id, PDO::PARAM_INT);
                 $sth->execute();
-                $bestellung = $sth->fetch(PDO::FETCH_OBJ);
+                $bestellung = $this->singleRead($sth);
 
                 $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);                
 
@@ -69,7 +69,30 @@
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
 
-                return $this->singleMap($bestellung);
+                return $bestellung;
+            }
+            else
+            {
+                $sth = $this->db->prepare("SELECT * FROM bestellungen");
+                $sth->execute();
+                $bestellungen = $this->multiRead($sth);
+                
+                foreach($bestellungen as $bestellung)
+                {
+                    $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);                
+
+                    $bestellung->summe_ohne_eigenschaften = 0;
+                    foreach($bestellung->bestellpositionen as $position)
+                    {
+                        $bestellung->summe_ohne_eigenschaften += $position->summe_ohne_eigenschaften;
+                        $position->produkt = $this->produkteService->read($position->produkte_id);
+                    }
+                    
+                    $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
+                    $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
+                }
+                
+                return $bestellungen;
             }
         }
 
@@ -115,7 +138,6 @@
             $obj->id = $this->asNumber($obj->id);
             $obj->tische_id = $this->asNumber($obj->tische_id);
             $obj->aufnehmer_id = $this->asNumber($obj->aufnehmer_id);
-            $obj->summe_ohne_eigenschaften = $this->asDecimal($obj->summe_ohne_eigenschaften);
             return $obj;
         }
     }
