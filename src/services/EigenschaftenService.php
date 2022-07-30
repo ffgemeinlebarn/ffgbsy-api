@@ -36,6 +36,25 @@
             }
         }
 
+        public function readAllByProduktNested($id)
+        {
+            $sth = $this->db->prepare("SELECT eigenschaften.* FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $eigenschaften = $this->multiRead($sth);
+
+            $sth = $this->db->prepare("SELECT eigenschaften.* FROM produktkategorien_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id WHERE produktkategorien_eigenschaften.produktkategorien_id = :id ORDER BY eigenschaften.sortierindex ASC");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $eigenschaften = array_merge($eigenschaften, $this->multiRead($sth));
+            
+            $arr = [];
+            foreach($eigenschaften as $eigenschaft)
+            {
+                $arr["_{$eigenschaft->id}"] = $eigenschaft;
+            }
+
+            return array_values($arr);
+        }
+
         public function update($data)
         {
             $sth = $this->db->prepare("UPDATE eigenschaften SET name = :name, preis = :preis, sortierindex = :sortierindex WHERE id = :id");

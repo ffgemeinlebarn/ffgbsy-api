@@ -19,7 +19,6 @@
                     einzahl, 
                     einheit, 
                     preis, 
-                    produktkategorien_id, 
                     drucker_id_level_2, 
                     aktiv, 
                     sortierindex, 
@@ -32,7 +31,6 @@
                     :einzahl, 
                     :einheit, 
                     :preis, 
-                    :produktkategorien_id, 
                     :drucker_id_level_2, 
                     :aktiv, 
                     :sortierindex, 
@@ -46,7 +44,6 @@
             $sth->bindParam(':einzahl', $data['einzahl'], PDO::PARAM_INT);
             $sth->bindParam(':einheit', $data['einheit'], PDO::PARAM_STR);
             $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
-            $sth->bindParam(':produktkategorien_id', $data['produktkategorie']['id'], PDO::PARAM_INT);
             $sth->bindParam(':drucker_id_level_2', $data['drucker_id_level_2'], PDO::PARAM_INT);
             $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
@@ -73,6 +70,13 @@
             }
         }
 
+        public function readByProdukteinteilung($id)
+        {
+            $sth = $this->db->prepare("SELECT * FROM produkte WHERE produkteinteilungen_id = :produkteinteilungen_id");
+            $sth->bindParam(':produkteinteilungen_id', $id, PDO::PARAM_INT);
+            return $this->multiRead($sth);
+        }
+
         public function update($data)
         {
             $sth = $this->db->prepare(
@@ -84,7 +88,6 @@
                     einzahl = :einzahl, 
                     einheit = :einheit, 
                     preis = :preis, 
-                    produktkategorien_id = :produktkategorien_id, 
                     drucker_id_level_2 = :drucker_id_level_2, 
                     aktiv = :aktiv, 
                     sortierindex = :sortierindex, 
@@ -101,7 +104,6 @@
             $sth->bindParam(':einzahl', $data['einzahl'], PDO::PARAM_INT);
             $sth->bindParam(':einheit', $data['einheit'], PDO::PARAM_STR);
             $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
-            $sth->bindParam(':produktkategorien_id', $data['produktkategorie']['id'], PDO::PARAM_INT);
             $sth->bindParam(':drucker_id_level_2', $data['drucker_id_level_2'], PDO::PARAM_INT);
             $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
@@ -125,7 +127,6 @@
             $obj->id = $this->asNumber($obj->id);
             $obj->einzahl = $this->asNumber($obj->einzahl);
             $obj->preis = $this->asDecimal($obj->preis);
-            $obj->produktkategorien_id = $this->asNumber($obj->produktkategorien_id);
             $obj->drucker_id_level_2 = $this->asNumberOrNull($obj->drucker_id_level_2);
             $obj->aktiv = $this->asBool($obj->aktiv);
             $obj->sortierindex = $this->asNumber($obj->sortierindex);

@@ -10,6 +10,18 @@
 
     final class ProduktkategorienService extends BaseService
     {
+        private $produkteinteilungenService = null;
+        private $produkteService = null;
+        private $eigenschaftenService = null;
+
+        public function __construct(ContainerInterface $container)
+        {
+            $this->produkteinteilungenService = $container->get('produkteinteilungen');
+            $this->produkteService = $container->get('produkte');
+            $this->eigenschaftenService = $container->get('eigenschaften');
+            parent::__construct($container);
+        }
+
         public function create($data)
         {
             $sth = $this->db->prepare("INSERT INTO produktkategorien (name, color, produktbereiche_id, drucker_id_level_1, sortierindex) VALUES (:name, :color, :produktbereiche_id, :drucker_id_level_1, :sortierindex)");
@@ -38,6 +50,29 @@
             }
         }
 
+        public function readAllNested()
+        {
+            $sth = $this->db->prepare("SELECT * FROM produktkategorien");
+            $produktkategorien = $this->multiRead($sth);
+
+            foreach($produktkategorien as $produktkategorie)
+            {
+                $produktkategorie->produkteinteilungen = $this->produkteinteilungenService->readByProduktkategorie($produktkategorie->id);
+
+                foreach($produktkategorie->produkteinteilungen as $produkteinteilung)
+                {
+                    $produkteinteilung->produkte = $this->produkteService->readByProdukteinteilung($produkteinteilung->id);
+
+                    foreach($produkteinteilung->produkte as $produkt)
+                    {
+                        $produkt->eigenschaften = $this->eigenschaftenService->readAllByProduktNested($produkt->id);
+                    }
+                }
+            }
+
+            return $produktkategorien;
+        }
+
         public function update($data)
         {
             $sth = $this->db->prepare("UPDATE produktkategorien SET name=:name, color=:color, produktbereiche_id=:produktbereiche_id, drucker_id_level_1=:drucker_id_level_1, sortierindex=:sortierindex WHERE id=:id");
@@ -48,7 +83,7 @@
             $sth->bindParam(':drucker_id_level_1', $data['drucker_id_level_1'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->execute();
-            
+
             return $this->read($data['id']);
         }
 

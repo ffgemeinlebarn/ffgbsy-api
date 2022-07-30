@@ -35,6 +35,13 @@
             }
         }
 
+        public function readByProduktkategorie($id)
+        {
+            $sth = $this->db->prepare("SELECT * FROM produkteinteilungen WHERE produktkategorien_id = :produktkategorien_id");
+            $sth->bindParam(':produktkategorien_id', $id, PDO::PARAM_INT);
+            return $this->multiRead($sth);
+        }
+
         public function update($data)
         {
             $sth = $this->db->prepare("UPDATE produkteinteilungen SET name=:name, sortierindex=:sortierindex WHERE id=:id");
