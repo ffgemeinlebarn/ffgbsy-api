@@ -53,7 +53,9 @@
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
                 LEFT JOIN 
-                    produktkategorien ON produktkategorien.id = produkte.produktkategorien_id
+                    produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
+                LEFT JOIN 
+                    produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
                 LEFT JOIN 
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 LEFT JOIN
@@ -80,7 +82,9 @@
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
                 LEFT JOIN 
-                    produktkategorien ON produktkategorien.id = produkte.produktkategorien_id
+                    produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
+                LEFT JOIN 
+                    produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
                 LEFT JOIN 
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 LEFT JOIN

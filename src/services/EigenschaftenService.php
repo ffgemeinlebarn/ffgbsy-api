@@ -38,17 +38,18 @@
 
         public function readAllByProduktNested($id)
         {
-            $sth = $this->db->prepare("SELECT eigenschaften.* FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
+            $sth = $this->db->prepare("SELECT eigenschaften.*, produkte_eigenschaften.in_produkt_enthalten FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             $eigenschaften = $this->multiRead($sth);
 
-            $sth = $this->db->prepare("SELECT eigenschaften.* FROM produktkategorien_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id WHERE produktkategorien_eigenschaften.produktkategorien_id = :id ORDER BY eigenschaften.sortierindex ASC");
+            $sth = $this->db->prepare("SELECT eigenschaften.*, produktkategorien_eigenschaften.in_produkt_enthalten FROM produktkategorien_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id WHERE produktkategorien_eigenschaften.produktkategorien_id = :id ORDER BY eigenschaften.sortierindex ASC");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             $eigenschaften = array_merge($eigenschaften, $this->multiRead($sth));
             
             $arr = [];
             foreach($eigenschaften as $eigenschaft)
             {
+                $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
                 $arr["_{$eigenschaft->id}"] = $eigenschaft;
             }
 
@@ -105,12 +106,7 @@
             ");
             $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
             $sth->execute();
-
-            $mit = [];
-            foreach($sth->fetchAll(PDO::FETCH_OBJ) as $item)
-            {
-                array_push($mit, $this->singleMapOfBestellposition($item));
-            }
+            $mit = $this->multiRead($sth);
             
             $sth = $this->db->prepare(
                 "SELECT 
@@ -126,12 +122,7 @@
             ");
             $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
             $sth->execute();
-
-            $ohne = [];
-            foreach($sth->fetchAll(PDO::FETCH_OBJ) as $item)
-            {
-                array_push($ohne, $this->singleMapOfBestellposition($item));
-            }
+            $ohne = $this->multiRead($sth);
 
             $return = new \stdClass();
             $return->mit = $mit;
@@ -140,21 +131,16 @@
             return $return;
         }
 
-        protected function singleMapOfBestellposition($obj)
-        {
-            $obj->id = $this->asNumber($obj->id);
-            $obj->preis = $this->asDecimal($obj->preis);
-            $obj->sortierindex = $this->asNumber($obj->sortierindex);
-            $obj->in_produkt_enthalten = $this->asBool($obj->in_produkt_enthalten);
-            $obj->aktiv = $this->asBool($obj->aktiv);
-            return $obj;
-        }
-
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
             $obj->preis = $this->asDecimal($obj->preis);
             $obj->sortierindex = $this->asNumber($obj->sortierindex);
+            if (isset($obj->in_produkt_enthalten))
+            {
+                $obj->in_produkt_enthalten = $this->asBool($obj->in_produkt_enthalten);
+            }
+            $obj->aktiv = isset($obj->aktiv) ? $this->asBool($obj->aktiv) : false;
             return $obj;
         }
     }
