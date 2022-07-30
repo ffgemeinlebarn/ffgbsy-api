@@ -28,11 +28,12 @@
 
         public function create($data)
         {
-            $sth = $this->db->prepare("INSERT INTO bestellungen (tische_id, timestamp_begonnen, aufnehmer_id, ip) VALUES (:tische_id, :timestamp_begonnen, :aufnehmer_id, :ip)");
+            $sth = $this->db->prepare("INSERT INTO bestellungen (tische_id, timestamp_begonnen, aufnehmer_id, device_name, device_ip) VALUES (:tische_id, :timestamp_begonnen, :aufnehmer_id, :device_name, :device_ip)");
             $sth->bindParam(':tische_id', $data['tisch']['id'], PDO::PARAM_INT);
             $sth->bindParam(':timestamp_begonnen', $data['timestamp_begonnen'], PDO::PARAM_STR);
             $sth->bindParam(':aufnehmer_id', $data['aufnehmer']['id'], PDO::PARAM_INT);
-            $sth->bindParam(':ip', $data['ip'], PDO::PARAM_STR);
+            $sth->bindParam(':device_name', $data['device_name'], PDO::PARAM_STR);
+            $sth->bindParam(':device_ip', $data['device_ip'], PDO::PARAM_STR);
             $sth->execute();
 
             $bestellungId = $this->db->lastInsertId();

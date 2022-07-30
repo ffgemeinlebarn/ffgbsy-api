@@ -94,7 +94,8 @@ CREATE TABLE `bestellungen` (
   `timestamp_beendet` datetime NOT NULL DEFAULT current_timestamp(),
   `timestamp_gedruckt` datetime DEFAULT NULL,
   `aufnehmer_id` int(11) NOT NULL,
-  `ip` varchar(30) NOT NULL
+  `device_name` varchar(50) NOT NULL,
+  `device_ip` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
