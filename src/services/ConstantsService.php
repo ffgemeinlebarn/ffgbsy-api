@@ -26,6 +26,6 @@
             $sth->bindParam(':name', $key, PDO::PARAM_STR);
             $sth->execute();
 
-            return ($sth->fetch(PDO::FETCH_OBJ))->value;
+            return ($sth->fetch(PDO::FETCH_OBJ))->value ?? null;
         }
     }

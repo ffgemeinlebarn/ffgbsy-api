@@ -40,8 +40,9 @@ INSERT INTO `aufnehmer` (`id`, `vorname`, `nachname`, `name`, `aktiv`, `zoom_lev
 --
 
 INSERT INTO `constants` (`name`, `value`) VALUES
-('event_date', 'FF Fest Gemeinlebarn'),
-('event_name', '13. bis 15. August 2022'),
+('event_image', '../assets/bon-header.png'),
+('event_date', '13. bis 15. August 2022'),
+('event_name', 'FF Fest Gemeinlebarn'),
 ('organisation_address', 'Ortsstraße 10, 3133 Gemeinlebarn'),
 ('organisation_email', 'gemeinlebarn@feuerwehr.gv.at'),
 ('organisation_name', 'Freiwillige Feuerwehr Gemeinlebarn');

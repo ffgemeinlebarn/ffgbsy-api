@@ -102,13 +102,12 @@
                 $this->printHeader($printer);
                 $this->printTisch($printer, $bestellung->tisch);
                 $this->printBestellpositionen($printer, $bestellpositionen);
-                $this->printFooterBestellung($printer, $bestellung);
-                $this->printFooterBon($printer, $bon);
+                $this->printFooterImprint($printer);
+                $this->printFooterQR($printer, $bestellung);
                 $this->printFooterLaufnummer($printer, $bon);
 
                 $printer->setTextSize(1,1);
-                $printer->feed(1);
-
+                $printer->text(" \n");
                 $printer->cut();
 
                 // Set Result of Bon Printing
@@ -143,15 +142,22 @@
 
         private function printHeader($printer)
         {
+            $headerImage = $this->constantsService->get('event_image');
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->setTextSize(2,2);
-            $printer->text("{$this->constantsService->get('event_name')}\n");
-            $printer->setTextSize(1,1);
-            $printer->text("{$this->constantsService->get('event_date')}\n");
-            $printer->feed(1);
-            $printer->text("{$this->constantsService->get('organisation_name')}\n");
-            $printer->text("{$this->constantsService->get('organisation_address')}\n");
-            $printer->text("{$this->constantsService->get('organisation_email')}\n");
+
+            if ($headerImage != null)
+            {
+                $img = EscposImage::load($headerImage);
+                $printer->graphics($img);
+            }
+            else
+            {
+                $printer->setTextSize(2,2);
+                $printer->text("{$this->constantsService->get('event_name')}\n");
+                $printer->setTextSize(1,1);
+                $printer->text("{$this->constantsService->get('event_date')}\n");
+            }
+
             $printer->feed(2);
         }
 
@@ -166,7 +172,7 @@
 
             $printer->setTextSize(1,1);
             $printer->text(LINE_AND_BREAK);
-            $printer->feed(2);
+            $printer->feed(1);
         }
 
         private function printBestellpositionen($printer, $bestellpositionen)
@@ -232,46 +238,32 @@
 
             $printer->setTextSize(1,1);
             $printer->text(LINE_AND_BREAK);
-            $printer->feed(2);
+            $printer->feed(1);
         }
 
-        private function printFooterBestellung($printer, $bestellung)
+        private function printFooterImprint($printer)
         {
-            $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->setLineSpacing(50);
-
-            $begonnen = date_format(date_create($bestellung->timestamp_begonnen), "d.m.Y H:i:s");
-            $beendet = date_format(date_create($bestellung->timestamp_beendet), "d.m.Y H:i:s");
-
-            $printer->setDoubleStrike(true);
-            $printer->text("Bestellung\n");
-            $printer->setDoubleStrike(false);
-            $printer->text("ID:        {$bestellung->id}\n");
-            $printer->text("Begonnen:  {$begonnen} Uhr\n");
-            $printer->text("Gesendet:  {$beendet} Uhr\n");
-            $printer->text("Aufnehmer: {$bestellung->aufnehmer->name}\n");
-            $printer->text("Gerät:     {$bestellung->ip}\n\n");
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("{$this->constantsService->get('organisation_name')}\n");
+            $printer->text("{$this->constantsService->get('organisation_address')}\n");
+            $printer->text("{$this->constantsService->get('organisation_email')}\n");
+            $printer->feed(1);
         }
 
-        private function printFooterBon($printer, $bon)
+        private function printFooterQr($printer, $bestellung)
         {
-            $gedruckt = date_format(date_create($bon->timestamp_gedruckt), "d.m.Y H:i:s");
-
-            $printer->setDoubleStrike(true);
-            $printer->text("Bon\n");
-            $printer->setDoubleStrike(false);
-            $printer->text("ID:        {$bon->id}\n");
-            $printer->text("Gedruckt:  {$gedruckt} Uhr\n");
-            $printer->text("Drucker:   {$bon->drucker->name}");
-            $printer->feed(3);
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->qrCode(json_encode($bestellung->id), Printer::QR_ECLEVEL_L, 5, Printer::QR_MODEL_2);
+            $printer->feed(1);
         }
 
         private function printFooterLaufnummer($printer, $bon)
         {
+            $gedruckt = date_format(date_create($bon->timestamp_gedruckt), "d.m.Y H:i:s");
             $printer->setLineSpacing(1);
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setDoubleStrike(true);
-            $printer->text("Laufnummer/Reihenfolge:\n");
+            $printer->text("$gedruckt\n");
             $printer->setTextSize(2,2);
             $printer->text(SHORT_LINE_AND_BREAK);
             $printer->setTextSize(2,1);

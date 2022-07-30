@@ -44,7 +44,7 @@
                 "SELECT 
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
-                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storono,
+                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storno,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
@@ -71,7 +71,7 @@
                 "SELECT 
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
-                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storono,
+                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storno,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
@@ -92,6 +92,20 @@
             );
             $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
             return $this->multiRead($sth);
+        }
+
+        public function storno($id)
+        {
+        
+            $sth = $this->db->prepare("INSERT INTO bestellpositionen_storno (bestellpositionen_id, anzahl) VALUES (:bestellpositionen_id, :anzahl)");
+            $sth->bindParam(':bestellpositionen_id', $bestellpositionen_id, PDO::PARAM_INT);
+            $sth->bindParam(':anzahl', $anzahl, PDO::PARAM_INT);
+            $data->insert->result = $sth->execute();
+
+            $position = $this->read($id);
+            
+
+            return $this->singleRead($sth);
         }
 
         public function calculateSummeByBestellpositionen($bestellpositionen): float
@@ -136,7 +150,7 @@
         {
             $obj->id = $this->asNumber($obj->id);
             $obj->anzahl = $this->asNumber($obj->anzahl);
-            $obj->anzahl_storono = $this->asNumber($obj->anzahl_storono);
+            $obj->anzahl_storno = $this->asNumber($obj->anzahl_storno);
             $obj->produkte_id = $this->asNumber($obj->produkte_id);
             $obj->produkt = $this->produkteService->read($obj->produkte_id);
             $obj->bestellungen_id = $this->asNumber($obj->bestellungen_id);
