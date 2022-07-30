@@ -25,7 +25,7 @@ final class BestellungenController extends BaseController
     {
         $input = $request->getParsedBody();
         $params = $request->getServerParams();
-        $input['ip'] = $params['REMOTE_ADDR'] ?? null;
+        $input['device_ip'] = $params['REMOTE_ADDR'] ?? null;
         
         // 1. Check Grundprodukte
         if ($notAvailabile = $this->bestellungenService->checkAvailabilityForBestellpositionen($input['bestellpositionen']))
