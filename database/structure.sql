@@ -180,11 +180,10 @@ CREATE TABLE `produkte` (
   `einzahl` float DEFAULT NULL,
   `einheit` varchar(50) DEFAULT NULL,
   `preis` decimal(19,2) NOT NULL,
-  `produktkategorien_id` int(11) NOT NULL,
   `drucker_id_level_2` int(11) DEFAULT NULL,
   `aktiv` tinyint(1) NOT NULL DEFAULT 1,
   `sortierindex` int(11) DEFAULT NULL,
-  `produkteinteilungen_id` int(11) DEFAULT NULL,
+  `produkteinteilungen_id` int(11) NOT NULL,
   `grundprodukte_id` int(11) DEFAULT NULL,
   `grundprodukte_multiplikator` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -198,6 +197,7 @@ CREATE TABLE `produkte` (
 CREATE TABLE `produkteinteilungen` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
+  `produktkategorien_id` int(11) NOT NULL,
   `sortierindex` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -346,7 +346,7 @@ ALTER TABLE `produktbereiche`
 --
 ALTER TABLE `produkte`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_kategorien_id` (`produktkategorien_id`),
+  ADD KEY `fk_produkteinteilungen_id` (`produkteinteilungen_id`),
   ADD KEY `fk_drucker_id_level_2` (`drucker_id_level_2`),
   ADD KEY `fk_grundprodukte_id` (`grundprodukte_id`);
 
@@ -354,7 +354,8 @@ ALTER TABLE `produkte`
 -- Indexes for table `produkteinteilungen`
 --
 ALTER TABLE `produkteinteilungen`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_produktkategorien_id` (`produktkategorien_id`);
 
 --
 -- Indexes for table `produkte_eigenschaften`
@@ -367,7 +368,7 @@ ALTER TABLE `produkte_eigenschaften`
 --
 ALTER TABLE `produktkategorien`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_bereiche_id` (`produktbereiche_id`),
+  ADD KEY `fk_produktbereiche_id` (`produktbereiche_id`),
   ADD KEY `fk_drucker_id_level_1` (`drucker_id_level_1`);
 
 --
@@ -485,6 +486,27 @@ ALTER TABLE `tischkategorien`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `produktkategorie`
+--
+ALTER TABLE `produktkategorien`
+  ADD CONSTRAINT `fk_produktbereiche_id` FOREIGN KEY (`produktbereiche_id`) REFERENCES `produktbereiche` (`id`);
+COMMIT;
+
+--
+-- Constraints for table `produkteinteilungen`
+--
+ALTER TABLE `produkteinteilungen`
+  ADD CONSTRAINT `fk_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`);
+COMMIT;
+
+--
+-- Constraints for table `produkte`
+--
+ALTER TABLE `produkte`
+  ADD CONSTRAINT `fk_produkteinteilungen_id` FOREIGN KEY (`produkteinteilungen_id`) REFERENCES `produkteinteilungen` (`id`);
+COMMIT;
 
 --
 -- Constraints for table `bestellungen`
