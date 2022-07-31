@@ -17,6 +17,7 @@
     use FFGBSY\Services\BestellpositionenService;
     use FFGBSY\Services\BonsService;
     use FFGBSY\Services\ConstantsService;
+    use FFGBSY\Services\PrintService;
     
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
@@ -57,7 +58,8 @@
         'bestellungen' => fn (ContainerInterface $c) => new BestellungenService($c),
         'bestellpositionen' => fn (ContainerInterface $c) => new BestellpositionenService($c),
         'bons' => fn (ContainerInterface $c) => new BonsService($c),
-        'constants' => fn (ContainerInterface $c) => new ConstantsService($c)
+        'constants' => fn (ContainerInterface $c) => new ConstantsService($c),
+        'print' => fn (ContainerInterface $c) => new PrintService($c)
     ]);
 
     $container = $containerBuilder->build();

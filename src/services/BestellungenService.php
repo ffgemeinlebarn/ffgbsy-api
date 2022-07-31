@@ -15,6 +15,7 @@
         private $aufnehmerService = null;
         private $tischeService = null;
         private $bestellpositionenService = null;
+        private $bonsService = null;
 
         public function __construct(ContainerInterface $container)
         {
@@ -23,6 +24,7 @@
             $this->aufnehmerService = $container->get('aufnehmer');
             $this->tischeService = $container->get('tische');
             $this->bestellpositionenService = $container->get('bestellpositionen');
+            $this->bonsService = $container->get('bons');
             parent::__construct($container);
         }
 
@@ -68,6 +70,7 @@
                 
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
+                $bestellung->bons = $this->bonsService->readByBestellung($bestellung->id);
 
                 return $bestellung;
             }
@@ -90,8 +93,9 @@
                     
                     $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                     $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
+                    $bestellung->bons = $this->bonsService->readByBestellung($bestellung->id);
                 }
-                
+
                 return $bestellungen;
             }
         }

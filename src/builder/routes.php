@@ -16,7 +16,7 @@ use FFGBSY\Controller\ProduktkategorienController;
 use FFGBSY\Controller\ProdukteController;
 use FFGBSY\Controller\EigenschaftenController;
 use FFGBSY\Controller\BestellungenController;
-use FFGBSY\Controller\BonsController;
+use FFGBSY\Controller\PrintController;
 use FFGBSY\Controller\DatenController;
 
 const PATH_ID    = '/{id}';
@@ -134,10 +134,10 @@ return function (App $app)
         $group->get(PATH_ID, "$controller:readSingle");
     });
 
-    $app->group('/bons', function (Group $group)
+    $app->group('/print', function (Group $group)
     {
-        $controller = BonsController::class;
-        $group->post('/druck/bestellung/{id}', "$controller:createFromBestellung");
+        $controller = PrintController::class;
+        $group->post('/bestellung/{id}', "$controller:createBonsAndPrintBestellung");
     });
 
     $app->group('/daten', function (Group $group)
