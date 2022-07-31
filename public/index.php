@@ -2,7 +2,8 @@
 
     declare(strict_types=1);
    
-    use FFGBSY\Application\ResponseEmitter\ResponseEmitter;
+    use FFGBSY\Application\ResponseEmitter;
+    use FFGBSY\Application\HttpErrorHandler;
     use FFGBSY\Services\AufnehmerService;
     use FFGBSY\Services\TischkategorienService;
     use FFGBSY\Services\TischeService;
@@ -40,7 +41,7 @@
         $containerBuilder->enableCompilation(__DIR__ . '/../var/cache');
     }
 
-    $settings = require __DIR__ . '/../src/builder/settings.php';
+    $settings = require __DIR__ . '/../settings.php';
     $database = require __DIR__ . '/../src/builder/database.php';
 
     $settings($containerBuilder);
@@ -87,6 +88,10 @@
 
     $settings = $container->get('settings');
 
+        
+    $responseFactory = $app->getResponseFactory();
+    $errorHandler = new HttpErrorHandler($callableResolver, $responseFactory);
+
     // Add Body Parsing Middleware
     $app->addBodyParsingMiddleware();
 
@@ -94,14 +99,14 @@
     $app->addRoutingMiddleware();
 
     // Error Middleware & Logging
-    
     $logger = new Logger('ffgbsy');
     $streamHandler = new StreamHandler(__DIR__ . '../../logs/error.log', 100);
     $logger->pushHandler($streamHandler);
 
     $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
-    $errorHandler = $errorMiddleware->getDefaultErrorHandler();
-    $errorHandler->forceContentType('application/json');
+    $errorMiddleware->setDefaultErrorHandler($errorHandler);
+    // $errorHandler = $errorMiddleware->getDefaultErrorHandler();
+    // $errorHandler->forceContentType('application/json');
 
     // Run App & Emit Response
     $serverRequestCreator = ServerRequestCreatorFactory::create();

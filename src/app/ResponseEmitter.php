@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FFGBSY\Application\ResponseEmitter;
+namespace FFGBSY\Application;
 
 use Psr\Http\Message\ResponseInterface;
 use Slim\ResponseEmitter as SlimResponseEmitter;
