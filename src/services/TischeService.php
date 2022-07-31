@@ -60,7 +60,7 @@
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
-            $obj->nummer = $this->asNumber($obj->nummer);
+            $obj->nummer = $this->asNumberOrNull($obj->nummer);
             $obj->tischkategorien_id = $this->asNumber($obj->tischkategorien_id);
             $obj->sortierindex = $this->asNumber($obj->sortierindex);
             return $obj;
