@@ -59,7 +59,8 @@
                 $sth->execute();
                 $bestellung = $this->singleRead($sth);
 
-                $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);                
+                $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);  
+                $this->bestellpositionenService->calculateSummeByBestellpositionen($bestellung->bestellpositionen);             
 
                 $bestellung->summe_ohne_eigenschaften = 0;
                 foreach($bestellung->bestellpositionen as $position)

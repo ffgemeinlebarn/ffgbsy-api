@@ -95,7 +95,9 @@
                     bestellpositionen.id"
             );
             $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
-            return $this->multiRead($sth);
+            $bestellpositionen = $this->multiRead($sth);
+            $this->calculateSummeByBestellpositionen($bestellpositionen);
+            return $bestellpositionen;
         }
 
         public function storno($bestellpositionen_id, $anzahl)
@@ -107,24 +109,34 @@
 
             return $this->read($bestellpositionen_id);
         }
+        public function calculateBestellposition($bestellposition)
+        {
+            $bestellposition->summe_eigenschaften = 0;
+            
+            foreach($bestellposition->eigenschaften->mit as $eigenschaft)
+            {
+                $bestellposition->summe_eigenschaften += $bestellposition->anzahl * $eigenschaft->preis;
+            }
+
+            foreach($bestellposition->eigenschaften->ohne as $eigenschaft)
+            {
+                $bestellposition->summe_eigenschaften -= $bestellposition->anzahl * $eigenschaft->preis;
+            }
+
+            $bestellposition->summe = $bestellposition->summe_ohne_eigenschaften + $bestellposition->summe_eigenschaften;
+            $bestellposition->summe_storno = - $bestellposition->anzahl_storno * $bestellposition->summe;
+
+            return $bestellposition;
+        }
 
         public function calculateSummeByBestellpositionen($bestellpositionen): float
         {
             $summe = 0;
 
-            foreach($bestellpositionen as $position)
+            foreach($bestellpositionen as $bestellposition)
             {
-                $summe += $position->summe_ohne_eigenschaften;
-
-                foreach($position->eigenschaften->mit as $eigenschaft)
-                {
-                    $summe += $position->anzahl * $eigenschaft->preis;
-                }
-
-                foreach($position->eigenschaften->ohne as $eigenschaft)
-                {
-                    $summe -= $position->anzahl * $eigenschaft->preis;
-                }
+                $this->calculateBestellposition($bestellposition);
+                $summe += $bestellposition->summe;
             }
 
             return $summe;

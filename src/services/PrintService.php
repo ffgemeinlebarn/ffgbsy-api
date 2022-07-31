@@ -276,8 +276,6 @@
 
         private function printBestellpositionen($printer, $bestellpositionen)
         {
-            $summe = $this->bestellpositionenService->calculateSummeByBestellpositionen($bestellpositionen);
-
             foreach($bestellpositionen as $position)
             {
                 $printer->setDoubleStrike(true);
@@ -322,7 +320,7 @@
             $printer->setTextSize(2,2);
             $printer->text("SUMME");
             $printer->setEmphasis(true);
-            $printer->text(str_pad(formatEuro($summe), 21, " ", STR_PAD_LEFT));
+            $printer->text(str_pad(formatEuro($this->bestellpositionenService->calculateSummeByBestellpositionen($bestellpositionen)), 21, " ", STR_PAD_LEFT));
             $printer->setEmphasis(false);
             $printer->text("\n");
 
@@ -334,7 +332,6 @@
         private function printStornoBestellposition($printer, $bestellposition)
         {
             $bestellposition->anzahl = $bestellposition->anzahl_storno;
-            $summe = $this->bestellpositionenService->calculateSummeByBestellpositionen([$bestellposition]);
 
             $printer->setDoubleStrike(true);
             $printer->setTextSize(1,1);
@@ -377,7 +374,7 @@
             $printer->setTextSize(2,2);
             $printer->text("SUMME");
             $printer->setEmphasis(true);
-            $printer->text(str_pad(formatEuro($summe), 21, " ", STR_PAD_LEFT));
+            $printer->text(str_pad(formatEuro($this->bestellpositionenService->calculateSummeByBestellposition([$bestellposition])), 21, " ", STR_PAD_LEFT));
             $printer->setEmphasis(false);
             $printer->text("\n");
 
