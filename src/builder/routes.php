@@ -138,7 +138,8 @@ return function (App $app)
     $app->group('/print', function (Group $group)
     {
         $controller = PrintController::class;
-        $group->post('/bestellung/{id}', "$controller:createBonsAndPrintBestellung");
+        $group->post('/bestellung/{id}', "$controller:printBestellung");
+        $group->post('/bestellung/{bestellungen_id}/drucker/{drucker_id}', "$controller:printBon");
     });
 
     $app->group('/daten', function (Group $group)

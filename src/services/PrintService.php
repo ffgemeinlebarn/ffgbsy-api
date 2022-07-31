@@ -34,52 +34,45 @@
             parent::__construct($container);
         }
         
-        public function createBonsAndPrintBestellung($bestellungId)
+        public function printBestellung($bestellungId)
         {
             $affectedDruckerIds = $this->bestellungenService->getAffectedDruckerIds($bestellungId);
 
             foreach($affectedDruckerIds as $druckerId)
             {
-                $today = date('Y-m-d');
-
-                // Get last laufnummer für heute
-                $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE drucker_id = :drucker_id AND datum = :datum ORDER BY laufnummer DESC");
-                $sth->bindParam(':datum', $today, PDO::PARAM_STR);
-                $sth->bindParam(':drucker_id', $druckerId, PDO::PARAM_INT);
-                $sth->execute();
-                $laufnummer_row = $sth->fetch();
-                $laufnummer = $laufnummer_row ? ($laufnummer_row['laufnummer'] + 1) : 1;
-    
-                // Bon in Datenbank anlegen: storno_id, timestamp_gedruckt, result, result_message --> default values
-                $sth = $this->db->prepare("INSERT INTO bons_druck (bestellungen_id, drucker_id, datum, laufnummer) VALUES (:bestellungen_id, :drucker_id, :datum, :laufnummer)");
-                $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
-                $sth->bindParam(':drucker_id', $druckerId, PDO::PARAM_INT);
-                $sth->bindParam(':datum', $today, PDO::PARAM_STR);
-                $sth->bindParam(':laufnummer', $laufnummer, PDO::PARAM_INT);
-                $sth->execute();
-
-                $bonId = $this->db->lastInsertId();
-
-                $this->printBonById($bonId);
+                $this->printBon($bestellungId, $druckerId);
             }
 
             return $this->bonsService->readByBestellung($bestellungId);
         }
 
-        public function printBonById($bonId)
+        public function printBon($bestellungId, $druckerId)
         {
-            $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE id = :id");
-            $sth->bindParam(':id', $bonId, PDO::PARAM_INT);
-            $sth->execute();
-            $bon = $sth->fetch(PDO::FETCH_OBJ);
+            $today = date('Y-m-d');
 
-            $bestellungId = $bon->bestellungen_id;
-            $druckerId = $bon->drucker_id;
-            $bon->drucker = $this->druckerService->read($druckerId);
-            $drucker = $bon->drucker;
+            // Get last laufnummer für heute
+            $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE drucker_id = :drucker_id AND datum = :datum ORDER BY laufnummer DESC");
+            $sth->bindParam(':datum', $today, PDO::PARAM_STR);
+            $sth->bindParam(':drucker_id', $druckerId, PDO::PARAM_INT);
+            $sth->execute();
+            $laufnummer_row = $sth->fetch();
+            $laufnummer = $laufnummer_row ? ($laufnummer_row['laufnummer'] + 1) : 1;
+
+            // Bon in Datenbank anlegen: storno_id, timestamp_gedruckt, result, result_message --> default values
+            $sth = $this->db->prepare("INSERT INTO bons_druck (bestellungen_id, drucker_id, datum, laufnummer) VALUES (:bestellungen_id, :drucker_id, :datum, :laufnummer)");
+            $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
+            $sth->bindParam(':drucker_id', $druckerId, PDO::PARAM_INT);
+            $sth->bindParam(':datum', $today, PDO::PARAM_STR);
+            $sth->bindParam(':laufnummer', $laufnummer, PDO::PARAM_INT);
+            $sth->execute();
+
+            $bonId = $this->db->lastInsertId();
+            
+            $drucker = $this->druckerService->read($druckerId);
             $bestellung = $this->bestellungenService->read($bestellungId);
             $bestellpositionen = $this->bestellpositionenService->readByBestellungAndDrucker($bestellungId, $druckerId);
-
+            $bon = $this->bonsService->read($bonId);
+    
             $printer = null;
 
             try
@@ -132,6 +125,8 @@
                 {
                     $printer->close();
                 }
+
+                return $this->bonsService->read($bonId);
             }
         }
 

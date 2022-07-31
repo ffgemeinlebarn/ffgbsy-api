@@ -18,9 +18,15 @@ final class PrintController extends BaseController
         $this->printService = $container->get('print');
     }
 
-    public function createBonsAndPrintBestellung(Request $request, Response $response, $args): Response
+    public function printBestellung(Request $request, Response $response, $args): Response
     {
-        $data = $this->printService->createBonsAndPrintBestellung($args['id']);
+        $data = $this->printService->printBestellung($args['id']);
+        return $this->responseAsJson($response, $data);
+    }
+
+    public function printBon(Request $request, Response $response, $args): Response
+    {
+        $data = $this->printService->printBon($args['bestellungen_id'], $args['drucker_id']);
         return $this->responseAsJson($response, $data);
     }
 }

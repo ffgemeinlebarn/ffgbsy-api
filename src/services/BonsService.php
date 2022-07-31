@@ -18,6 +18,13 @@
             parent::__construct($container);
         }
 
+        public function read($bonId)
+        {
+            $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE id = :id");
+            $sth->bindParam(':id', $bonId, PDO::PARAM_INT);
+            return $this->singleRead($sth);
+        }
+
         public function readByBestellung($bestellungId)
         {
             $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE bestellungen_id = :bestellungen_id ORDER BY timestamp_gedruckt DESC");
