@@ -98,18 +98,14 @@
             return $this->multiRead($sth);
         }
 
-        public function storno($id)
+        public function storno($bestellpositionen_id, $anzahl)
         {
-        
             $sth = $this->db->prepare("INSERT INTO bestellpositionen_storno (bestellpositionen_id, anzahl) VALUES (:bestellpositionen_id, :anzahl)");
             $sth->bindParam(':bestellpositionen_id', $bestellpositionen_id, PDO::PARAM_INT);
             $sth->bindParam(':anzahl', $anzahl, PDO::PARAM_INT);
-            $data->insert->result = $sth->execute();
+            $sth->execute();
 
-            $position = $this->read($id);
-            
-
-            return $this->singleRead($sth);
+            return $this->read($bestellpositionen_id);
         }
 
         public function calculateSummeByBestellpositionen($bestellpositionen): float

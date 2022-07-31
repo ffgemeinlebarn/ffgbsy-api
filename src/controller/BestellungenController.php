@@ -8,17 +8,23 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use FFGBSY\Services\BestellungenService;
+use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\GrundprodukteService;
+use FFGBSY\Services\PrintService;
 
 final class BestellungenController extends BaseController
 {
     private BestellungenService $bestellungenService;
+    private BestellpositionenService $bestellpositionenService;
     private GrundprodukteService $grundprodukteService;
+    private PrintService $printService;
 
     public function __construct(ContainerInterface $container)
     {
         $this->bestellungenService = $container->get('bestellungen');
+        $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->grundprodukteService = $container->get('grundprodukte');
+        $this->printService = $container->get('print');
     }
 
     public function create(Request $request, Response $response): Response
@@ -44,15 +50,22 @@ final class BestellungenController extends BaseController
 
     public function readAll(Request $request, Response $response): Response
     {
-        $this->request = $request;
         $data = $this->bestellungenService->read();
         return $this->responseAsJson($response, $data);
     }
 
     public function readSingle(Request $request, Response $response, array $args): Response
     {
-        $this->request = $request;
         $data = $this->bestellungenService->read($args['id']);
+        return $this->responseAsJson($response, $data);
+    }
+
+    public function createStornoAndPrint(Request $request, Response $response, array $args): Response
+    {
+        $input = $request->getParsedBody();
+
+        $bestellposition = $this->bestellpositionenService->storno($args['bestellpositionen_id'], $input['anzahl']);
+        $data = $this->printService->printStorno($bestellposition);
         return $this->responseAsJson($response, $data);
     }
 }

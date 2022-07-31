@@ -133,6 +133,7 @@ return function (App $app)
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");
+        $group->post('/{bestellungen_id}/storno/{bestellpositionen_id}', "$controller:createStornoAndPrint");
     });
 
     $app->group('/print', function (Group $group)
