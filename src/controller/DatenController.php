@@ -24,6 +24,8 @@ final class DatenController extends BaseController
     private ProduktbereicheService $produktbereicheService;
     private ProduktkategorienService $produktkategorienService;
     private ProdukteService $produkteService;
+    private $database;
+    private string $databaseName;
 
     public function __construct(ContainerInterface $container)
     {
@@ -34,14 +36,13 @@ final class DatenController extends BaseController
         $this->produktbereicheService = $container->get('produktbereiche');
         $this->produktkategorienService = $container->get('produktkategorien');
         $this->produkteService = $container->get('produkte');
+        $this->database = $container->get('database');
+        $this->databaseName = $container->get('settings')['database']['database'];
     }
 
     public function latest(Request $request, Response $response): Response
     {
         $data = new \stdClass();
-
-        $data->version = time();
-        $data->timestamp = date(DATE_RFC3339);
 
         $data->aufnehmer = $this->aufnehmerService->read();
         $data->tische = $this->tischeService->read();
@@ -51,36 +52,33 @@ final class DatenController extends BaseController
         $data->produktkategorien = $this->produktkategorienService->readAllNested();
         $data->produkte = $this->produkteService->read();
         
-        // $sth = $this->db->prepare(
-        //     "SELECT 
-        //         UPDATE_TIME
-        // FROM   information_schema.tables
-        // WHERE  TABLE_SCHEMA = 'ffgbsy'
-        //    AND (TABLE_NAME = 'aufnehmer' OR 
-        //        TABLE_NAME = 'drucker' OR 
-        //        TABLE_NAME = 'eigenschaften' OR 
-        //        TABLE_NAME = 'geraete' OR 
-        //        TABLE_NAME = 'produktbreiche' OR 
-        //        TABLE_NAME = 'produkte' OR 
-        //        TABLE_NAME = 'produkte_eigenschaften' OR 
-        //        TABLE_NAME = 'produktkategorien' OR 
-        //        TABLE_NAME = 'produktkategorien_eigenschaften' OR 
-        //        TABLE_NAME = 'tische' OR 
-        //        TABLE_NAME = 'tischkategorien')
-        // ORDER BY UPDATE_TIME DESC
-        // LIMIT 1");
-        // $sth->execute();
-        // $data->timestamp = $sth->fetch()['UPDATE_TIME'];
-        // $data->version = (new DateTime($data->timestamp))->getTimestamp();
-
+        $sth = $this->database->prepare(
+            "SELECT 
+                UPDATE_TIME
+            FROM   
+                information_schema.tables
+            WHERE
+                TABLE_SCHEMA = '$this->databaseName'
+            AND (TABLE_NAME = 'aufnehmer' OR 
+                TABLE_NAME = 'drucker' OR 
+                TABLE_NAME = 'eigenschaften' OR 
+                TABLE_NAME = 'geraete' OR 
+                TABLE_NAME = 'produktbreiche' OR 
+                TABLE_NAME = 'produkte' OR 
+                TABLE_NAME = 'produkteinteilungen' OR 
+                TABLE_NAME = 'produkte_eigenschaften' OR 
+                TABLE_NAME = 'produktkategorien' OR 
+                TABLE_NAME = 'produktkategorien_eigenschaften' OR 
+                TABLE_NAME = 'tische' OR 
+                TABLE_NAME = 'tischkategorien')
+            ORDER BY 
+                UPDATE_TIME DESC
+            LIMIT 1");
+        $sth->execute();
+        $datetime = new \DateTime($sth->fetch()['UPDATE_TIME']);
+        $data->timestamp = $datetime->format(DATE_RFC3339);
+        $data->version = $datetime->getTimestamp();
 
         return $this->responseAsJson($response, $data);
     }
 }
-
-        // $data->tischkategorien = $sth->fetchAll();
-        // $data->tische = $sth->fetchAll();
-        // $data->aufnehmer = $sth->fetchAll();
-        // $data->produktbereiche = $sth->fetchAll();
-        // $data->produktkategorien = $sth->fetchAll();
-        // $data->produkte = array();
