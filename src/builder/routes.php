@@ -18,6 +18,7 @@ use FFGBSY\Controller\EigenschaftenController;
 use FFGBSY\Controller\BestellungenController;
 use FFGBSY\Controller\PrintController;
 use FFGBSY\Controller\DatenController;
+use FFGBSY\Controller\StatusController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -144,5 +145,11 @@ return function (App $app)
     {
         $controller = DatenController::class;
         $group->get('/latest', "$controller:latest");
+    });
+
+    $app->group('/status', function (Group $group)
+    {
+        $controller = StatusController::class;
+        $group->get('/systemstatus', "$controller:systemstatus");
     });
 };

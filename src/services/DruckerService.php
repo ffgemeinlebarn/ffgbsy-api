@@ -7,6 +7,10 @@
     use DI\ContainerBuilder;
     use Psr\Container\ContainerInterface;
     use PDO;
+    use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+    use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+    use Mike42\Escpos\Printer;
+    use Mike42\Escpos\EscposImage;
 
     final class DruckerService extends BaseService
     {
@@ -34,6 +38,46 @@
                 $sth = $this->db->prepare("SELECT * FROM drucker");
                 return $this->multiRead($sth);
             }
+        }
+
+        public function checkConnections()
+        {
+            $drucker = $this->read();
+            $results = [];
+
+            foreach($drucker as $drucker)
+            {
+                $result = new \stdClass();
+                $result->drucker = $drucker;
+                $result->result = $this->connectPosPrinter($drucker, 2);
+                array_push($results, $result);
+            }
+
+            return $results;
+        }
+
+        public function checkConnection($id)
+        {
+            $drucker = $this->read($id);
+            $result = new \stdClass();
+            $result->drucker = $drucker;
+            $result->result = $this->connectPosPrinter($drucker, 2);
+
+            return $result;
+        }
+
+        private function connectPosPrinter($drucker, $timeout = 3)
+        {
+            try{
+                $connector = new NetworkPrintConnector($drucker->ip, $drucker->port, $timeout);
+                $printer = new Printer($connector);
+                $printer->close();
+                return true;
+            } catch (Exception $e)
+            {
+                return false;
+            }
+            return false;
         }
 
         public function update($data)
