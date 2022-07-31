@@ -33,6 +33,8 @@
     "autoload": {
         "psr-4": {
             "FFGBSY\\Application\\": "src/app/",
+            "FFGBSY\\Services\\": "src/services/",
+            "FFGBSY\\Controller\\": "src/controller/",
             "FFGBSY\\": "src/"
         }
     },

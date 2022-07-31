@@ -23,6 +23,8 @@
     use Slim\Factory\AppFactory;
     use Slim\Factory\ServerRequestCreatorFactory;
     use Psr\Container\ContainerInterface;
+    use Monolog\Handler\StreamHandler;
+    use Monolog\Logger;
 
     require __DIR__ . '/../vendor/autoload.php';
 
@@ -85,15 +87,21 @@
 
     $settings = $container->get('settings');
 
-    $displayErrorDetails = $settings['displayErrorDetails'];
-    $logError = $settings['logError'];
-    $logErrorDetails = $settings['logErrorDetails'];
-
     // Add Body Parsing Middleware
     $app->addBodyParsingMiddleware();
 
     // Add Routing Middleware
     $app->addRoutingMiddleware();
+
+    // Error Middleware & Logging
+    
+    $logger = new Logger('ffgbsy');
+    $streamHandler = new StreamHandler(__DIR__ . '../../logs/error.log', 100);
+    $logger->pushHandler($streamHandler);
+
+    $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
+    $errorHandler = $errorMiddleware->getDefaultErrorHandler();
+    $errorHandler->forceContentType('application/json');
 
     // Run App & Emit Response
     $serverRequestCreator = ServerRequestCreatorFactory::create();

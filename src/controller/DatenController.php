@@ -75,7 +75,7 @@ final class DatenController extends BaseController
                 UPDATE_TIME DESC
             LIMIT 1");
         $sth->execute();
-        $datetime = new \DateTime($sth->fetch()['UPDATE_TIME']);
+        $datetime = new \DateTime($sth->fetch()['UPDATE_TIME'] ?? "now");
         $data->timestamp = $datetime->format(DATE_RFC3339);
         $data->version = $datetime->getTimestamp();
 
