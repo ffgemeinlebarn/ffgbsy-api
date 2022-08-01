@@ -80,9 +80,9 @@
             else
             {
                 $sql = "SELECT * FROM bestellungen WHERE 1=1";
-                $aufnehmer = isset($filter['aufnehmerId']) && $filter['aufnehmerId'] != null;
-                $tisch = isset($filter['tischId']) && $filter['tischId'] != null;
-                $limit = isset($filter['limit']) && $filter['limit'] != null;
+                $aufnehmer = isset($filter['aufnehmerId']);
+                $tisch = isset($filter['tischId']);
+                $limit = isset($filter['limit']);
 
                 if ($aufnehmer)
                 {
@@ -93,6 +93,8 @@
                 {
                     $sql .= " AND bestellungen.tische_id = :tische_id";
                 }
+
+                $sql .= " ORDER BY timestamp_beendet DESC";
 
                 if ($limit)
                 {
