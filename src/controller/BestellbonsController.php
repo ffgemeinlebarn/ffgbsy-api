@@ -18,18 +18,6 @@ final class BestellbonsController extends BaseController
         $this->bestellbonsService = $container->get('bestellbons');
     }
 
-    // public function create(Request $request, Response $response): Response
-    // {
-    //     $data = $this->bestellbonsService->create($request->getParsedBody());
-    //     return $this->responseAsJson($response, $data);
-    // }
-
-    // public function createForBestellung(Request $request, Response $response, $args): Response
-    // {
-    //     $data = $this->bestellbonsService->createForBestellung($args['id']);
-    //     return $this->responseAsJson($response, $data);
-    // }
-
     public function read(Request $request, Response $response, $args): Response
     {
         $data = $this->bestellbonsService->read($args['id']);

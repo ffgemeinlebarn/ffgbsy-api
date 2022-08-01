@@ -46,9 +46,6 @@
                 $this->bestellpositionenService->addToBestellung($bestellungId, $bestellposition);
             }
 
-            // Bestellbons erstellen
-            $this->bestellbonsService->createForBestellung($bestellungId);
-
             // Grundprodukte
 
             return $this->read($bestellungId);

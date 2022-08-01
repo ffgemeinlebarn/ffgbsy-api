@@ -98,16 +98,6 @@
             return $bestellpositionen;
         }
 
-        // public function storno($bestellpositionen_id, $anzahl)
-        // {
-        //     $sth = $this->db->prepare("INSERT INTO bestellpositionen_storno (bestellpositionen_id, anzahl) VALUES (:bestellpositionen_id, :anzahl)");
-        //     $sth->bindParam(':bestellpositionen_id', $bestellpositionen_id, PDO::PARAM_INT);
-        //     $sth->bindParam(':anzahl', $anzahl, PDO::PARAM_INT);
-        //     $sth->execute();
-
-        //     return $this->read($bestellpositionen_id);
-        // }
-
         public function calculateBestellposition($bestellposition)
         {
             $bestellposition->summe_eigenschaften = 0;
@@ -123,7 +113,7 @@
             }
 
             $bestellposition->summe = $bestellposition->summe_ohne_eigenschaften + $bestellposition->summe_eigenschaften;
-            $bestellposition->summe_storno = - $bestellposition->anzahl_storno * $bestellposition->summe;
+            // $bestellposition->summe_storno = - $bestellposition->anzahl_storno * $bestellposition->summe;
 
             return $bestellposition;
         }
@@ -161,7 +151,6 @@
         {
             $obj->id = $this->asNumber($obj->id);
             $obj->anzahl = $this->asNumber($obj->anzahl);
-            $obj->anzahl_storno = $this->asNumber($obj->anzahl_storno);
             $obj->produkte_id = $this->asNumber($obj->produkte_id);
             $obj->produkt = $this->produkteService->read($obj->produkte_id);
             $obj->bestellungen_id = $this->asNumber($obj->bestellungen_id);

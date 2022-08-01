@@ -11,6 +11,7 @@ use FFGBSY\Services\BestellungenService;
 use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\GrundprodukteService;
 use FFGBSY\Services\PrintService;
+use FFGBSY\Services\BestellbonsService;
 
 final class BestellungenController extends BaseController
 {
@@ -18,6 +19,7 @@ final class BestellungenController extends BaseController
     private BestellpositionenService $bestellpositionenService;
     private GrundprodukteService $grundprodukteService;
     private PrintService $printService;
+    private BestellbonsService $bestellbonsService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -25,6 +27,7 @@ final class BestellungenController extends BaseController
         $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->grundprodukteService = $container->get('grundprodukte');
         $this->printService = $container->get('print');
+        $this->bestellbonsService = $container->get('bestellbons');
     }
 
     public function create(Request $request, Response $response): Response
@@ -40,12 +43,23 @@ final class BestellungenController extends BaseController
         }
         
         // 2. Create Bestellung
-        $data = $this->bestellungenService->create($input);
-        
-        // 3. Count down Grundprodukte
+        $bestellung = $this->bestellungenService->create($input);
+
+        // 3. Create Bestellbons
+        $affectedDruckerIds = $this->bestellbonsService->getAffectedDruckerIdsForBestellung($bestellung->id);
+        foreach($affectedDruckerIds as $druckerId)
+        {
+            $this->bestellbonsService->create([
+                "bestellungen_id" => $bestellung->id,
+                "drucker_id" => $druckerId,
+                "bestellpositionen" => $this->bestellpositionenService->readByBestellungAndDrucker($bestellung->id, $druckerId)
+            ]);
+        }
+
+        // 4. Count down Grundprodukte
         
 
-        return $this->responseAsJson($response, $data);
+        return $this->responseAsJson($response, $this->bestellungenService->read($bestellung->id));
     }
 
     public function readAll(Request $request, Response $response): Response
@@ -57,15 +71,6 @@ final class BestellungenController extends BaseController
     public function readSingle(Request $request, Response $response, array $args): Response
     {
         $data = $this->bestellungenService->read($args['id']);
-        return $this->responseAsJson($response, $data);
-    }
-
-    public function createStornoAndPrint(Request $request, Response $response, array $args): Response
-    {
-        $input = $request->getParsedBody();
-
-        $bestellposition = $this->bestellpositionenService->storno($args['bestellpositionen_id'], $input['anzahl']);
-        $data = $this->printService->printStorno($bestellposition);
         return $this->responseAsJson($response, $data);
     }
 }
