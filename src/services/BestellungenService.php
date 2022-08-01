@@ -59,16 +59,12 @@
                 $sth->execute();
                 $bestellung = $this->singleRead($sth);
 
-                $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);  
-                $this->bestellpositionenService->calculateSummeByBestellpositionen($bestellung->bestellpositionen);             
-
-                $bestellung->summe_ohne_eigenschaften = 0;
+                $bestellung->summe = 0;
+                $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);
                 foreach($bestellung->bestellpositionen as $position)
                 {
-                    $bestellung->summe_ohne_eigenschaften += $position->summe_ohne_eigenschaften;
-                    $position->produkt = $this->produkteService->read($position->produkte_id);
+                    $bestellung->summe += $position->summe;
                 }
-                
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
                 $bestellung->bons = $this->bonsService->readByBestellung($bestellung->id);
@@ -83,15 +79,11 @@
                 
                 foreach($bestellungen as $bestellung)
                 {
-                    $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);                
-
-                    $bestellung->summe_ohne_eigenschaften = 0;
+                    $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);
                     foreach($bestellung->bestellpositionen as $position)
                     {
-                        $bestellung->summe_ohne_eigenschaften += $position->summe_ohne_eigenschaften;
-                        $position->produkt = $this->produkteService->read($position->produkte_id);
+                        $bestellung->summe += $position->summe;
                     }
-                    
                     $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                     $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
                     $bestellung->bons = $this->bonsService->readByBestellung($bestellung->id);

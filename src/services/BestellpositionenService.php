@@ -96,6 +96,10 @@
             );
             $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
             $bestellpositionen = $this->multiRead($sth);
+            foreach($bestellpositionen as $bestellposition)
+            {
+                $bestellposition->produkt = $this->produkteService->read($bestellposition->produkte_id);
+            }
             $this->calculateSummeByBestellpositionen($bestellpositionen);
             return $bestellpositionen;
         }
