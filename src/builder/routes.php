@@ -143,6 +143,7 @@ return function (App $app)
         $group->get(PATH_ID, "$controller:read");
         $group->get('/bestellungen/{id}/bestellbons', "$controller:readByBestellung");
         $group->post('/druck', "$controller:printMultiple");
+        $group->post('/{id}/druck', "$controller:printSingle");
     });
 
     $app->group('/daten', function (Group $group)

@@ -30,6 +30,12 @@ final class BestellbonsController extends BaseController
         return $this->responseAsJson($response, $data);
     }
 
+    public function printSingle(Request $request, Response $response, $args): Response
+    {
+        $data = $this->bestellbonsService->printSingle($request->getParsedBody());//(array) $this->bestellbonsService->read($args['id']));
+        return $this->responseAsJson($response, $data);
+    }
+
     public function printMultiple(Request $request, Response $response): Response
     {
         $data = $this->bestellbonsService->printMultiple($request->getParsedBody());

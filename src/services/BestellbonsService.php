@@ -71,6 +71,7 @@
             foreach($items as $item)
             {
                 $item = $this->addNested($item);
+                $item->drucke = $this->bestellbonsDruckService->readByBestellbon($item->id);
             }
             return $items;
         }
@@ -81,13 +82,13 @@
 
             foreach($bestellbons as $bestellbon)
             {
-                array_push($besllbonsDrucke, $this->printBestellbon($bestellbon));
+                array_push($besllbonsDrucke, $this->printSingle($bestellbon));
             }
 
             return $besllbonsDrucke;
         }
         
-        public function printBestellbon($bestellbon)
+        public function printSingle($bestellbon)
         {
             $bestellbonDruck = $this->bestellbonsDruckService->createFromBestellbon($bestellbon);
             $tisch = $this->tischeService->readByBestellbon($bestellbon['id']);
@@ -95,7 +96,10 @@
             $setup = $this->printService->setupPrinter($drucker);
             $bestellpositionen = $this->bestellpositionenService->readByBestellbon($bestellbon['id']);
 
-            $qrData = json_encode($bestellbon->bestellungen_id);
+            $qrData = json_encode([
+                "bestellungen_id" => $bestellbon['bestellungen_id'],
+                "bestellbon_id" => $bestellbon['id']
+            ]);
 
             if ($setup->success)
             {

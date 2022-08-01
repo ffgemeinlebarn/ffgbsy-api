@@ -41,6 +41,13 @@
             return $this->singleRead($sth);
         }
 
+        public function readByBestellbon($bestellbonsId)
+        {
+            $sth = $this->db->prepare("SELECT * FROM bestellbons_druck WHERE bestellbons_id = :bestellbons_id");
+            $sth->bindParam(':bestellbons_id', $bestellbonsId, PDO::PARAM_INT);
+            return $this->multiRead($sth);
+        }
+
         public function updateResult($id, $success, $message)
         {
             $sth = $this->db->prepare("UPDATE bestellbons_druck SET success = :success, message = :message WHERE id = :id");
