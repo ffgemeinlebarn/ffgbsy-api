@@ -45,6 +45,14 @@
             return $this->singleRead($sth);
         }
 
+        public function readByStornobon($id)
+        {
+            $sth = $this->db->prepare("SELECT tische.* FROM stornobons LEFT JOIN bestellungen ON bestellungen.id = stornobons.bestellungen_id LEFT JOIN tische ON tische.id = bestellungen.tische_id WHERE stornobons.id = :id LIMIT 1");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $sth->execute();
+            return $this->singleRead($sth);
+        }
+
         public function update($data)
         {
             $sth = $this->db->prepare("UPDATE tische SET reihe = :reihe, nummer = :nummer, tischkategorien_id = :tischkategorien_id, sortierindex = :sortierindex WHERE id=:id");

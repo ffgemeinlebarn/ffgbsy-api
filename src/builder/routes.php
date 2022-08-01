@@ -20,6 +20,7 @@ use FFGBSY\Controller\PrintController;
 use FFGBSY\Controller\DatenController;
 use FFGBSY\Controller\StatusController;
 use FFGBSY\Controller\BestellbonsController;
+use FFGBSY\Controller\StornobonsController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -143,6 +144,15 @@ return function (App $app)
         $group->get(PATH_ID, "$controller:read");
         $group->get('/bestellungen/{id}/bestellbons', "$controller:readByBestellung");
         $group->post('/druck', "$controller:printMultiple");
+        $group->post('/{id}/druck', "$controller:printSingle");
+    });
+
+    $app->group('/stornobons', function (Group $group)
+    {
+        $controller = StornobonsController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_ID, "$controller:read");
+        $group->get('/bestellungen/{id}/bestellbons', "$controller:readByBestellung");
         $group->post('/{id}/druck', "$controller:printSingle");
     });
 

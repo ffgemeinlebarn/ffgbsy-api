@@ -7,6 +7,8 @@
     use DI\ContainerBuilder;
     use Psr\Container\ContainerInterface;
     use PDO;
+    use FFGBSY\Services\BestellbonsService;
+    use FFGBSY\Services\StornobonsService;
 
     final class BestellungenService extends BaseService
     {
@@ -16,6 +18,7 @@
         private $tischeService = null;
         private $bestellpositionenService = null;
         private BestellbonsService $bestellbonsService;
+        private StornobonsService $stornobonsService;
 
         public function __construct(ContainerInterface $container)
         {
@@ -25,6 +28,7 @@
             $this->tischeService = $container->get('tische');
             $this->bestellpositionenService = $container->get('bestellpositionen');
             $this->bestellbonsService = $container->get('bestellbons');
+            $this->stornobonsService = $container->get('stornobons');
             parent::__construct($container);
         }
 
@@ -69,6 +73,7 @@
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
                 $bestellung->bestellbons = $this->bestellbonsService->readByBestellung($bestellung->id);
+                $bestellung->stornobons = $this->stornobonsService->readByBestellung($bestellung->id);
 
                 return $bestellung;
             }
@@ -88,6 +93,7 @@
                     $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                     $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
                     $bestellung->bestellbons = $this->bestellbonsService->readByBestellung($bestellung->id);
+                    $bestellung->stornobons = $this->stornobonsService->readByBestellung($bestellung->id);
                 }
 
                 return $bestellungen;
