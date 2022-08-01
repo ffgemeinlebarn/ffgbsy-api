@@ -55,7 +55,7 @@
             return $this->read($bestellungId);
         }
 
-        public function read($id = null)
+        public function read($id = null, $filter = [])
         {
             if ($id != null)
             {
@@ -79,7 +79,43 @@
             }
             else
             {
-                $sth = $this->db->prepare("SELECT * FROM bestellungen");
+                $sql = "SELECT * FROM bestellungen WHERE 1=1";
+                $aufnehmer = isset($filter['aufnehmerId']) && $filter['aufnehmerId'] != null;
+                $tisch = isset($filter['tischId']) && $filter['tischId'] != null;
+                $limit = isset($filter['limit']) && $filter['limit'] != null;
+
+                if ($aufnehmer)
+                {
+                    $sql .= " AND bestellungen.aufnehmer_id = :aufnehmer_id";
+                }
+
+                if ($tisch)
+                {
+                    $sql .= " AND bestellungen.tische_id = :tische_id";
+                }
+
+                if ($limit)
+                {
+                    $sql .= " LIMIT :limit";
+                }
+
+                $sth = $this->db->prepare($sql);
+                
+                if ($aufnehmer)
+                {
+                    $sth->bindParam(':aufnehmer_id', $filter['aufnehmerId'], PDO::PARAM_INT);
+                }
+
+                if ($tisch)
+                {
+                    $sth->bindParam(':tische_id', $filter['tischId'], PDO::PARAM_INT);
+                }
+
+                if ($limit)
+                {
+                    $sth->bindParam(':limit', $filter['limit'], PDO::PARAM_INT);
+                }
+
                 $sth->execute();
                 $bestellungen = $this->multiRead($sth);
                 

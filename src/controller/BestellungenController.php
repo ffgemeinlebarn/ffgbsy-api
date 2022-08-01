@@ -64,7 +64,7 @@ final class BestellungenController extends BaseController
 
     public function readAll(Request $request, Response $response): Response
     {
-        $data = $this->bestellungenService->read();
+        $data = $this->bestellungenService->read(null, $request->getQueryParams());
         return $this->responseAsJson($response, $data);
     }
 
