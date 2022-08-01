@@ -59,9 +59,7 @@
         {
             $sth = $this->db->prepare("SELECT * FROM bestellbons WHERE id = :id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
-            $bestellbon = $this->addNested($this->singleRead($sth));
-            $bestellbon->bestellbonDrucke = [];
-            return $bestellbon;
+            return $this->addNested($this->singleRead($sth));
         }
 
         public function readByBestellung($bestellungId)
@@ -95,6 +93,7 @@
             $tisch = $this->tischeService->readByBestellbon($bestellbon['id']);
             $drucker = $this->druckerService->read($bestellbon['drucker_id']);
             $setup = $this->printService->setupPrinter($drucker);
+            $bestellpositionen = $this->bestellpositionenService->readByBestellbon($bestellbon['id']);
 
             $qrData = json_encode($bestellbon->bestellungen_id);
 
@@ -105,7 +104,7 @@
                 $this->printService->printHeader($printer);
                 $this->printService->printTisch($printer, $tisch);
                 $this->printService->printBestellpositionenHeader($printer);
-                // $this->printService->printBestellpositionen($printer, $bestellpositionen);
+                $this->printService->printBestellpositionen($printer, $bestellpositionen);
                 $this->printService->printImprint($printer);
                 $this->printService->printQR($printer, $qrData);
                 $this->printService->printLaufnummernBlock($printer, $bestellbonDruck->timestamp, $drucker->name, $bestellbonDruck->laufnummer);

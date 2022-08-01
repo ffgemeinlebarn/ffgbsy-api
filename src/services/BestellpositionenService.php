@@ -98,6 +98,45 @@
             return $bestellpositionen;
         }
 
+        public function readByBestellbon($bestellbonId)
+        {
+            $sth = $this->db->prepare(
+                "SELECT 
+                    bestellpositionen.*,
+                    produktbereiche.drucker_id_level_0,
+                    produktkategorien.drucker_id_level_1,
+                    produkte.drucker_id_level_2,
+
+                    -- Use the Anzahl of Table bestellbons_bestellpositionen instead of bestellpositionen (!)
+                    (produkte.preis * bestellbons_bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
+                    bestellbons_bestellpositionen.anzahl AS anzahl
+                FROM 
+                    bestellpositionen 
+                LEFT JOIN 
+                    bestellbons_bestellpositionen ON bestellbons_bestellpositionen.bestellpositionen_id = bestellpositionen.id 
+                LEFT JOIN 
+                    produkte ON produkte.id = bestellpositionen.produkte_id 
+                LEFT JOIN 
+                    produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
+                LEFT JOIN 
+                    produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
+                LEFT JOIN 
+                    produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
+                WHERE 
+                    bestellbons_bestellpositionen.bestellbons_id = :bestellbons_id
+                GROUP BY
+                    bestellpositionen.id"
+            );
+            $sth->bindParam(':bestellbons_id', $bestellbonId, PDO::PARAM_INT);
+            $bestellpositionen = $this->multiRead($sth);
+            foreach($bestellpositionen as $bestellposition)
+            {
+                $bestellposition->produkt = $this->produkteService->read($bestellposition->produkte_id);
+            }
+            $this->calculateSummeByBestellpositionen($bestellpositionen);
+            return $bestellpositionen;
+        }
+
         public function calculateBestellposition($bestellposition)
         {
             $bestellposition->summe_eigenschaften = 0;
