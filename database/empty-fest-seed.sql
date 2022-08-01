@@ -34,7 +34,7 @@ INSERT INTO `aufnehmer` (`id`, `vorname`, `nachname`, `aktiv`, `zoom_level`) VAL
 (12, 'Marlene', 'Kaller', 1, 3),
 (13, 'Andreas', 'Pfiel', 1, 3),
 (14, 'Marcel', 'Czech', 1, 1);
-s
+
 --
 -- Dumping data for table `constants`
 --
