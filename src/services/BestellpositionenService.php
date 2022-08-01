@@ -44,7 +44,6 @@
                 "SELECT 
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
-                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storno,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
@@ -58,8 +57,6 @@
                     produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
                 LEFT JOIN 
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
-                LEFT JOIN
-                    bestellpositionen_storno ON bestellpositionen_storno.bestellpositionen_id = bestellpositionen.id
                 WHERE
                     bestellpositionen.id = :id"
             );
@@ -73,7 +70,6 @@
                 "SELECT 
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
-                    IFNULL(SUM(bestellpositionen_storno.anzahl), 0) AS anzahl_storno,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
@@ -87,8 +83,6 @@
                     produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
                 LEFT JOIN 
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
-                LEFT JOIN
-                    bestellpositionen_storno ON bestellpositionen_storno.bestellpositionen_id = bestellpositionen.id
                 WHERE 
                     bestellpositionen.bestellungen_id = :bestellungen_id
                 GROUP BY
@@ -104,15 +98,16 @@
             return $bestellpositionen;
         }
 
-        public function storno($bestellpositionen_id, $anzahl)
-        {
-            $sth = $this->db->prepare("INSERT INTO bestellpositionen_storno (bestellpositionen_id, anzahl) VALUES (:bestellpositionen_id, :anzahl)");
-            $sth->bindParam(':bestellpositionen_id', $bestellpositionen_id, PDO::PARAM_INT);
-            $sth->bindParam(':anzahl', $anzahl, PDO::PARAM_INT);
-            $sth->execute();
+        // public function storno($bestellpositionen_id, $anzahl)
+        // {
+        //     $sth = $this->db->prepare("INSERT INTO bestellpositionen_storno (bestellpositionen_id, anzahl) VALUES (:bestellpositionen_id, :anzahl)");
+        //     $sth->bindParam(':bestellpositionen_id', $bestellpositionen_id, PDO::PARAM_INT);
+        //     $sth->bindParam(':anzahl', $anzahl, PDO::PARAM_INT);
+        //     $sth->execute();
 
-            return $this->read($bestellpositionen_id);
-        }
+        //     return $this->read($bestellpositionen_id);
+        // }
+
         public function calculateBestellposition($bestellposition)
         {
             $bestellposition->summe_eigenschaften = 0;

@@ -92,9 +92,7 @@ CREATE TABLE `bestellungen` (
 CREATE TABLE `bestellbons` (
   `id` int(11) NOT NULL,
   `bestellungen_id` int(11) NOT NULL,
-  `drucker_id` int(11) NOT NULL,
-  `datum` date NOT NULL,
-  `laufnummer` int(11) NOT NULL
+  `drucker_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -106,9 +104,11 @@ CREATE TABLE `bestellbons` (
 CREATE TABLE `bestellbons_druck` (
   `id` int(11) NOT NULL,
   `bestellbons_id` int(11) NOT NULL,
-  `timestamp_druck` datetime NOT NULL DEFAULT current_timestamp(),
-  `result` tinyint(1) DEFAULT NULL,
-  `result_message` varchar(300) DEFAULT NULL
+  `datum` date NOT NULL,
+  `laufnummer` int(11) NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
+  `success` tinyint(1) DEFAULT NULL,
+  `message` varchar(300) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -120,9 +120,7 @@ CREATE TABLE `bestellbons_druck` (
 CREATE TABLE `stornobons` (
   `id` int(11) NOT NULL,
   `bestellungen_id` int(11) NOT NULL,
-  `drucker_id` int(11) NOT NULL,
-  `datum` date NOT NULL,
-  `laufnummer` int(11) NOT NULL
+  `drucker_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -134,9 +132,11 @@ CREATE TABLE `stornobons` (
 CREATE TABLE `stornobons_druck` (
   `id` int(11) NOT NULL,
   `stornobons_id` int(11) NOT NULL,
-  `timestamp_druck` datetime NOT NULL DEFAULT current_timestamp(),
-  `result` tinyint(1) DEFAULT NULL,
-  `result_message` varchar(300) DEFAULT NULL
+  `datum` date NOT NULL,
+  `laufnummer` int(11) NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
+  `success` tinyint(1) DEFAULT NULL,
+  `message` varchar(300) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

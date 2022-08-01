@@ -15,7 +15,7 @@
         private $aufnehmerService = null;
         private $tischeService = null;
         private $bestellpositionenService = null;
-        private $bonsService = null;
+        private BestellbonsService $bestellbonsService;
 
         public function __construct(ContainerInterface $container)
         {
@@ -24,7 +24,7 @@
             $this->aufnehmerService = $container->get('aufnehmer');
             $this->tischeService = $container->get('tische');
             $this->bestellpositionenService = $container->get('bestellpositionen');
-            $this->bonsService = $container->get('bons');
+            $this->bestellbonsService = $container->get('bestellbons');
             parent::__construct($container);
         }
 
@@ -40,10 +40,14 @@
 
             $bestellungId = $this->db->lastInsertId();
 
-            foreach($data['bestellpositionen'] as $position)
+            // Bestellpositionen hinzufügen
+            foreach($data['bestellpositionen'] as $bestellposition)
             {
-                $this->bestellpositionenService->addToBestellung($bestellungId, $position);
+                $this->bestellpositionenService->addToBestellung($bestellungId, $bestellposition);
             }
+
+            // Bestellbons erstellen
+            $this->bestellbonsService->createForBestellung($bestellungId);
 
             // Grundprodukte
 
@@ -67,7 +71,7 @@
                 }
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
-                $bestellung->bons = $this->bonsService->readByBestellung($bestellung->id);
+                $bestellung->bestellbons = $this->bestellbonsService->readByBestellung($bestellung->id);
 
                 return $bestellung;
             }
@@ -86,7 +90,7 @@
                     }
                     $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                     $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
-                    $bestellung->bons = $this->bonsService->readByBestellung($bestellung->id);
+                    $bestellung->bestellbons = $this->bestellbonsService->readByBestellung($bestellung->id);
                 }
 
                 return $bestellungen;
@@ -114,20 +118,6 @@
             }
     
             return false;
-        }
-
-        public function getAffectedDruckerIds($bestellungId)
-        {
-            $ids = [];
-            foreach($this->bestellpositionenService->readByBestellung($bestellungId) as $position)
-            {
-                if (!in_array($position->drucker_id, $ids))
-                {
-                    $ids[] = $position->drucker_id;
-                }
-            }
-
-            return $ids;
         }
 
         protected function singleMap($obj)

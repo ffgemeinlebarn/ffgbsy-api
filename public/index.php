@@ -19,6 +19,8 @@
     use FFGBSY\Services\BonsService;
     use FFGBSY\Services\ConstantsService;
     use FFGBSY\Services\PrintService;
+    use FFGBSY\Services\BestellbonsService;
+    use FFGBSY\Services\BestellbonsDruckService;
     
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
@@ -60,6 +62,8 @@
         'eigenschaften' => fn (ContainerInterface $c) => new EigenschaftenService($c),
         'bestellungen' => fn (ContainerInterface $c) => new BestellungenService($c),
         'bestellpositionen' => fn (ContainerInterface $c) => new BestellpositionenService($c),
+        'bestellbons' => fn (ContainerInterface $c) => new BestellbonsService($c),
+        'bestellbonsDruck' => fn (ContainerInterface $c) => new BestellbonsDruckService($c),
         'bons' => fn (ContainerInterface $c) => new BonsService($c),
         'constants' => fn (ContainerInterface $c) => new ConstantsService($c),
         'print' => fn (ContainerInterface $c) => new PrintService($c)

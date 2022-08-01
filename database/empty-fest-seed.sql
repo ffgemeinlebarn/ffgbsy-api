@@ -92,10 +92,10 @@ INSERT INTO `eigenschaften` (`id`, `name`, `preis`, `sortierindex`) VALUES
 --
 
 INSERT INTO `grundprodukte` (`id`, `name`, `bestand`, `einheit`) VALUES
-(1, 'Grillhendl', 0, 'Portion(en)'),
+(1, 'Grillhendl', NULL, 'Portion(en)'),
 (2, 'Kotelett', NULL, 'Stück'),
-(3, 'Spieß', 7, 'Portion(en)'),
-(4, 'Grillwurst', 14, 'Portion(en)'),
+(3, 'Spieß', NULL, 'Portion(en)'),
+(4, 'Grillwurst', NULL, 'Portion(en)'),
 (5, 'Champignonsauce', NULL, 'Portion(en)'),
 (6, 'Krautfleisch', NULL, 'Portion(en)');
 

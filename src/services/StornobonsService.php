@@ -27,7 +27,7 @@
 
         public function readByBestellung($bestellungId)
         {
-            $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE bestellungen_id = :bestellungen_id ORDER BY timestamp_gedruckt DESC");
+            $sth = $this->db->prepare("SELECT * FROM bons_druck WHERE bestellungen_id = :bestellungen_id");
             $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
             return $this->multiRead($sth);
         }
