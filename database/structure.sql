@@ -36,7 +36,6 @@ CREATE TABLE `aufnehmer` (
   `id` int(11) NOT NULL,
   `vorname` varchar(50) DEFAULT NULL,
   `nachname` varchar(50) DEFAULT NULL,
-  `name` varchar(100) DEFAULT NULL,
   `aktiv` tinyint(1) NOT NULL DEFAULT 0,
   `zoom_level` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
