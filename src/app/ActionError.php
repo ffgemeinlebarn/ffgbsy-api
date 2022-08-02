@@ -22,6 +22,9 @@ class ActionError implements JsonSerializable
 
     private string $description;
 
+    private string $file;
+    private int $line;
+
     public function __construct(string $type, ?string $description)
     {
         $this->type = $type;
@@ -50,12 +53,36 @@ class ActionError implements JsonSerializable
         return $this;
     }
 
+    public function getFile(): string
+    {
+        return $this->file;
+    }
+
+    public function setFile(?string $file = null): self
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    public function getLine(): string
+    {
+        return $this->line;
+    }
+
+    public function setLine(?int $line = null): self
+    {
+        $this->line = $line;
+        return $this;
+    }
+
     #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {
         return [
             'type' => $this->type,
             'description' => $this->description,
+            'file' => $this->file,
+            'line' => $this->line
         ];
     }
 }

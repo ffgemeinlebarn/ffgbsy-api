@@ -55,10 +55,7 @@ final class BestellungenController extends BaseController
                 "bestellpositionen" => $this->bestellpositionenService->readByBestellungAndDrucker($bestellung->id, $druckerId)
             ]);
         }
-
-        // 4. Count down Grundprodukte
         
-
         return $this->responseAsJson($response, $this->bestellungenService->read($bestellung->id));
     }
 

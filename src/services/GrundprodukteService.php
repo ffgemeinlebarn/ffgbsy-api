@@ -72,13 +72,14 @@
 
             $data = $sth->fetch(PDO::FETCH_OBJ);
 
-            return $data->bestand == NULL || ($data->grundprodukte_multiplikator * $anzahl) <= $data->bestand;
+            return $data->bestand === NULL || ($data->grundprodukte_multiplikator * $anzahl) <= $data->bestand;
         }
 
         public function reduceByProduktId($produktId, $anzahl = 1)
         {
             $sth = $this->db->prepare(
                 "SELECT 
+                    grundprodukte.id,
                     produkte.grundprodukte_multiplikator,
                     grundprodukte.bestand
                 FROM 
@@ -91,19 +92,25 @@
             $sth->execute();
 
             $grundprodukt = $sth->fetch(PDO::FETCH_OBJ);
-            $neuerBestand = $grundprodukt->bestand - ($grundprodukt->grundprodukte_multiplikator * $anzahl);
 
-            $sth = $this->db->prepare(
-                "UPDATE
-                    grundprodukte (bestand)
-                VALUES
-                    (:bestand)
-                WHERE 
-                    id = :id");
-            $sth->bindParam(':bestand', $neuerBestand, PDO::PARAM_INT);
-            $sth->bindParam(':id', $grundprodukt->id, PDO::PARAM_INT);
-            
-            return $sth->execute();
+            if ($grundprodukt->bestand !== null)
+            {
+                $neuerBestand = $grundprodukt->bestand - ($grundprodukt->grundprodukte_multiplikator * $anzahl);
+    
+                $sth = $this->db->prepare(
+                    "UPDATE
+                        grundprodukte 
+                    SET 
+                        bestand = :bestand
+                    WHERE 
+                        id = :id");
+                $sth->bindParam(':bestand', $neuerBestand, PDO::PARAM_INT);
+                $sth->bindParam(':id', $grundprodukt->id, PDO::PARAM_INT);
+                
+                return $sth->execute();
+            }
+
+            return false;
         }
 
         protected function singleMap($obj)

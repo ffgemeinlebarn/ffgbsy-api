@@ -32,6 +32,7 @@
     },
     "autoload": {
         "psr-4": {
+            "FFGBSY\\Application\\Exceptions\\": "src/app/exceptions",
             "FFGBSY\\Application\\": "src/app/",
             "FFGBSY\\Services\\": "src/services/",
             "FFGBSY\\Controller\\": "src/controller/",

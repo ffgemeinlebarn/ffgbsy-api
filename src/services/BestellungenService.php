@@ -9,7 +9,8 @@
     use PDO;
     use FFGBSY\Services\BestellbonsService;
     use FFGBSY\Services\StornobonsService;
-
+    use FFGBSY\Application\Exceptions\HttpBadRequestException;
+    
     final class BestellungenService extends BaseService
     {
         private $grundprodukteService = null;
@@ -48,9 +49,8 @@
             foreach($data['bestellpositionen'] as $bestellposition)
             {
                 $this->bestellpositionenService->addToBestellung($bestellungId, $bestellposition);
+                $this->grundprodukteService->reduceByProduktId($bestellposition['produkt']['id'], $bestellposition['anzahl']);
             }
-
-            // Grundprodukte
 
             return $this->read($bestellungId);
         }
@@ -155,7 +155,8 @@
             {
                 $produkt = ($num > 1) ? "Die Produkte" : "Das Produkt";
                 $ist = ($num > 1) ? "sind" : "ist";
-                return "Die Bestellung wurde nicht angelegt. $produkt '" . implode("', '", $notAvailableProdukte) . "' $ist aufgrund nicht vorhandener Grundprodukte aktuell leider nicht verfügbar!";
+                
+                throw new HttpBadRequestException("Die Bestellung wurde nicht angelegt. $produkt '" . implode("', '", $notAvailableProdukte) . "' $ist aufgrund nicht vorhandener Grundprodukte aktuell leider nicht verfügbar!");
             }
     
             return false;
