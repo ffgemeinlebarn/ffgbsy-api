@@ -86,11 +86,12 @@ CREATE TABLE `bestellungen` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bestellbons`
+-- Table structure for table `bons`
 --
 
-CREATE TABLE `bestellbons` (
+CREATE TABLE `bons` (
   `id` int(11) NOT NULL,
+  `type` enum('bestell', 'storno') NOT NULL,
   `bestellungen_id` int(11) NOT NULL,
   `drucker_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -98,12 +99,12 @@ CREATE TABLE `bestellbons` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bestellbons_druck`
+-- Table structure for table `bons_druck`
 --
 
-CREATE TABLE `bestellbons_druck` (
+CREATE TABLE `bons_druck` (
   `id` int(11) NOT NULL,
-  `bestellbons_id` int(11) NOT NULL,
+  `bons_id` int(11) NOT NULL,
   `datum` date NOT NULL,
   `laufnummer` int(11) NOT NULL,
   `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
@@ -114,54 +115,12 @@ CREATE TABLE `bestellbons_druck` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `stornobons`
+-- Table structure for table `bons_bestellpositionen`
 --
 
-CREATE TABLE `stornobons` (
+CREATE TABLE `bons_bestellpositionen` (
   `id` int(11) NOT NULL,
-  `bestellungen_id` int(11) NOT NULL,
-  `drucker_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `stornobons_druck`
---
-
-CREATE TABLE `stornobons_druck` (
-  `id` int(11) NOT NULL,
-  `stornobons_id` int(11) NOT NULL,
-  `datum` date NOT NULL,
-  `laufnummer` int(11) NOT NULL,
-  `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
-  `success` tinyint(1) DEFAULT NULL,
-  `message` varchar(300) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bestellbons_bestellpositionen`
---
-
-CREATE TABLE `bestellbons_bestellpositionen` (
-  `id` int(11) NOT NULL,
-  `anzahl` int(11) NOT NULL DEFAULT 1,
-  `bestellbons_id` int(11) NOT NULL,
-  `bestellpositionen_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `stornobons_bestellpositionen`
---
-
-CREATE TABLE `stornobons_bestellpositionen` (
-  `id` int(11) NOT NULL,
-  `anzahl` int(11) NOT NULL DEFAULT 1,
-  `stornobons_id` int(11) NOT NULL,
+  `bons_id` int(11) NOT NULL,
   `bestellpositionen_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -355,50 +314,27 @@ ALTER TABLE `bestellungen`
   ADD KEY `fk_bestellungen_aufnehmer_id` (`aufnehmer_id`);
 
 --
--- Indexes for table `bestellbons`
+-- Indexes for table `bons`
 --
-ALTER TABLE `bestellbons`
+ALTER TABLE `bons`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_bestellbons_bestellungen_id` (`bestellungen_id`),
-  ADD KEY `fk_bestellbons_drucker_id` (`drucker_id`);
+  ADD KEY `fk_bons_bestellungen_id` (`bestellungen_id`),
+  ADD KEY `fk_bons_drucker_id` (`drucker_id`);
 
 --
--- Indexes for table `bestellbons_druck`
+-- Indexes for table `bons_druck`
 --
-ALTER TABLE `bestellbons_druck`
+ALTER TABLE `bons_druck`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_bestellbons_druck_bestellbons_id` (`bestellbons_id`);
+  ADD KEY `fk_bons_druck_bons_id` (`bons_id`);
 
 --
--- Indexes for table `bestellbons_bestellpositionen`
+-- Indexes for table `bons_bestellpositionen`
 --
-ALTER TABLE `bestellbons_bestellpositionen`
+ALTER TABLE `bons_bestellpositionen`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_bestellbons_bestellpositionen_bestellbons_id` (`bestellbons_id`),
-  ADD KEY `fk_bestellbons_bestellpositionen_bestellpositionen_id` (`bestellpositionen_id`);
-
---
--- Indexes for table `stornobons`
---
-ALTER TABLE `stornobons`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_stornobons_bestellungen_id` (`bestellungen_id`),
-  ADD KEY `fk_stornobons_drucker_id` (`drucker_id`);
-
---
--- Indexes for table `stornobons_druck`
---
-ALTER TABLE `stornobons_druck`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_stornobons_druck_stornobons_id` (`stornobons_id`);
-
---
--- Indexes for table `stornobons_bestellpositionen`
---
-ALTER TABLE `stornobons_bestellpositionen`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_stornobons_bestellpositionen_stornobons_id` (`stornobons_id`),
-  ADD KEY `fk_stornobons_bestellpositionen_bestellpositionen_id` (`bestellpositionen_id`);
+  ADD KEY `fk_bons_bestellpositionen_bons_id` (`bons_id`),
+  ADD KEY `fk_bons_bestellpositionen_bestellpositionen_id` (`bestellpositionen_id`);
 
 --
 -- Indexes for table `drucker`
@@ -496,21 +432,21 @@ ALTER TABLE `bestellungen`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `bestellbons`
+-- AUTO_INCREMENT for table `bons`
 --
-ALTER TABLE `bestellbons`
+ALTER TABLE `bons`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `bestellbons_druck`
+-- AUTO_INCREMENT for table `bons_druck`
 --
-ALTER TABLE `bestellbons_druck`
+ALTER TABLE `bons_druck`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `bestellbons_bestellpositionen`
+-- AUTO_INCREMENT for table `bons_bestellpositionen`
 --
-ALTER TABLE `bestellbons_bestellpositionen`
+ALTER TABLE `bons_bestellpositionen`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -619,47 +555,24 @@ ALTER TABLE `bestellungen`
 COMMIT;
 
 --
--- Constraints for table `bestellbons`
+-- Constraints for table `bons`
 --
-ALTER TABLE `bestellbons`
-  ADD CONSTRAINT `fk_bestellbons_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`),
-  ADD CONSTRAINT `fk_bestellbons_drucker_id` FOREIGN KEY (`drucker_id`) REFERENCES `drucker` (`id`);
+ALTER TABLE `bons`
+  ADD CONSTRAINT `fk_bons_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`),
+  ADD CONSTRAINT `fk_bons_drucker_id` FOREIGN KEY (`drucker_id`) REFERENCES `drucker` (`id`);
 COMMIT;
 
 --
--- Constraints for table `bestellbons_druck`
+-- Constraints for table `bons_druck`
 --
-ALTER TABLE `bestellbons_druck`
-  ADD CONSTRAINT `fk_bestellbons_druck_bestellbons_id` FOREIGN KEY (`bestellbons_id`) REFERENCES `bestellbons` (`id`);
+ALTER TABLE `bons_druck`
+  ADD CONSTRAINT `fk_bons_druck_bestellbons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`);
 COMMIT;
 
 --
--- Constraints for table `bestellbons_bestellpositionen`
+-- Constraints for table `bons_bestellpositionen`
 --
-ALTER TABLE `bestellbons_bestellpositionen`
-  ADD CONSTRAINT `fk_bestellbons_bestellpositionen_bestellbons_id` FOREIGN KEY (`bestellbons_id`) REFERENCES `bestellbons` (`id`),
-  ADD CONSTRAINT `fk_bestellbons_bestellpositionen_bestellpositionen_id` FOREIGN KEY (`bestellpositionen_id`) REFERENCES `bestellpositionen` (`id`);
-COMMIT;
-
---
--- Constraints for table `stornobons`
---
-ALTER TABLE `stornobons`
-  ADD CONSTRAINT `fk_stornobons_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`),
-  ADD CONSTRAINT `fk_stornobons_drucker_id` FOREIGN KEY (`drucker_id`) REFERENCES `drucker` (`id`);
-COMMIT;
-
---
--- Constraints for table `stornobons_druck`
---
-ALTER TABLE `stornobons_druck`
-  ADD CONSTRAINT `fk_stornobons_druck_stornobons_id` FOREIGN KEY (`stornobons_id`) REFERENCES `stornobons` (`id`);
-COMMIT;
-
---
--- Constraints for table `stornobons_bestellpositionen`
---
-ALTER TABLE `stornobons_bestellpositionen`
-  ADD CONSTRAINT `fk_stornobons_bestellpositionen_stornobons_id` FOREIGN KEY (`stornobons_id`) REFERENCES `stornobons` (`id`),
-  ADD CONSTRAINT `fk_stornobons_bestellpositionen_bestellpositionen_id` FOREIGN KEY (`bestellpositionen_id`) REFERENCES `bestellpositionen` (`id`);
+ALTER TABLE `bons_bestellpositionen`
+  ADD CONSTRAINT `fk_bons_bestellpositionen_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`),
+  ADD CONSTRAINT `fk_bons_bestellpositionen_bestellpositionen_id` FOREIGN KEY (`bestellpositionen_id`) REFERENCES `bestellpositionen` (`id`);
 COMMIT;
