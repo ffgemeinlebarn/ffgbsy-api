@@ -18,6 +18,12 @@ final class BonsController extends BaseController
         $this->bonsService = $container->get('bons');
     }
 
+    public function create(Request $request, Response $response, $args): Response
+    {
+        $data = $this->bonsService->create($request->getParsedBody());
+        return $this->responseAsJson($response, $data);
+    }
+
     public function read(Request $request, Response $response, $args): Response
     {
         $data = $this->bonsService->read($args['id']);

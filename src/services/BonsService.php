@@ -106,6 +106,11 @@
             {
                 $printer = $setup->printer;
 
+                if ($bon['type'] == 'storno')
+                {
+                    $this->printService->printStornoMark($printer);
+                }
+
                 $this->printService->printHeader($printer);
                 $this->printService->printTisch($printer, $tisch);
                 $this->printService->printBestellpositionenHeader($printer);
@@ -113,6 +118,12 @@
                 $this->printService->printImprint($printer);
                 $this->printService->printQR($printer, $qrData);
                 $this->printService->printLaufnummernBlock($printer, $bonDruck->timestamp, $drucker->name, $bonDruck->laufnummer);
+
+                if ($bon['type'] == 'storno')
+                {
+                    $this->printService->printStornoMark($printer);
+                }
+
                 $this->printService->printFinish($printer);
             }
 

@@ -64,6 +64,18 @@
             return $this->singleRead($sth);
         }
 
+        public function storno($id, $anzahl)
+        {
+            $bestellposition = $this->read($id);
+
+            return $this->addToBestellung($bestellposition->bestellungen_id, [
+                "anzahl" => ($anzahl * -1),
+                "produkt" => (array) $bestellposition->produkt,
+                "notiz" => $bestellposition->notiz,
+                "eigenschaften" => $bestellposition->eigenschaften
+            ]);
+        }
+
         public function readByTypeAndBestellung($type, $bestellungId)
         {
             if($type == 'bestell')

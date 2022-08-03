@@ -63,8 +63,12 @@
 
                 $bestellung->summe = 0;
                 $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
-                $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
+                $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
                 foreach($bestellung->bestellpositionen as $position)
+                {
+                    $bestellung->summe += $position->summe;
+                }
+                foreach($bestellung->stornopositionen as $position)
                 {
                     $bestellung->summe += $position->summe;
                 }

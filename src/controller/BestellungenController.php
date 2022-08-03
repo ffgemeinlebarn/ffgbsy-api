@@ -60,6 +60,12 @@ final class BestellungenController extends BaseController
         return $this->responseAsJson($response, $this->bestellungenService->read($bestellung->id));
     }
 
+    public function stornoBestellposition(Request $request, Response $response, array $args): Response
+    {
+        $data = $this->bestellpositionenService->storno($args['bestellpositionen_id'], $request->getParsedBody()['anzahl']);
+        return $this->responseAsJson($response, $data);
+    }
+
     public function readAll(Request $request, Response $response): Response
     {
         $data = $this->bestellungenService->read(null, $request->getQueryParams());
