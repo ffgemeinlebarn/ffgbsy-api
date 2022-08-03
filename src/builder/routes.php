@@ -19,8 +19,7 @@ use FFGBSY\Controller\BestellungenController;
 use FFGBSY\Controller\PrintController;
 use FFGBSY\Controller\DatenController;
 use FFGBSY\Controller\StatusController;
-use FFGBSY\Controller\BestellbonsController;
-use FFGBSY\Controller\StornobonsController;
+use FFGBSY\Controller\BonsController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -135,24 +134,16 @@ return function (App $app)
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");
-        $group->post('/{bestellungen_id}/storno/{bestellpositionen_id}', "$controller:createStornoAndPrint");
+        $group->post('/{bestellungen_id}/bestellpositionen/{bestellpositionen_id}', "$controller:stornoBestellposition");
     });
 
-    $app->group('/bestellbons', function (Group $group)
+    $app->group('/bons', function (Group $group)
     {
-        $controller = BestellbonsController::class;
-        $group->get(PATH_ID, "$controller:read");
-        $group->get('/bestellungen/{id}', "$controller:readByBestellung");
-        $group->post('/druck', "$controller:printMultiple");
-        $group->post('/{id}/druck', "$controller:printSingle");
-    });
-
-    $app->group('/stornobons', function (Group $group)
-    {
-        $controller = StornobonsController::class;
+        $controller = BonsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_ID, "$controller:read");
-        $group->get('/bestellungen/{id}', "$controller:readByBestellung");
+        $group->get('/bestellungen/{id}/{type}', "$controller:readByTypeAndBestellung");
+        $group->post('/druck', "$controller:printMultiple");
         $group->post('/{id}/druck', "$controller:printSingle");
     });
 

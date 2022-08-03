@@ -7,8 +7,7 @@
     use DI\ContainerBuilder;
     use Psr\Container\ContainerInterface;
     use PDO;
-    use FFGBSY\Services\BestellbonsService;
-    use FFGBSY\Services\StornobonsService;
+    use FFGBSY\Services\BonsService;
     use FFGBSY\Application\Exceptions\HttpBadRequestException;
     
     final class BestellungenService extends BaseService
@@ -18,8 +17,7 @@
         private $aufnehmerService = null;
         private $tischeService = null;
         private $bestellpositionenService = null;
-        private BestellbonsService $bestellbonsService;
-        private StornobonsService $stornobonsService;
+        private BonsService $bonsService;
 
         public function __construct(ContainerInterface $container)
         {
@@ -28,8 +26,7 @@
             $this->aufnehmerService = $container->get('aufnehmer');
             $this->tischeService = $container->get('tische');
             $this->bestellpositionenService = $container->get('bestellpositionen');
-            $this->bestellbonsService = $container->get('bestellbons');
-            $this->stornobonsService = $container->get('stornobons');
+            $this->bonsService = $container->get('bons');
             parent::__construct($container);
         }
 
@@ -65,15 +62,20 @@
                 $bestellung = $this->singleRead($sth);
 
                 $bestellung->summe = 0;
-                $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);
+                $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
+                $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
                 foreach($bestellung->bestellpositionen as $position)
+                {
+                    $bestellung->summe += $position->summe;
+                }
+                foreach($bestellung->stornopositionen as $position)
                 {
                     $bestellung->summe += $position->summe;
                 }
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
-                $bestellung->bestellbons = $this->bestellbonsService->readByBestellung($bestellung->id);
-                $bestellung->stornobons = $this->stornobonsService->readByBestellung($bestellung->id);
+                $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestell', $bestellung->id);
+                $bestellung->stornobons = $this->bonsService->readByTypeAndBestellung('storno', $bestellung->id);
 
                 return $bestellung;
             }
@@ -123,15 +125,16 @@
                 
                 foreach($bestellungen as $bestellung)
                 {
-                    $bestellung->bestellpositionen = $this->bestellpositionenService->readByBestellung($bestellung->id);
+                    $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
+                    $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
                     foreach($bestellung->bestellpositionen as $position)
                     {
                         $bestellung->summe += $position->summe;
                     }
                     $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                     $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
-                    $bestellung->bestellbons = $this->bestellbonsService->readByBestellung($bestellung->id);
-                    $bestellung->stornobons = $this->stornobonsService->readByBestellung($bestellung->id);
+                    $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestell', $bestellung->id);
+                    $bestellung->stornobons = $this->bonsService->readByTypeAndBestellung('storno', $bestellung->id);
                 }
 
                 return $bestellungen;
