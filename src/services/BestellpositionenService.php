@@ -68,11 +68,21 @@
         {
             $bestellposition = $this->read($id);
 
+            $eigenschaften = [];
+            foreach($bestellposition->eigenschaften->mit as $eigenschaft)
+            {
+                array_push($eigenschaften, (array) $eigenschaft);
+            }
+            foreach($bestellposition->eigenschaften->ohne as $eigenschaft)
+            {
+                array_push($eigenschaften, (array) $eigenschaft);
+            }
+
             return $this->addToBestellung($bestellposition->bestellungen_id, [
                 "anzahl" => ($anzahl * -1),
                 "produkt" => (array) $bestellposition->produkt,
                 "notiz" => $bestellposition->notiz,
-                "eigenschaften" => $bestellposition->eigenschaften
+                "eigenschaften" => $eigenschaften
             ]);
         }
 
