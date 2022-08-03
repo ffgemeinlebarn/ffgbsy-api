@@ -64,8 +64,21 @@
             return $this->singleRead($sth);
         }
 
-        public function readByBestellung($bestellungId)
+        public function readByTypeAndBestellung($type, $bestellungId)
         {
+            if($type == 'bestell')
+            {
+                $von = 0;
+                $bis = 999;
+            }
+            elseif($type == 'storno')
+            {
+                $von = -999;
+                $bis = 0;
+            }else{
+                throw new \Exception("Type der Position ist weder 'bestell' noch 'storno'!");
+            }
+
             $sth = $this->db->prepare(
                 "SELECT 
                     bestellpositionen.*,
@@ -84,10 +97,14 @@
                 LEFT JOIN 
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 WHERE 
-                    bestellpositionen.bestellungen_id = :bestellungen_id
+                    bestellpositionen.bestellungen_id = :bestellungen_id AND
+                    bestellpositionen.anzahl > :von AND
+                    bestellpositionen.anzahl < :bis
                 GROUP BY
                     bestellpositionen.id"
             );
+            $sth->bindParam(':von', $von, PDO::PARAM_INT);
+            $sth->bindParam(':bis', $bis, PDO::PARAM_INT);
             $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
             $bestellpositionen = $this->multiRead($sth);
             foreach($bestellpositionen as $bestellposition)
@@ -98,22 +115,19 @@
             return $bestellpositionen;
         }
 
-        public function readByBestellbon($bestellbonId)
+        public function readByBon($bonId)
         {
             $sth = $this->db->prepare(
                 "SELECT 
                     bestellpositionen.*,
+                    (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
-                    produkte.drucker_id_level_2,
-
-                    -- Use the Anzahl of Table bestellbons_bestellpositionen instead of bestellpositionen (!)
-                    (produkte.preis * bestellbons_bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
-                    bestellbons_bestellpositionen.anzahl AS anzahl
+                    produkte.drucker_id_level_2
                 FROM 
                     bestellpositionen 
                 LEFT JOIN 
-                    bestellbons_bestellpositionen ON bestellbons_bestellpositionen.bestellpositionen_id = bestellpositionen.id 
+                    bons_bestellpositionen ON bons_bestellpositionen.bestellpositionen_id = bestellpositionen.id 
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
                 LEFT JOIN 
@@ -123,50 +137,11 @@
                 LEFT JOIN 
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 WHERE 
-                    bestellbons_bestellpositionen.bestellbons_id = :bestellbons_id
+                    bons_bestellpositionen.bons_id = :bons_id
                 GROUP BY
                     bestellpositionen.id"
             );
-            $sth->bindParam(':bestellbons_id', $bestellbonId, PDO::PARAM_INT);
-            $bestellpositionen = $this->multiRead($sth);
-            foreach($bestellpositionen as $bestellposition)
-            {
-                $bestellposition->produkt = $this->produkteService->read($bestellposition->produkte_id);
-            }
-            $this->calculateSummeByBestellpositionen($bestellpositionen);
-            return $bestellpositionen;
-        }
-
-        public function readByStornobon($stornobonId)
-        {
-            $sth = $this->db->prepare(
-                "SELECT 
-                    bestellpositionen.*,
-                    produktbereiche.drucker_id_level_0,
-                    produktkategorien.drucker_id_level_1,
-                    produkte.drucker_id_level_2,
-
-                    -- Use the Anzahl of Table stornobons_bestellpositionen instead of bestellpositionen (!)
-                    (produkte.preis * stornobons_bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
-                    stornobons_bestellpositionen.anzahl AS anzahl
-                FROM 
-                    bestellpositionen 
-                LEFT JOIN 
-                stornobons_bestellpositionen ON stornobons_bestellpositionen.bestellpositionen_id = bestellpositionen.id 
-                LEFT JOIN 
-                    produkte ON produkte.id = bestellpositionen.produkte_id 
-                LEFT JOIN 
-                    produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
-                LEFT JOIN 
-                    produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
-                LEFT JOIN 
-                    produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
-                WHERE 
-                    stornobons_bestellpositionen.stornobons_id = :stornobons_id
-                GROUP BY
-                    bestellpositionen.id"
-            );
-            $sth->bindParam(':stornobons_id', $stornobonId, PDO::PARAM_INT);
+            $sth->bindParam(':bons_id', $bonId, PDO::PARAM_INT);
             $bestellpositionen = $this->multiRead($sth);
             foreach($bestellpositionen as $bestellposition)
             {
@@ -191,7 +166,6 @@
             }
 
             $bestellposition->summe = $bestellposition->summe_ohne_eigenschaften + $bestellposition->summe_eigenschaften;
-            // $bestellposition->summe_storno = - $bestellposition->anzahl_storno * $bestellposition->summe;
 
             return $bestellposition;
         }
@@ -209,9 +183,9 @@
             return $summe;
         }
 
-        public function readByBestellungAndDrucker($bestellungId, $druckerId)
+        public function readByTypeAndBestellungAndDrucker($type, $bestellungId, $druckerId)
         {
-            $positionen = $this->readByBestellung($bestellungId);
+            $positionen = $this->readByTypeAndBestellung($type, $bestellungId);
             $filteredPositions = [];
 
             foreach($positionen as $position)

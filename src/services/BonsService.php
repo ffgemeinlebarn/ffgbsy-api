@@ -10,15 +10,15 @@
     use FFGBSY\Services\DruckerService;
     use FFGBSY\Services\TischeService;
     use FFGBSY\Services\BestellpositionenService;
-    use FFGBSY\Services\BestellbonsDruckService;
+    use FFGBSY\Services\BonsDruckService;
     use FFGBSY\Services\PrintService;
 
-    final class BestellbonsService extends BaseService
+    final class BonsService extends BaseService
     {
         private DruckerService $druckerService;
         private TischeService $tischeService;
         private BestellpositionenService $bestellpositionenService;
-        private BestellbonsDruckService $bestellbonsDruckService;
+        private BonsDruckService $bonsDruckService;
         private PrintService $printService;
 
         public function __construct(ContainerInterface $container)
@@ -26,79 +26,80 @@
             $this->druckerService = $container->get('drucker');
             $this->tischeService = $container->get('tische');
             $this->bestellpositionenService = $container->get('bestellpositionen');
-            $this->bestellbonsDruckService = $container->get('bestellbonsDruck');
+            $this->bonsDruckService = $container->get('bonsDruck');
             $this->printService = $container->get('print');
             parent::__construct($container);
         }
 
         public function create($data)
         {
-            $sth = $this->db->prepare("INSERT INTO bestellbons (bestellungen_id, drucker_id) VALUES (:bestellungen_id, :drucker_id)");
+            $sth = $this->db->prepare("INSERT INTO bons (type, bestellungen_id, drucker_id) VALUES (:type, :bestellungen_id, :drucker_id)");
+            $sth->bindParam(':type', $data['type'], PDO::PARAM_STR);
             $sth->bindParam(':bestellungen_id', $data['bestellungen_id'], PDO::PARAM_STR);
             $sth->bindParam(':drucker_id', $data['drucker_id'], PDO::PARAM_STR);
             $sth->execute();
 
-            $bestellbonId = $this->db->lastInsertId();
-            $sth = $this->db->prepare("INSERT INTO bestellbons_bestellpositionen (anzahl, bestellbons_id, bestellpositionen_id) VALUES (:anzahl, :bestellbons_id, :bestellpositionen_id)");
+            $bonId = $this->db->lastInsertId();
+            $sth = $this->db->prepare("INSERT INTO bons_bestellpositionen (bons_id, bestellpositionen_id) VALUES (:bons_id, :bestellpositionen_id)");
             foreach($data['bestellpositionen'] as $bestellposition)
             {
                 $bestellposition = (array) $bestellposition;
                 $sth->execute(
                     array(
-                        'anzahl' => $bestellposition['anzahl'], 
-                        'bestellbons_id' => $bestellbonId, 
+                        'bons_id' => $bonId, 
                         'bestellpositionen_id' => $bestellposition['id']
                     )
                 );
             }
 
-            return $this->read($bestellbonId);
+            return $this->read($bonId);
         }
 
         public function read($id)
         {
-            $sth = $this->db->prepare("SELECT * FROM bestellbons WHERE id = :id");
+            $sth = $this->db->prepare("SELECT * FROM bons WHERE id = :id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             return $this->addNested($this->singleRead($sth));
         }
 
-        public function readByBestellung($bestellungId)
+        public function readByTypeAndBestellung($type, $bestellungId)
         {
-            $sth = $this->db->prepare("SELECT * FROM bestellbons WHERE bestellungen_id = :bestellungen_id");
+            $sth = $this->db->prepare("SELECT * FROM bons WHERE type = :type AND bestellungen_id = :bestellungen_id");
+            $sth->bindParam(':type', $type, PDO::PARAM_STR);
             $sth->bindParam(':bestellungen_id', $bestellungId, PDO::PARAM_INT);
 
             $items = $this->multiRead($sth);
             foreach($items as $item)
             {
                 $item = $this->addNested($item);
-                $item->drucke = $this->bestellbonsDruckService->readByBestellbon($item->id);
+                $item->drucke = $this->bonsDruckService->readByBon($item->id);
             }
             return $items;
         }
 
-        public function printMultiple($bestellbons)
+        public function printMultiple($bons)
         {
             $besllbonsDrucke = [];
 
-            foreach($bestellbons as $bestellbon)
+            foreach($bons as $bon)
             {
-                array_push($besllbonsDrucke, $this->printSingle($bestellbon));
+                array_push($besllbonsDrucke, $this->printSingle($bon));
             }
 
             return $besllbonsDrucke;
         }
         
-        public function printSingle($bestellbon)
+        public function printSingle($bon)
         {
-            $bestellbonDruck = $this->bestellbonsDruckService->createFromBestellbon($bestellbon);
-            $tisch = $this->tischeService->readByBestellbon($bestellbon['id']);
-            $drucker = $this->druckerService->read($bestellbon['drucker_id']);
+            $bonDruck = $this->bonsDruckService->createFromBon($bon);
+            $tisch = $this->tischeService->readByBon($bon['id']);
+            $drucker = $this->druckerService->read($bon['drucker_id']);
             $setup = $this->printService->setupPrinter($drucker);
-            $bestellpositionen = $this->bestellpositionenService->readByBestellbon($bestellbon['id']);
+            $bestellpositionen = $this->bestellpositionenService->readByBon($bon['id']);
 
             $qrData = json_encode([
-                "bestellungen_id" => $bestellbon['bestellungen_id'],
-                "bestellbon_id" => $bestellbon['id']
+                "bestellungen_id" => $bon['bestellungen_id'],
+                "bon_id" => $bon['id']
             ]);
 
             if ($setup->success)
@@ -111,18 +112,18 @@
                 $this->printService->printBestellpositionen($printer, $bestellpositionen);
                 $this->printService->printImprint($printer);
                 $this->printService->printQR($printer, $qrData);
-                $this->printService->printLaufnummernBlock($printer, $bestellbonDruck->timestamp, $drucker->name, $bestellbonDruck->laufnummer);
+                $this->printService->printLaufnummernBlock($printer, $bonDruck->timestamp, $drucker->name, $bonDruck->laufnummer);
                 $this->printService->printFinish($printer);
             }
 
-            return $this->bestellbonsDruckService->updateResult($bestellbonDruck->id, $setup->success, $setup->message);
+            return $this->bonsDruckService->updateResult($bonDruck->id, $setup->success, $setup->message);
 
         }
 
-        public function getAffectedDruckerIdsForBestellung($bestellungId)
+        public function getAffectedDruckerIdsForBestellung($type, $bestellungId)
         {
             $ids = [];
-            foreach($this->bestellpositionenService->readByBestellung($bestellungId) as $position)
+            foreach($this->bestellpositionenService->readByTypeAndBestellung($type, $bestellungId) as $position)
             {
                 if (!in_array($position->drucker_id, $ids))
                 {

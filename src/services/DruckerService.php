@@ -42,7 +42,7 @@
 
         public function getNextLaufnummer($druckerId, $date)
         {
-            $sth = $this->db->prepare("SELECT laufnummer FROM bestellbons_druck LEFT JOIN bestellbons ON bestellbons.id = bestellbons_druck.bestellbons_id WHERE drucker_id = :drucker_id AND datum = :datum ORDER BY laufnummer DESC");
+            $sth = $this->db->prepare("SELECT laufnummer FROM bons_druck LEFT JOIN bons ON bons.id = bons_druck.bons_id WHERE drucker_id = :drucker_id AND datum = :datum ORDER BY laufnummer DESC");
             $sth->bindParam(':datum', $date, PDO::PARAM_STR);
             $sth->bindParam(':drucker_id', $druckerId, PDO::PARAM_INT);
             $sth->execute();

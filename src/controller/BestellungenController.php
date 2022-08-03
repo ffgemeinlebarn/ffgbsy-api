@@ -11,7 +11,7 @@ use FFGBSY\Services\BestellungenService;
 use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\GrundprodukteService;
 use FFGBSY\Services\PrintService;
-use FFGBSY\Services\BestellbonsService;
+use FFGBSY\Services\BonsService;
 
 final class BestellungenController extends BaseController
 {
@@ -19,7 +19,7 @@ final class BestellungenController extends BaseController
     private BestellpositionenService $bestellpositionenService;
     private GrundprodukteService $grundprodukteService;
     private PrintService $printService;
-    private BestellbonsService $bestellbonsService;
+    private BonsService $bonsService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -27,7 +27,7 @@ final class BestellungenController extends BaseController
         $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->grundprodukteService = $container->get('grundprodukte');
         $this->printService = $container->get('print');
-        $this->bestellbonsService = $container->get('bestellbons');
+        $this->bonsService = $container->get('bons');
     }
 
     public function create(Request $request, Response $response): Response
@@ -45,14 +45,15 @@ final class BestellungenController extends BaseController
         // 2. Create Bestellung
         $bestellung = $this->bestellungenService->create($input);
 
-        // 3. Create Bestellbons
-        $affectedDruckerIds = $this->bestellbonsService->getAffectedDruckerIdsForBestellung($bestellung->id);
+        // 3. Create Bons
+        $affectedDruckerIds = $this->bonsService->getAffectedDruckerIdsForBestellung('bestell', $bestellung->id);
         foreach($affectedDruckerIds as $druckerId)
         {
-            $this->bestellbonsService->create([
+            $this->bonsService->create([
+                "type" => "bestell",
                 "bestellungen_id" => $bestellung->id,
                 "drucker_id" => $druckerId,
-                "bestellpositionen" => $this->bestellpositionenService->readByBestellungAndDrucker($bestellung->id, $druckerId)
+                "bestellpositionen" => $this->bestellpositionenService->readByTypeAndBestellungAndDrucker('bestell', $bestellung->id, $druckerId)
             ]);
         }
         

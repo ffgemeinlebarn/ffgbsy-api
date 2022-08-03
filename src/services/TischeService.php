@@ -37,9 +37,9 @@
             }
         }
 
-        public function readByBestellbon($id)
+        public function readByBon($id)
         {
-            $sth = $this->db->prepare("SELECT tische.* FROM bestellbons LEFT JOIN bestellungen ON bestellungen.id = bestellbons.bestellungen_id LEFT JOIN tische ON tische.id = bestellungen.tische_id WHERE bestellbons.id = :id LIMIT 1");
+            $sth = $this->db->prepare("SELECT tische.* FROM bons LEFT JOIN bestellungen ON bestellungen.id = bons.bestellungen_id LEFT JOIN tische ON tische.id = bestellungen.tische_id WHERE bons.id = :id LIMIT 1");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             $sth->execute();
             return $this->singleRead($sth);
