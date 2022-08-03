@@ -450,24 +450,6 @@ ALTER TABLE `bons_bestellpositionen`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `stornobons`
---
-ALTER TABLE `stornobons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `stornobons_druck`
---
-ALTER TABLE `stornobons_druck`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `stornobons_bestellpositionen`
---
-ALTER TABLE `stornobons_bestellpositionen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `drucker`
 --
 ALTER TABLE `drucker`
