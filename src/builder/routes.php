@@ -142,7 +142,7 @@ return function (App $app)
     {
         $controller = BestellbonsController::class;
         $group->get(PATH_ID, "$controller:read");
-        $group->get('/bestellungen/{id}/bestellbons', "$controller:readByBestellung");
+        $group->get('/bestellungen/{id}', "$controller:readByBestellung");
         $group->post('/druck', "$controller:printMultiple");
         $group->post('/{id}/druck', "$controller:printSingle");
     });
@@ -152,7 +152,7 @@ return function (App $app)
         $controller = StornobonsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_ID, "$controller:read");
-        $group->get('/bestellungen/{id}/bestellbons', "$controller:readByBestellung");
+        $group->get('/bestellungen/{id}', "$controller:readByBestellung");
         $group->post('/{id}/druck', "$controller:printSingle");
     });
 
