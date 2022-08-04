@@ -9,6 +9,7 @@
     use PDO;
     use FFGBSY\Services\BonsService;
     use FFGBSY\Application\Exceptions\HttpBadRequestException;
+    use FFGBSY\Services\CelebrationService;
     
     final class BestellungenService extends BaseService
     {
@@ -18,6 +19,7 @@
         private $tischeService = null;
         private $bestellpositionenService = null;
         private BonsService $bonsService;
+        private CelebrationService $celebrationService;
 
         public function __construct(ContainerInterface $container)
         {
@@ -27,6 +29,7 @@
             $this->tischeService = $container->get('tische');
             $this->bestellpositionenService = $container->get('bestellpositionen');
             $this->bonsService = $container->get('bons');
+            $this->celebrationService = $container->get('celebration');
             parent::__construct($container);
         }
 
@@ -47,6 +50,8 @@
             {
                 $this->bestellpositionenService->addToBestellung($bestellungId, $bestellposition);
                 $this->grundprodukteService->reduceByProduktId($bestellposition['produkt']['id'], $bestellposition['anzahl']);
+
+                $this->celebrationService->invoke($bestellposition['produkt']['id']);
             }
 
             return $this->read($bestellungId);

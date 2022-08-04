@@ -106,22 +106,14 @@
             {
                 $printer = $setup->printer;
 
-                if ($bon['type'] == 'storno')
+                if ($bon['type'] == 'bestell')
                 {
-                    $this->printService->printStornoMark($printer);
+                    $this->printBestellbon($printer, $tisch, $drucker, $bestellpositionen, $qrData, $bonDruck);
                 }
 
-                $this->printService->printHeader($printer);
-                $this->printService->printTisch($printer, $tisch);
-                $this->printService->printBestellpositionenHeader($printer);
-                $this->printService->printBestellpositionen($printer, $bestellpositionen);
-                $this->printService->printImprint($printer);
-                $this->printService->printQR($printer, $qrData);
-                $this->printService->printLaufnummernBlock($printer, $bonDruck->timestamp, $drucker->name, $bonDruck->laufnummer);
-
                 if ($bon['type'] == 'storno')
                 {
-                    $this->printService->printStornoMark($printer);
+                    $this->printStornobon($printer, $tisch, $drucker, $bestellpositionen, $qrData, $bonDruck);
                 }
 
                 $this->printService->printFinish($printer);
@@ -129,6 +121,27 @@
 
             return $this->bonsDruckService->updateResult($bonDruck->id, $setup->success, $setup->message);
 
+        }
+
+        private function printBestellbon($printer, $tisch, $drucker, $bestellpositionen, $qrData, $bonDruck)
+        {
+            $this->printService->printHeader($printer);
+            $this->printService->printTisch($printer, $tisch);
+            $this->printService->printBestellpositionenHeader($printer);
+            $this->printService->printBestellpositionen($printer, $bestellpositionen);
+            $this->printService->printImprint($printer);
+            $this->printService->printQR($printer, $qrData);
+            $this->printService->printLaufnummernBlock($printer, $bonDruck->timestamp, $drucker->name, $bonDruck->laufnummer);
+        }
+
+        private function printStornobon($printer, $tisch, $drucker, $bestellpositionen, $qrData, $bonDruck)
+        {
+            $this->printService->printStornoMark($printer);
+            $this->printService->printTisch($printer, $tisch);
+            $this->printService->printBestellpositionenHeader($printer);
+            $this->printService->printBestellpositionen($printer, $bestellpositionen);
+            $this->printService->printQR($printer, $qrData);
+            $this->printService->printLaufnummernBlock($printer, $bonDruck->timestamp, $drucker->name, $bonDruck->laufnummer);
         }
 
         public function getAffectedDruckerIdsForBestellung($type, $bestellungId)

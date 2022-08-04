@@ -20,6 +20,8 @@ use FFGBSY\Controller\PrintController;
 use FFGBSY\Controller\DatenController;
 use FFGBSY\Controller\StatusController;
 use FFGBSY\Controller\BonsController;
+use FFGBSY\Controller\StatistikenController;
+use FFGBSY\Controller\DebugController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -157,5 +159,18 @@ return function (App $app)
     {
         $controller = StatusController::class;
         $group->get('/systemstatus', "$controller:systemstatus");
+    });
+
+    $app->group('/statistiken', function (Group $group)
+    {
+        $controller = StatistikenController::class;
+        $group->get('/timeline', "$controller:timeline");
+        $group->get('/kennzahlen', "$controller:kennzahlen");
+    });
+
+    $app->group('/debug', function (Group $group)
+    {
+        $controller = DebugController::class;
+        $group->get('/celebration', "$controller:celebration");
     });
 };

@@ -20,6 +20,8 @@
     use FFGBSY\Services\PrintService;
     use FFGBSY\Services\BonsService;
     use FFGBSY\Services\BonsDruckService;
+    use FFGBSY\Services\StatistikenService;
+    use FFGBSY\Services\CelebrationService;
     
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
@@ -64,7 +66,9 @@
         'bons' => fn (ContainerInterface $c) => new BonsService($c),
         'bonsDruck' => fn (ContainerInterface $c) => new BonsDruckService($c),
         'constants' => fn (ContainerInterface $c) => new ConstantsService($c),
-        'print' => fn (ContainerInterface $c) => new PrintService($c)
+        'print' => fn (ContainerInterface $c) => new PrintService($c),
+        'statistiken' => fn (ContainerInterface $c) => new StatistikenService($c),
+        'celebration' => fn (ContainerInterface $c) => new CelebrationService($c)
     ]);
 
     $container = $containerBuilder->build();
