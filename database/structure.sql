@@ -18,6 +18,20 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `message` varchar(300) DEFAULT NULL,
+  `author` varchar(50) DEFAULT NULL,
+  `timestamp` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `constants`
 --
 
@@ -194,9 +208,7 @@ CREATE TABLE `produkte` (
   `sortierindex` int(11) DEFAULT NULL,
   `produkteinteilungen_id` int(11) NOT NULL,
   `grundprodukte_id` int(11) DEFAULT NULL,
-  `grundprodukte_multiplikator` int(11) DEFAULT NULL,
-  `celebration_active` tinyint(1) NOT NULL DEFAULT 0,
-  `celebration_last` int(11) NOT NULL DEFAULT 0
+  `grundprodukte_multiplikator` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -280,6 +292,12 @@ CREATE TABLE `tischkategorien` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `constants`
@@ -414,6 +432,12 @@ ALTER TABLE `tischkategorien`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `aufnehmer`
