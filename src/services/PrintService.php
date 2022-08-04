@@ -10,7 +10,9 @@
     use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
     use Mike42\Escpos\Printer;
     use Mike42\Escpos\EscposImage;
-
+    
+    const QUATER_LINE_BLANK = "            \n";
+    const THIRD_LINE_BLANK = "                \n";
     const HALF_LINE_BLANK = "                        \n";
     const LINE_AND_BREAK = "------------------------------------------------\n";
     const SHORT_LINE_AND_BREAK = "------------\n";
@@ -72,7 +74,7 @@
         }
 
         /**********************************************************
-        *** Print Blocks
+        *** Print Blocks - Bons
         **********************************************************/
 
         public function printHeader($printer)
@@ -113,10 +115,10 @@
         public function printStornoMark($printer)
         {
             $printer->setReverseColors(true);
-            $printer->setTextSize(2,2);
-            $printer->text(HALF_LINE_BLANK);
-            $printer->text("      STORNIERUNG       \n");
-            $printer->text(HALF_LINE_BLANK);
+            $printer->setTextSize(4,4);
+            $printer->text(QUATER_LINE_BLANK);
+            $printer->text("   STORONO  \n");
+            $printer->text(QUATER_LINE_BLANK);
             $printer->setTextSize(1,1);
             $printer->setReverseColors(false);
             $printer->feed(1);
@@ -225,6 +227,50 @@
             $printer->setTextSize(2,2);
             $printer->text(SHORT_LINE_AND_BREAK);
         }
+
+        /**********************************************************
+        *** Print Blocks - Celebration
+        **********************************************************/
+
+        public function printCelebrationHeader($printer)
+        {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->setTextSize(3, 3);
+            $printer->feed(1);
+            $printer->text("Gute Arbeit!\n");
+            $printer->feed(1);
+
+            $headerImage = $this->constantsService->get('celebration_header_image');
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->graphics(EscposImage::load($headerImage));
+            $printer->feed(1);
+        }
+
+        public function printCelebrationContent($printer, $num, $textArtikel, $textEinheitAndName, $bottomImage)
+        {
+            $datetime = date('d.m.Y H:i:s');
+
+            $printer->setTextSize(2, 2);
+            $printer->text("Das war gerade $textArtikel\n");
+            $printer->setTextSize(5, 5);
+            $printer->feed(1);
+            $printer->text("{$num}.\n");
+            $printer->feed(1);
+            $printer->setTextSize(2, 2);
+            $printer->text("$textEinheitAndName\n");
+            $printer->feed(1);
+            $printer->text("beim heurigen Fest!\n");
+            $printer->setTextSize(1,1);
+            $printer->feed(2);
+            $printer->graphics(EscposImage::load($bottomImage));
+            $printer->feed(2);
+            $printer->text("$datetime");
+            $printer->feed(2);
+        }
+
+        /**********************************************************
+        *** Print Blocks - Finish
+        **********************************************************/
 
         public function printFinish($printer)
         {
