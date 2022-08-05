@@ -126,8 +126,9 @@
 
         public function printBestellpositionenHeader($printer)
         {
-            //  2+1/30 /1+5    /1/1+6     /1
-            // 00/_/ABC/_/00.00/€/_/000,00/€
+            // 3   |30                            |7        |8         |
+            // 2 |1|30                            |1|5    |1|1|6     |1|
+            // 00| |ABC                           | |00,00|€| |000,00|€|
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->setTextSize(1,1);
@@ -143,10 +144,10 @@
             {
                 $printer->setDoubleStrike(true);
                 $printer->setTextSize(1,1);
-                $printer->text(str_pad($position->anzahl."x", 3));
-                $printer->text(str_pad($position->produkt->name, 30));
-                $printer->text(str_pad($this->formatEuro($position->produkt->preis), 9, " ", STR_PAD_LEFT));
-                $printer->text(str_pad($this->formatEuro($position->summe_ohne_eigenschaften), 10, " ", STR_PAD_LEFT));
+                $printer->text($this->utf8StrPad($position->anzahl."x", 3));
+                $printer->text($this->utf8StrPad($position->produkt->name, 30));
+                $printer->text($this->utf8StrPad($this->formatEuro($position->produkt->preis), 7, " ", STR_PAD_LEFT));
+                $printer->text($this->utf8StrPad($this->formatEuro($position->summe_ohne_eigenschaften), 8, " ", STR_PAD_LEFT));
                 $printer->text("\n");
 
                 if (count($position->eigenschaften->mit))
@@ -183,7 +184,7 @@
             $printer->setTextSize(2,2);
             $printer->text("SUMME");
             $printer->setEmphasis(true);
-            $printer->text(str_pad($this->formatEuro($this->bestellpositionenService->calculateSummeByBestellpositionen($bestellpositionen)), 21, " ", STR_PAD_LEFT));
+            $printer->text($this->utf8StrPad($this->formatEuro($this->bestellpositionenService->calculateSummeByBestellpositionen($bestellpositionen)), 19, " ", STR_PAD_LEFT));
             $printer->setEmphasis(false);
             $printer->text("\n");
 
@@ -289,4 +290,10 @@
     
             return $symbol_after ? "$number$blank$symbol" : "$symbol$blank$number";
         }
+
+        private function utf8StrPad ($input, $pad_length, $pad_string = " ", $pad_style = STR_PAD_RIGHT) {
+            return str_pad($input, 
+                           strlen($input)-mb_strlen($input,'UTF-8')+$pad_length, 
+                           $pad_string, $pad_style); 
+         }
     }
