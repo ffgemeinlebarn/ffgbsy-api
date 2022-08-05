@@ -241,9 +241,8 @@
             $printer->text("Gute Arbeit!\n");
             $printer->feed(1);
 
-            $headerImage = $this->constantsService->get('celebration_header_image');
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->graphics(EscposImage::load($headerImage));
+            $printer->graphics(EscposImage::load('../assets/celebration-header.png'));
             $printer->feed(1);
         }
 
