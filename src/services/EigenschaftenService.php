@@ -36,6 +36,22 @@
             }
         }
 
+        public function readAllByProdukt($id)
+        {
+            $sth = $this->db->prepare("SELECT eigenschaften.*, produkte_eigenschaften.in_produkt_enthalten FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $eigenschaften = $this->multiRead($sth);
+            
+            $arr = [];
+            foreach($eigenschaften as $eigenschaft)
+            {
+                $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
+                $arr["_{$eigenschaft->id}"] = $eigenschaft;
+            }
+
+            return array_values($arr);
+        }
+
         public function readAllByProduktNested($id)
         {
             $sth = $this->db->prepare("SELECT eigenschaften.*, produkte_eigenschaften.in_produkt_enthalten FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");

@@ -11,6 +11,7 @@ use FFGBSY\Services\ProdukteService;
 use FFGBSY\Services\ProduktkategorienService;
 use FFGBSY\Services\ProdukteinteilungenService;
 use FFGBSY\Services\GrundprodukteService;
+use FFGBSY\Services\EigenschaftenService;
 
 final class ProdukteController extends BaseController
 {
@@ -18,6 +19,7 @@ final class ProdukteController extends BaseController
     private ProduktkategorienService $produktkategorienService;
     private ProdukteinteilungenService $produkteinteilungenService;
     private GrundprodukteService $grundprodukteService;
+    private EigenschaftenService $eigenschaftenService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -25,6 +27,7 @@ final class ProdukteController extends BaseController
         $this->produktkategorienService = $container->get('produktkategorien');
         $this->produkteinteilungenService = $container->get('produkteinteilungen');
         $this->grundprodukteService = $container->get('grundprodukte');
+        $this->eigenschaftenService = $container->get('eigenschaften');
     }
 
     public function create(Request $request, Response $response): Response
@@ -43,8 +46,8 @@ final class ProdukteController extends BaseController
         
         foreach($data as $item)
         {
-            $item->produktkategorie = $this->produktkategorienService->read($item->produktkategorien_id);
             $item->produkteinteilung = $this->produkteinteilungenService->read($item->produkteinteilungen_id);
+            $item->produkteinteilung->produktkategorie = $this->produktkategorienService->read($item->produkteinteilung->produktkategorien_id);
             $item->grundprodukt = $item->grundprodukte_id != null ? $this->grundprodukteService->read($item->grundprodukte_id) : null;
         }
 
@@ -55,9 +58,10 @@ final class ProdukteController extends BaseController
     {
         $this->request = $request;
         $data = $this->produkteService->read($args['id']);
-        $data->produktkategorie = $this->produktkategorienService->read($data->produktkategorien_id);
         $data->produkteinteilung = $this->produkteinteilungenService->read($data->produkteinteilungen_id);
+        $data->produkteinteilung->produktkategorie = $this->produktkategorienService->read($data->produkteinteilung->produktkategorien_id);
         $data->grundprodukt = $data->grundprodukte_id != null ? $this->grundprodukteService->read($data->grundprodukte_id) : null;
+        $data->eigenschaften = $this->eigenschaftenService->readAllByProdukt($data->id);
         return $this->responseAsJson($response, $data);
     }
 

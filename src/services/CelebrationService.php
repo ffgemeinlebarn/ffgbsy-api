@@ -55,8 +55,44 @@
                     $sth->bindParam(':celebration_last', $celebration, PDO::PARAM_INT);
                     $sth->execute();
 
+                    $sth = $this->db->prepare(
+                        "SELECT 
+                            produktbereiche.drucker_id_level_0,
+                            produktkategorien.drucker_id_level_1,
+                            produkte.drucker_id_level_2
+                        FROM 
+                            produkte
+                        LEFT JOIN 
+                            produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
+                        LEFT JOIN 
+                            produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
+                        LEFT JOIN 
+                            produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
+                        WHERE
+                            produkte.id = :id"
+                    );
+                    $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
+                    $sth->execute();
+                    $druckerIds = $sth->fetch(PDO::FETCH_ASSOC);
+
+                    $druckerIds['drucker_id_level_0'] = $this->asNumberOrNull($druckerIds['drucker_id_level_0']);
+                    $druckerIds['drucker_id_level_1'] = $this->asNumberOrNull($druckerIds['drucker_id_level_1']);
+                    $druckerIds['drucker_id_level_2'] = $this->asNumberOrNull($druckerIds['drucker_id_level_2']);
+                    
+                    if ($druckerIds['drucker_id_level_2'] != null)
+                    {
+                        $drucker = $this->druckerService->read($druckerIds['drucker_id_level_2']);
+                    }
+                    else if ($druckerIds['drucker_id_level_1'] != null)
+                    {
+                        $drucker = $this->druckerService->read($druckerIds['drucker_id_level_1']);
+                    }
+                    else
+                    {
+                        $drucker = $this->druckerService->read($druckerIds['drucker_id_level_0']);
+                    }
+
                     $produkt = $this->produkteService->read($produktId);
-                    $drucker = $this->druckerService->read(3);
                     $setup = $this->printService->setupPrinter($drucker);
     
                     if ($setup->success)
