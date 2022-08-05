@@ -208,7 +208,9 @@ CREATE TABLE `produkte` (
   `sortierindex` int(11) DEFAULT NULL,
   `produkteinteilungen_id` int(11) NOT NULL,
   `grundprodukte_id` int(11) DEFAULT NULL,
-  `grundprodukte_multiplikator` int(11) DEFAULT NULL
+  `grundprodukte_multiplikator` int(11) DEFAULT NULL,
+  `celebration_active` tinyint(1) NOT NULL DEFAULT 0,
+  `celebration_last` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
