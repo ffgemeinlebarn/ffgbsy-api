@@ -317,7 +317,7 @@ ALTER TABLE `aufnehmer`
 ALTER TABLE `bestellpositionen`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_bestellpositionen_produkte_id` (`produkte_id`),
-  ADD KEY `fkbestellpositionen__bestellungen_id` (`bestellungen_id`);
+  ADD KEY `fk_bestellpositionen_bestellungen_id` (`bestellungen_id`);
 
 --
 -- Indexes for table `bestellpositionen_eigenschaften`
@@ -330,8 +330,8 @@ ALTER TABLE `bestellpositionen_eigenschaften`
 --
 ALTER TABLE `bestellungen`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_bestellungen_tische_id` (`tische_id`),
-  ADD KEY `fk_bestellungen_aufnehmer_id` (`aufnehmer_id`);
+  ADD KEY `fk_bestellungen_aufnehmer_id` (`aufnehmer_id`),
+  ADD KEY `fk_bestellungen_tische_id` (`tische_id`);
 
 --
 -- Indexes for table `bons`
@@ -536,8 +536,24 @@ ALTER TABLE `tischkategorien`
 --
 -- Constraints for table `produktkategorie`
 --
+ALTER TABLE `produktbereiche`
+  ADD CONSTRAINT `fk_produktbereiche_drucker_id_level_0` FOREIGN KEY (`drucker_id_level_0`) REFERENCES `drucker` (`id`);
+COMMIT;
+
+--
+-- Constraints for table `produktkategorie`
+--
 ALTER TABLE `produktkategorien`
-  ADD CONSTRAINT `fk_produktkategorien_produktbereiche_id` FOREIGN KEY (`produktbereiche_id`) REFERENCES `produktbereiche` (`id`);
+  ADD CONSTRAINT `fk_produktkategorien_produktbereiche_id` FOREIGN KEY (`produktbereiche_id`) REFERENCES `produktbereiche` (`id`),
+  ADD CONSTRAINT `fk_produktkategorien_drucker_id_level_1` FOREIGN KEY (`drucker_id_level_1`) REFERENCES `drucker` (`id`);
+COMMIT;
+
+--
+-- Constraints for table `produktkategorien_eigenschaften`
+--
+ALTER TABLE `produktkategorien_eigenschaften`
+  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`),
+  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`);
 COMMIT;
 
 --
@@ -551,7 +567,17 @@ COMMIT;
 -- Constraints for table `produkte`
 --
 ALTER TABLE `produkte`
-  ADD CONSTRAINT `fk_produkte_produkteinteilungen_id` FOREIGN KEY (`produkteinteilungen_id`) REFERENCES `produkteinteilungen` (`id`);
+  ADD CONSTRAINT `fk_produkte_produkteinteilungen_id` FOREIGN KEY (`produkteinteilungen_id`) REFERENCES `produkteinteilungen` (`id`),
+  ADD CONSTRAINT `fk_produkte_grundprodukte_id` FOREIGN KEY (`grundprodukte_id`) REFERENCES `grundprodukte` (`id`),
+  ADD CONSTRAINT `fk_produkte_drucker_id_level_2` FOREIGN KEY (`drucker_id_level_2`) REFERENCES `drucker` (`id`);
+COMMIT;
+
+--
+-- Constraints for table `bestellpositionen`
+--
+ALTER TABLE `bestellpositionen`
+  ADD CONSTRAINT `fk_bestellpositionen_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`),
+  ADD CONSTRAINT `fk_bestellpositionen_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`);
 COMMIT;
 
 --
@@ -574,7 +600,7 @@ COMMIT;
 -- Constraints for table `bons_druck`
 --
 ALTER TABLE `bons_druck`
-  ADD CONSTRAINT `fk_bons_druck_bestellbons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`);
+  ADD CONSTRAINT `fk_bons_druck_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`);
 COMMIT;
 
 --

@@ -542,3 +542,4 @@ INSERT INTO `tische` (`id`, `reihe`, `nummer`, `tischkategorien_id`, `sortierind
 (133, 'Bühne (Musik)', NULL, 12, 1320),
 (134, 'G', 7, 7, 555),
 (135, 'H', 7, 8, 655);
+COMMIT;
