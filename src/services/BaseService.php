@@ -71,4 +71,9 @@
         {
             return filter_var($str, FILTER_VALIDATE_BOOLEAN);
         }
+
+        final protected function asDatetime($str)
+        {
+            return $str;
+        }
     }

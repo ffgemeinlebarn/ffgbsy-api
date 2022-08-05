@@ -21,6 +21,7 @@ use FFGBSY\Controller\DatenController;
 use FFGBSY\Controller\StatusController;
 use FFGBSY\Controller\BonsController;
 use FFGBSY\Controller\StatistikenController;
+use FFGBSY\Controller\NotificationsController;
 use FFGBSY\Controller\DebugController;
 
 const PATH_ID    = '/{id}';
@@ -166,6 +167,15 @@ return function (App $app)
         $controller = StatistikenController::class;
         $group->get('/timeline', "$controller:timeline");
         $group->get('/kennzahlen', "$controller:kennzahlen");
+    });
+
+    $app->group('/notifications', function (Group $group)
+    {
+        $controller = NotificationsController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_ID, "$controller:readSingle");
+        $group->get('/until/{until}', "$controller:readUntil");
+        $group->get('/since/{since}', "$controller:readSince");
     });
 
     $app->group('/debug', function (Group $group)

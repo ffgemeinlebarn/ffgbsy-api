@@ -200,8 +200,6 @@ CREATE TABLE `produkte` (
   `id` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
   `formal_name` varchar(50) DEFAULT NULL,
-  `einzahl` float DEFAULT NULL,
-  `einheit` varchar(50) DEFAULT NULL,
   `preis` decimal(19,2) NOT NULL,
   `drucker_id_level_2` int(11) DEFAULT NULL,
   `aktiv` tinyint(1) NOT NULL DEFAULT 1,

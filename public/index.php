@@ -22,6 +22,7 @@
     use FFGBSY\Services\BonsDruckService;
     use FFGBSY\Services\StatistikenService;
     use FFGBSY\Services\CelebrationService;
+    use FFGBSY\Services\NotificationsService;
     
     use DI\ContainerBuilder;
     use Slim\Factory\AppFactory;
@@ -68,7 +69,8 @@
         'constants' => fn (ContainerInterface $c) => new ConstantsService($c),
         'print' => fn (ContainerInterface $c) => new PrintService($c),
         'statistiken' => fn (ContainerInterface $c) => new StatistikenService($c),
-        'celebration' => fn (ContainerInterface $c) => new CelebrationService($c)
+        'celebration' => fn (ContainerInterface $c) => new CelebrationService($c),
+        'notifications' => fn (ContainerInterface $c) => new NotificationsService($c)
     ]);
 
     $container = $containerBuilder->build();
