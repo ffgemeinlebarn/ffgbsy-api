@@ -549,10 +549,18 @@ ALTER TABLE `produktkategorien`
 COMMIT;
 
 --
+-- Constraints for table `produkte_eigenschaften`
+--
+ALTER TABLE `produkte_eigenschaften`
+  ADD CONSTRAINT `fk_produkte_eigenschaften_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_produkte_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`);
+COMMIT;
+
+--
 -- Constraints for table `produktkategorien_eigenschaften`
 --
 ALTER TABLE `produktkategorien_eigenschaften`
-  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`),
+  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_produktkategorien_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`);
 COMMIT;
 
@@ -577,7 +585,7 @@ COMMIT;
 --
 ALTER TABLE `bestellpositionen`
   ADD CONSTRAINT `fk_bestellpositionen_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`),
-  ADD CONSTRAINT `fk_bestellpositionen_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`);
+  ADD CONSTRAINT `fk_bestellpositionen_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 --
@@ -592,7 +600,7 @@ COMMIT;
 -- Constraints for table `bons`
 --
 ALTER TABLE `bons`
-  ADD CONSTRAINT `fk_bons_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`),
+  ADD CONSTRAINT `fk_bons_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_bons_drucker_id` FOREIGN KEY (`drucker_id`) REFERENCES `drucker` (`id`);
 COMMIT;
 
@@ -600,13 +608,13 @@ COMMIT;
 -- Constraints for table `bons_druck`
 --
 ALTER TABLE `bons_druck`
-  ADD CONSTRAINT `fk_bons_druck_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`);
+  ADD CONSTRAINT `fk_bons_druck_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 --
 -- Constraints for table `bons_bestellpositionen`
 --
 ALTER TABLE `bons_bestellpositionen`
-  ADD CONSTRAINT `fk_bons_bestellpositionen_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`),
+  ADD CONSTRAINT `fk_bons_bestellpositionen_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_bons_bestellpositionen_bestellpositionen_id` FOREIGN KEY (`bestellpositionen_id`) REFERENCES `bestellpositionen` (`id`);
 COMMIT;
