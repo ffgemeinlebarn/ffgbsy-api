@@ -24,7 +24,9 @@
                     grundprodukte_id, 
                     grundprodukte_multiplikator,
                     celebration_active,
-                    celebration_last
+                    celebration_last,
+                    celebration_prefix,
+                    celebration_suffix
                 ) VALUES (
                     :name, 
                     :formal_name, 
@@ -36,7 +38,9 @@
                     :grundprodukte_id, 
                     :grundprodukte_multiplikator,
                     :celebration_active,
-                    :celebration_last
+                    :celebration_last,
+                    :celebration_prefix,
+                    :celebration_suffix
                 )"
             );
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
@@ -50,6 +54,8 @@
             $sth->bindParam(':grundprodukte_multiplikator', $data['grundprodukte_multiplikator'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_active', $data['celebration_active'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_last', $data['celebration_last'], PDO::PARAM_INT);
+            $sth->bindParam(':celebration_prefix', $data['celebration_prefix'], PDO::PARAM_STR);
+            $sth->bindParam(':celebration_suffix', $data['celebration_suffix'], PDO::PARAM_STR);
             $sth->execute();
 
             return $this->read($this->db->lastInsertId());
@@ -99,7 +105,9 @@
                     grundprodukte_id = :grundprodukte_id, 
                     grundprodukte_multiplikator = :grundprodukte_multiplikator,
                     celebration_active = :celebration_active,
-                    celebration_last = :celebration_last
+                    celebration_last = :celebration_last,
+                    celebration_prefix = :celebration_prefix,
+                    celebration_suffix = :celebration_suffix
                 WHERE 
                     id = :id
                 "
@@ -116,6 +124,8 @@
             $sth->bindParam(':grundprodukte_multiplikator', $data['grundprodukte_multiplikator'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_active', $data['celebration_active'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_last', $data['celebration_last'], PDO::PARAM_INT);
+            $sth->bindParam(':celebration_prefix', $data['celebration_prefix'], PDO::PARAM_STR);
+            $sth->bindParam(':celebration_suffix', $data['celebration_suffix'], PDO::PARAM_STR);
             $sth->execute();
             
             return $this->read($data['id']);

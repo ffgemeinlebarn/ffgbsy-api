@@ -32,7 +32,7 @@
         {
             $step = 100;
 
-            $sth = $this->db->prepare("SELECT celebration_active, celebration_last FROM produkte WHERE id = :id");
+            $sth = $this->db->prepare("SELECT celebration_active, celebration_last, celebration_prefix, celebration_suffix FROM produkte WHERE id = :id");
             $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
             $sth->execute();
             $result = $sth->fetch(PDO::FETCH_ASSOC);
@@ -40,6 +40,8 @@
             if (filter_var($result['celebration_active'], FILTER_VALIDATE_BOOLEAN))
             {
                 $lastCelebration = intval($result['celebration_last']);
+                $celebrationPrefix = $result['celebration_prefix'];
+                $celebrationSuffix = $result['celebration_suffix'];
 
                 $sth = $this->db->prepare("SELECT SUM(anzahl) as anzahl FROM bestellpositionen WHERE produkte_id = :produkte_id");
                 $sth->bindParam(':produkte_id', $produktId, PDO::PARAM_INT);
@@ -97,9 +99,14 @@
     
                     if ($setup->success)
                     {
+                        if ($celebrationSuffix != null && count_chars($celebrationSuffix) > 0)
+                        {
+                            $celebrationSuffix = "$celebrationSuffix\n";
+                        }
+
                         $printer = $setup->printer;
                         $this->printService->printCelebrationHeader($printer);
-                        $this->printService->printCelebrationContent($printer, $celebration, "die", "Portion\n{$produkt->name}", "../assets/celebration-{$drucker->id}.png");
+                        $this->printService->printCelebrationContent($printer, $celebration, $celebrationPrefix, "$celebrationSuffix{$produkt->name}", "../assets/celebration-{$drucker->id}.png");
                         $this->printService->printFinish($printer);
                     }
                 }

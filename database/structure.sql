@@ -224,7 +224,9 @@ CREATE TABLE `produkte` (
   `grundprodukte_id` int(11) DEFAULT NULL,
   `grundprodukte_multiplikator` int(11) DEFAULT NULL,
   `celebration_active` tinyint(1) NOT NULL DEFAULT 0,
-  `celebration_last` int(11) NOT NULL DEFAULT 0
+  `celebration_last` int(11) NOT NULL DEFAULT 0,
+  `celebration_prefix` varchar(30) DEFAULT NULL,
+  `celebration_suffix` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
