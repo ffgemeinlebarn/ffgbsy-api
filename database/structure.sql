@@ -18,6 +18,22 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `logs`
+--
+
+CREATE TABLE `logs` (
+  `id` int(11) NOT NULL,
+  `level` int(11) NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `additional` varchar(300) DEFAULT NULL,
+  `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
+  `device_name` varchar(50) DEFAULT NULL,
+  `device_ip` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `notifications`
 --
 
@@ -294,6 +310,12 @@ CREATE TABLE `tischkategorien` (
 --
 
 --
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `notifications`
 --
 ALTER TABLE `notifications`
@@ -432,6 +454,12 @@ ALTER TABLE `tischkategorien`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notifications`

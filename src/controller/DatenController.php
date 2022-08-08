@@ -50,7 +50,7 @@ final class DatenController extends BaseController
         $data->produkteinteilungen = $this->produkteinteilungenService->read();
         $data->produktbereiche = $this->produktbereicheService->read();
         $data->produktkategorien = $this->produktkategorienService->readAllNested();
-        $data->produkte = $this->produkteService->read();
+        $data->produkte = $this->produkteService->readAllActive();
         
         $sth = $this->database->prepare(
             "SELECT 

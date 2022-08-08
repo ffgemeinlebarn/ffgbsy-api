@@ -85,7 +85,9 @@ INSERT INTO `eigenschaften` (`id`, `name`, `preis`, `sortierindex`) VALUES
 (20, 'Portion Krautsalat', '1.60', 200),
 (21, 'Portion Letscho', '1.60', 210),
 (22, 'Zusätzliches Besteck', '0.00', 221),
-(23, 'Zusätzliche Semmel', '0.70', 180);
+(23, 'Zusätzliche Semmel', '0.70', 180),
+(24, 'Erdäpfel', '0.00', 240),
+(25, 'Kräutersauce', '0.00', 250);
 
 --
 -- Dumping data for table `grundprodukte`
@@ -113,15 +115,15 @@ INSERT INTO `produktbereiche` (`id`, `name`, `color`, `drucker_id_level_0`) VALU
 --
 
 INSERT INTO `produktkategorien` (`id`, `name`, `color`, `produktbereiche_id`, `drucker_id_level_1`, `sortierindex`) VALUES
-(1, 'Bier', '#5693fc', 1, 1, 10),
-(2, 'Wein weiß', '#5693fc', 1, 1, 20),
-(3, 'Wein rot', '#5693fc', 1, 1, 30),
-(4, 'Säfte', '#5693fc', 1, 1, 40),
-(5, 'Limo & Wasser', '#5693fc', 1, 1, 50),
-(6, 'Limo gespritzt', '#5693fc', 1, 1, 60),
-(7, 'Kaffee & Toast', '#176bff', 3, 5, 120),
-(8, 'Kotelett, Spieß & Würstel', '#3880ff', 2, 2, 70),
-(9, 'Hendl & Vegetarisches', '#2675ff', 2, 4, 100);
+(1, 'Bier', 'color-1', 1, 1, 10),
+(2, 'Wein weiß', 'color-1', 1, 1, 20),
+(3, 'Wein rot', 'color-1', 1, 1, 30),
+(4, 'Säfte', 'color-1', 1, 1, 40),
+(5, 'Limo & Wasser', 'color-1', 1, 1, 50),
+(6, 'Limo gespritzt', 'color-1', 1, 1, 60),
+(7, 'Kaffee & Toast', 'color-4', 3, 5, 120),
+(8, 'Kotelett, Spieß & Würstel', 'color-3', 2, 2, 70),
+(9, 'Hendl & Vegetarisch', 'color-3', 2, 4, 100);
 
 --
 -- Dumping data for table `produkteinteilungen`
@@ -342,7 +344,9 @@ INSERT INTO `produkte_eigenschaften` (`produkte_id`, `eigenschaften_id`, `in_pro
 (147, 2, 0),
 (147, 3, 0),
 (147, 5, 1),
-(147, 13, 0);
+(147, 13, 0),
+(147, 24, 0),
+(147, 25, 0);
 
 --
 -- Dumping data for table `produktkategorien_eigenschaften`

@@ -70,6 +70,12 @@
             }
         }
 
+        public function readAllActive()
+        {
+            $sth = $this->db->prepare("SELECT * FROM produkte WHERE aktiv = 1");
+            return $this->multiRead($sth);
+        }
+
         public function readByProdukteinteilung($id)
         {
             $sth = $this->db->prepare("SELECT * FROM produkte WHERE produkteinteilungen_id = :produkteinteilungen_id");

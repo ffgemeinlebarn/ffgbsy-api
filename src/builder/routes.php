@@ -23,6 +23,7 @@ use FFGBSY\Controller\BonsController;
 use FFGBSY\Controller\StatistikenController;
 use FFGBSY\Controller\NotificationsController;
 use FFGBSY\Controller\DebugController;
+use FFGBSY\Controller\LogsController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -176,6 +177,13 @@ return function (App $app)
         $group->get(PATH_ID, "$controller:readSingle");
         $group->get('/until/{until}', "$controller:readUntil");
         $group->get('/since/{since}', "$controller:readSince");
+    });
+
+    $app->group('/logs', function (Group $group)
+    {
+        $controller = LogsController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:read");
     });
 
     $app->group('/debug', function (Group $group)
