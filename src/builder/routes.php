@@ -24,6 +24,7 @@ use FFGBSY\Controller\StatistikenController;
 use FFGBSY\Controller\NotificationsController;
 use FFGBSY\Controller\DebugController;
 use FFGBSY\Controller\LogsController;
+use FFGBSY\Controller\TestsController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
@@ -38,7 +39,9 @@ return function (App $app)
 
     $app->get('/', function (Request $request, Response $response)
     {
-        $response->getBody()->write('Hello world!');
+        $datetime = new \DateTime("now");
+        $timestamp = $datetime->format(DATE_RFC3339);
+        $response->getBody()->write($timestamp);
         return $response;
     });
 
@@ -184,6 +187,12 @@ return function (App $app)
         $controller = LogsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:read");
+    });
+
+    $app->group('/tests', function (Group $group)
+    {
+        $controller = TestsController::class;
+        $group->post('/random-bestellung', "$controller:randomBestellung");
     });
 
     $app->group('/debug', function (Group $group)
