@@ -65,7 +65,7 @@
 
                     foreach($produkteinteilung->produkte as $produkt)
                     {
-                        $produkt->eigenschaften = $this->eigenschaftenService->readAllByProduktNested($produkt->id);
+                        $produkt->eigenschaften = $this->eigenschaftenService->readAllByProduktAndProduktkategorie($produkt->id, $produktkategorie->id);
                     }
                 }
             }

@@ -65,8 +65,9 @@ final class TestsController extends BaseController
             $produkte = $this->produkteService->readByProdukteinteilung($id2);
             $produkt2 = $produkte[array_rand($produkte)];
 
-            $produkt1->eigenschaften = $this->eigenschaftenService->readAllByProduktNested($produkt1->id);
-            $produkt2->eigenschaften = $this->eigenschaftenService->readAllByProduktNested($produkt2->id);
+            // TODO: Add Kategorie Id
+            $produkt1->eigenschaften = $this->eigenschaftenService->readAllByProduktAndProduktkategorie($produkt1->id, 1);
+            $produkt2->eigenschaften = $this->eigenschaftenService->readAllByProduktAndProduktkategorie($produkt2->id, 1);
 
             $bestellposition1 = $this->bestellpositionenService->addToBestellung($bestellung->id, [
                 "anzahl" => rand(1, 5),
