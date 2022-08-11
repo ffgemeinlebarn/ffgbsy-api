@@ -52,14 +52,14 @@
             return array_values($arr);
         }
 
-        public function readAllByProduktNested($id)
+        public function readAllByProduktAndProduktkategorie($produktId, $produktkategorienId)
         {
             $sth = $this->db->prepare("SELECT eigenschaften.*, produkte_eigenschaften.in_produkt_enthalten FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
-            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
             $eigenschaften = $this->multiRead($sth);
 
             $sth = $this->db->prepare("SELECT eigenschaften.*, produktkategorien_eigenschaften.in_produkt_enthalten FROM produktkategorien_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id WHERE produktkategorien_eigenschaften.produktkategorien_id = :id ORDER BY eigenschaften.sortierindex ASC");
-            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $sth->bindParam(':id', $produktkategorienId, PDO::PARAM_INT);
             $eigenschaften = array_merge($eigenschaften, $this->multiRead($sth));
             
             $arr = [];
