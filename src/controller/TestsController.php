@@ -107,16 +107,19 @@ final class TestsController extends BaseController
         $bestellung = $this->bestellungenService->read($bestellung->id);
         $bestellbons = (array) $bestellung->bestellbons;
 
-        $bons = [];
-        foreach($bestellbons as $bestellbon)
+        if ($bonDruck)
         {
-            $bestellbon = (array) $bestellbon;
-            $bestellbon['drucker'] = (array) $bestellbon['drucker'];
-            array_push($bons, $bestellbon);
+            $bons = [];
+            foreach($bestellbons as $bestellbon)
+            {
+                $bestellbon = (array) $bestellbon;
+                $bestellbon['drucker'] = (array) $bestellbon['drucker'];
+                array_push($bons, $bestellbon);
+            }
+            $data = $this->bonsService->printMultiple($bons);
         }
 
-
-        $data = $this->bonsService->printMultiple($bons);
+        $data = $this->bestellungenService->read($bestellung->id);
 
         return $this->responseAsJson($response, $data);
     }
