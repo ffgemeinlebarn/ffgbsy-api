@@ -29,4 +29,16 @@ final class StatistikenController extends BaseController
         $data = $this->statistikenService->kennzahlen();
         return $this->responseAsJson($response, $data);
     }
+
+    public function produktbereiche(Request $request, Response $response): Response
+    {
+        $data = $this->statistikenService->produktbereiche();
+        return $this->responseAsJson($response, $data);
+    }
+
+    public function produktkategorien(Request $request, Response $response): Response
+    {
+        $data = $this->statistikenService->produktkategorien();
+        return $this->responseAsJson($response, $data);
+    }
 }
