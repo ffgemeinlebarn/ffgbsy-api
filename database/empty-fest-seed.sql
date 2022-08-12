@@ -26,14 +26,17 @@ INSERT INTO `aufnehmer` (`id`, `vorname`, `nachname`, `aktiv`, `zoom_level`) VAL
 (4, 'Anne', 'Pfiel', 1, 3),
 (5, 'Andreas', 'Strohmayer', 1, 3),
 (6, 'Elisabeth', 'Marik', 1, 3),
-(7, 'Heinrich', 'Redl jun.', 1, 1),
-(8, 'Heinrich', 'Redl sen.', 1, 2),
+(7, 'Heinz', 'Redl jun.', 0, 1),
+(8, 'Heinz', 'Redl sen.', 1, 2),
 (9, 'Kathrin', 'Redl-Swift', 0, 0),
 (10, 'Kathrin', 'Strohmayer', 0, 1),
-(11, 'Kathrin', 'Bauer', 1, 2),
-(12, 'Marlene', 'Kaller', 1, 3),
+(11, 'Kathrin', 'Holzheu', 1, 2),
+(12, 'Marlene', 'Kaller', 0, 3),
 (13, 'Andreas', 'Pfiel', 1, 3),
-(14, 'Marcel', 'Czech', 1, 1);
+(14, 'Marcel', 'Czech', 1, 1),
+(15, 'Theresa', 'Süss', 1, 1),
+(16, 'Elisabth', 'Haas', 1, 1),
+(17, 'Iris ', 'Strasser', 1, 1);
 
 --
 -- Dumping data for table `constants`
@@ -67,7 +70,7 @@ INSERT INTO `eigenschaften` (`id`, `name`, `preis`, `sortierindex`) VALUES
 (2, 'Ketchup', '0.00', 20),
 (3, 'Krautsalat', '0.00', 30),
 (4, 'Pommes', '1.00', 40),
-(5, 'Semmel', '0.70', 50),
+(5, 'Semmel', '0.80', 50),
 (6, 'Zusätzlicher Teller', '0.00', 220),
 (7, 'zum Mitnehmen', '0.00', 300),
 (8, 'Strohalm', '0.00', 80),
@@ -80,14 +83,17 @@ INSERT INTO `eigenschaften` (`id`, `name`, `preis`, `sortierindex`) VALUES
 (15, 'Zuckerpackung', '0.00', 150),
 (16, 'Schinken', '0.00', 160),
 (17, 'Käse', '0.00', 170),
-(18, 'Semmelknödel', '1.00', 52),
-(19, 'Portion Pommes', '2.00', 190),
+(18, 'Knödel', '1.00', 52),
+(19, 'Portion Pommes', '2.50', 190),
 (20, 'Portion Krautsalat', '1.60', 200),
 (21, 'Portion Letscho', '1.60', 210),
 (22, 'Zusätzliches Besteck', '0.00', 221),
-(23, 'Zusätzliche Semmel', '0.70', 180),
+(23, 'Zusätzliche Semmel', '0.80', 180),
 (24, 'Erdäpfel', '0.00', 240),
-(25, 'Kräutersauce', '0.00', 250);
+(25, 'Kräutersauce', '0.00', 250),
+(26, 'Zusätzlicher Erdäpfel', '0.00', 250),
+(27, 'Zusätzlicher Knödel', '1.00', 53),
+(28, 'Zusätzliche Portion Pommes zum Hendl', '2.50', 191);
 
 --
 -- Dumping data for table `grundprodukte`
@@ -115,13 +121,13 @@ INSERT INTO `produktbereiche` (`id`, `name`, `color`, `drucker_id_level_0`) VALU
 --
 
 INSERT INTO `produktkategorien` (`id`, `name`, `color`, `produktbereiche_id`, `drucker_id_level_1`, `sortierindex`) VALUES
-(1, 'Bier', 'color-1', 1, 1, 10),
-(2, 'Wein weiß', 'color-1', 1, 1, 20),
-(3, 'Wein rot', 'color-1', 1, 1, 30),
-(4, 'Säfte', 'color-1', 1, 1, 40),
-(5, 'Limo & Wasser', 'color-1', 1, 1, 50),
-(6, 'Limo gespritzt', 'color-1', 1, 1, 60),
-(7, 'Kaffee & Toast', 'color-4', 3, 5, 120),
+(1, 'Bier', 'color-1', 1, NULL, 10),
+(2, 'Wein weiß', 'color-1', 1, NULL, 20),
+(3, 'Wein rot', 'color-1', 1, NULL, 30),
+(4, 'Säfte', 'color-1', 1, NULL, 40),
+(5, 'Limo & Wasser', 'color-1', 1, NULL, 50),
+(6, 'Limo gespritzt', 'color-1', 1, NULL, 60),
+(7, 'Kaffee & Toast', 'color-4', 3, NULL, 120),
 (8, 'Kotelett, Spieß & Würstel', 'color-3', 2, 2, 70),
 (9, 'Hendl & Vegetarisch', 'color-3', 2, 4, 100);
 
@@ -343,10 +349,12 @@ INSERT INTO `produkte_eigenschaften` (`produkte_id`, `eigenschaften_id`, `in_pro
 (147, 1, 0),
 (147, 2, 0),
 (147, 3, 0),
-(147, 5, 1),
+(147, 5, 0),
 (147, 13, 0),
-(147, 24, 0),
-(147, 25, 0);
+(147, 24, 1),
+(147, 25, 1),
+(147, 26, 0),
+(117, 27, 0);
 
 --
 -- Dumping data for table `produktkategorien_eigenschaften`
