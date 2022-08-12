@@ -135,6 +135,7 @@
                 
                 foreach($bestellungen as $bestellung)
                 {
+                    $bestellung->summe = 0;
                     $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
                     $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
                     foreach($bestellung->bestellpositionen as $position)
