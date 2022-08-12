@@ -10,14 +10,19 @@
     use FFGBSY\Services\BonsService;
     use FFGBSY\Application\Exceptions\HttpBadRequestException;
     use FFGBSY\Services\CelebrationService;
+    use FFGBSY\Services\GrundprodukteService;
+    use FFGBSY\Services\ProdukteService;
+    use FFGBSY\Services\AufnehmerService;
+    use FFGBSY\Services\TischeService;
+    use FFGBSY\Services\BestellpositionenService;
     
     final class BestellungenService extends BaseService
     {
-        private $grundprodukteService = null;
-        private $produkteService = null;
-        private $aufnehmerService = null;
-        private $tischeService = null;
-        private $bestellpositionenService = null;
+        private GrundprodukteService $grundprodukteService;
+        private ProdukteService $produkteService;
+        private AufnehmerService $aufnehmerService;
+        private TischeService $tischeService;
+        private BestellpositionenService $bestellpositionenService;
         private BonsService $bonsService;
         private CelebrationService $celebrationService;
 
