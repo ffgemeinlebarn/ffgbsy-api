@@ -7,11 +7,13 @@
     use DI\ContainerBuilder;
     use Psr\Container\ContainerInterface;
     use PDO;
+    use FFGBSY\Services\ProdukteService;
+    use FFGBSY\Services\EigenschaftenService;
 
     final class BestellpositionenService extends BaseService
     {
-        private $produkteService = null;
-        private $eigenschaftenService = null;
+        private ProdukteService $produkteService;
+        private EigenschaftenService $eigenschaftenService;
 
         public function __construct(ContainerInterface $container)
         {

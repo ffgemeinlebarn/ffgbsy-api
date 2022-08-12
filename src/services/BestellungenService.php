@@ -10,14 +10,19 @@
     use FFGBSY\Services\BonsService;
     use FFGBSY\Application\Exceptions\HttpBadRequestException;
     use FFGBSY\Services\CelebrationService;
+    use FFGBSY\Services\GrundprodukteService;
+    use FFGBSY\Services\ProdukteService;
+    use FFGBSY\Services\AufnehmerService;
+    use FFGBSY\Services\TischeService;
+    use FFGBSY\Services\BestellpositionenService;
     
     final class BestellungenService extends BaseService
     {
-        private $grundprodukteService = null;
-        private $produkteService = null;
-        private $aufnehmerService = null;
-        private $tischeService = null;
-        private $bestellpositionenService = null;
+        private GrundprodukteService $grundprodukteService;
+        private ProdukteService $produkteService;
+        private AufnehmerService $aufnehmerService;
+        private TischeService $tischeService;
+        private BestellpositionenService $bestellpositionenService;
         private BonsService $bonsService;
         private CelebrationService $celebrationService;
 
@@ -130,6 +135,7 @@
                 
                 foreach($bestellungen as $bestellung)
                 {
+                    $bestellung->summe = 0;
                     $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
                     $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
                     foreach($bestellung->bestellpositionen as $position)
@@ -175,6 +181,8 @@
             $obj->id = $this->asNumber($obj->id);
             $obj->tische_id = $this->asNumber($obj->tische_id);
             $obj->aufnehmer_id = $this->asNumber($obj->aufnehmer_id);
+            $obj->timestamp_begonnen = $this->asIsoTimestamp($obj->timestamp_begonnen);
+            $obj->timestamp_beendet = $this->asIsoTimestamp($obj->timestamp_beendet);
             return $obj;
         }
     }

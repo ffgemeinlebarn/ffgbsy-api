@@ -44,7 +44,7 @@ final class DatenController extends BaseController
     {
         $data = new \stdClass();
 
-        $data->aufnehmer = $this->aufnehmerService->read();
+        $data->aufnehmer = $this->aufnehmerService->readAllActive();
         $data->tische = $this->tischeService->read();
         $data->tischkategorien = $this->tischkategorienService->read();
         $data->produkteinteilungen = $this->produkteinteilungenService->read();

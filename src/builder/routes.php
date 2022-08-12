@@ -171,6 +171,8 @@ return function (App $app)
         $controller = StatistikenController::class;
         $group->get('/timeline', "$controller:timeline");
         $group->get('/kennzahlen', "$controller:kennzahlen");
+        $group->get('/produktbereiche', "$controller:produktbereiche");
+        $group->get('/produktkategorien', "$controller:produktkategorien");
     });
 
     $app->group('/notifications', function (Group $group)

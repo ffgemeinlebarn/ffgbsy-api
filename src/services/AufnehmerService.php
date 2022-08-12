@@ -37,6 +37,19 @@
             }
         }
 
+        public function readAllActive($id = null)
+        {
+            $sth = $this->db->prepare("SELECT * FROM aufnehmer WHERE aktiv = 1 ORDER BY nachname ASC, vorname ASC");
+            return $this->multiRead($sth);
+        }
+
+        public function readByBestellung($id)
+        {
+            $sth = $this->db->prepare("SELECT aufnehmer.* FROM bestellungen INNER JOIN aufnehmer ON aufnehmer.id = bestellungen.aufnehmer_id WHERE bestellungen.id = :id");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            return $this->singleRead($sth);
+        }
+
         public function update($data)
         {
             $sth = $this->db->prepare("UPDATE aufnehmer SET vorname = :vorname, nachname = :nachname, aktiv = :aktiv, zoom_level = :zoom_level WHERE id = :id");

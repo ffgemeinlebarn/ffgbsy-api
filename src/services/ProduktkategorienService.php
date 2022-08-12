@@ -7,12 +7,15 @@
     use DI\ContainerBuilder;
     use Psr\Container\ContainerInterface;
     use PDO;
+    use FFGBSY\Services\ProdukteinteilungenService;
+    use FFGBSY\Services\ProdukteService;
+    use FFGBSY\Services\EigenschaftenService;
 
     final class ProduktkategorienService extends BaseService
     {
-        private $produkteinteilungenService = null;
-        private $produkteService = null;
-        private $eigenschaftenService = null;
+        private ProdukteinteilungenService $produkteinteilungenService;
+        private ProdukteService $produkteService;
+        private EigenschaftenService $eigenschaftenService;
 
         public function __construct(ContainerInterface $container)
         {
