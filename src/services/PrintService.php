@@ -205,18 +205,23 @@
         public function printQr($printer, string $data)
         {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->qrCode($data, Printer::QR_ECLEVEL_L, 5, Printer::QR_MODEL_2);
+            $printer->qrCode($data, Printer::QR_ECLEVEL_L, 4, Printer::QR_MODEL_2);
             $printer->feed(1);
         }
 
-        public function printLaufnummernBlock($printer, $timestamp, $druckerName, $laufnummer)
+        public function printInfo($printer, $bestellungId, $bonId, $aufnehmerName, $timestamp)
         {
             $gedruckt = date_format(date_create($timestamp), "d.m.Y H:i:s");
 
+            $printer->text("BS-{$bestellungId} / BO-{$bonId} / {$aufnehmerName}\n");
+            $printer->text("$gedruckt\n");
+        }
+
+        public function printLaufnummernBlock($printer, $druckerName, $laufnummer)
+        {
             $printer->setLineSpacing(1);
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setDoubleStrike(true);
-            $printer->text("$gedruckt\n");
             $printer->setTextSize(2,2);
             $printer->text(SHORT_LINE_AND_BREAK);
             $printer->setTextSize(2,1);
