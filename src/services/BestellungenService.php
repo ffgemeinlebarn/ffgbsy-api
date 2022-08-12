@@ -181,6 +181,8 @@
             $obj->id = $this->asNumber($obj->id);
             $obj->tische_id = $this->asNumber($obj->tische_id);
             $obj->aufnehmer_id = $this->asNumber($obj->aufnehmer_id);
+            $obj->timestamp_begonnen = $this->asIsoTimestamp($obj->timestamp_begonnen);
+            $obj->timestamp_beendet = $this->asIsoTimestamp($obj->timestamp_beendet);
             return $obj;
         }
     }

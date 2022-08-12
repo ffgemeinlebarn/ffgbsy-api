@@ -45,7 +45,7 @@
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
-            $obj->timestamp = $this->asDatetime($obj->timestamp);
+            $obj->timestamp = $this->asIsoTimestamp($obj->timestamp);
             return $obj;
         }
     }

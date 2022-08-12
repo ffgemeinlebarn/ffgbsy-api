@@ -36,6 +36,7 @@
         {
             $obj->id = $this->asNumber($obj->id);
             $obj->level = $this->asNumber($obj->level);
+            $obj->timestamp = $this->asIsoTimestamp($obj->timestamp);
             return $obj;
         }
     }

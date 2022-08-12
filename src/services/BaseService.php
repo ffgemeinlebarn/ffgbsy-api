@@ -72,8 +72,8 @@
             return filter_var($str, FILTER_VALIDATE_BOOLEAN);
         }
 
-        final protected function asDatetime($str)
+        final protected function asIsoTimestamp($str)
         {
-            return $str;
+            return date(DATE_ISO8601, strtotime($str));
         }
     }

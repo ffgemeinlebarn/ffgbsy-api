@@ -91,6 +91,8 @@
 
         public function update($data)
         {
+            $grundprodukte_multiplikator = $data['grundprodukte_multiplikator'] > 0 ? $data['grundprodukte_multiplikator'] : null;
+
             $sth = $this->db->prepare(
                 "UPDATE 
                     produkte 
@@ -121,7 +123,7 @@
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->bindParam(':produkteinteilungen_id', $data['produkteinteilung']['id'], PDO::PARAM_INT);
             $sth->bindParam(':grundprodukte_id', $data['grundprodukt']['id'], PDO::PARAM_STR);
-            $sth->bindParam(':grundprodukte_multiplikator', $data['grundprodukte_multiplikator'], PDO::PARAM_INT);
+            $sth->bindParam(':grundprodukte_multiplikator', $grundprodukte_multiplikator, PDO::PARAM_INT);
             $sth->bindParam(':celebration_active', $data['celebration_active'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_last', $data['celebration_last'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_prefix', $data['celebration_prefix'], PDO::PARAM_STR);

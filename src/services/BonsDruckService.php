@@ -63,6 +63,7 @@
             $obj->id = $this->asNumber($obj->id);
             $obj->bons_id = $this->asNumber($obj->bons_id);
             $obj->laufnummer = $this->asNumber($obj->laufnummer);
+            $obj->timestamp = $this->asIsoTimestamp($obj->timestamp);
             $obj->success = $this->asBool($obj->success);
             return $obj;
         }
