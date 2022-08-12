@@ -31,7 +31,7 @@
         {
             $sth = $this->db->prepare(
                 "SELECT 
-                    COUNT(bestellpositionen.anzahl) AS bestellte_produkte,
+                    SUM(bestellpositionen.anzahl) AS bestellte_produkte,
                     SUM(produkte.preis * bestellpositionen.anzahl) AS summe, 
                     DATE(bestellungen.timestamp_beendet) AS datum
                 FROM 
@@ -124,9 +124,9 @@
                     REPLACE(SUM(produkte.preis * bestellpositionen.anzahl), ',', '') AS summe, 
                     DATE(bestellungen.timestamp_beendet) AS datum
                 FROM 
-                    bestellungen 
+                    bestellpositionen
                 LEFT JOIN 
-                    bestellpositionen ON bestellpositionen.bestellungen_id = bestellungen.id 
+                    bestellungen ON bestellpositionen.bestellungen_id = bestellungen.id 
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
                 GROUP BY
@@ -201,9 +201,9 @@
                     DATE(bestellungen.timestamp_beendet) AS datum,
                     produktbereiche.id AS produktbereiche_id
                 FROM 
-                    bestellungen 
+                    bestellpositionen
                 LEFT JOIN 
-                    bestellpositionen ON bestellpositionen.bestellungen_id = bestellungen.id 
+                    bestellungen ON bestellpositionen.bestellungen_id = bestellungen.id 
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
                 LEFT JOIN 
@@ -298,9 +298,9 @@
                     DATE(bestellungen.timestamp_beendet) AS datum,
                     produktkategorien.id AS produktkategorien_id
                 FROM 
-                    bestellungen 
+                    bestellpositionen
                 LEFT JOIN 
-                    bestellpositionen ON bestellpositionen.bestellungen_id = bestellungen.id 
+                    bestellungen ON bestellpositionen.bestellungen_id = bestellungen.id 
                 LEFT JOIN 
                     produkte ON produkte.id = bestellpositionen.produkte_id 
                 LEFT JOIN 
