@@ -37,6 +37,12 @@
             }
         }
 
+        public function readAllActive($id = null)
+        {
+            $sth = $this->db->prepare("SELECT * FROM aufnehmer WHERE aktiv = 1 ORDER BY nachname ASC, vorname ASC");
+            return $this->multiRead($sth);
+        }
+
         public function readByBestellung($id)
         {
             $sth = $this->db->prepare("SELECT aufnehmer.* FROM bestellungen INNER JOIN aufnehmer ON aufnehmer.id = bestellungen.aufnehmer_id WHERE bestellungen.id = :id");
