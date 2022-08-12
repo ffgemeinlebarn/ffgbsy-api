@@ -137,7 +137,7 @@
             $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
         }
 
-        private function printStornobon($printer, $tisch, $drucker, $aufnehmerName, $bestellpositionen, $qrData, $bonDruck)
+        private function printStornobon($printer, $tisch, $drucker, $bestellungId, $bonId, $aufnehmerName, $bestellpositionen, $qrData, $bonDruck)
         {
             $this->printService->printStornoMark($printer);
             $this->printService->printTisch($printer, $tisch);
