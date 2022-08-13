@@ -32,7 +32,7 @@
             }
             else
             {
-                $sth = $this->db->prepare("SELECT * FROM tische");
+                $sth = $this->db->prepare("SELECT * FROM tische ORDER BY sortierindex ASC");
                 return $this->multiRead($sth);
             }
         }
