@@ -4,8 +4,6 @@
 
     namespace FFGBSY\Services;
 
-    use DI\ContainerBuilder;
-    use Psr\Container\ContainerInterface;
     use PDO;
 
     final class ProdukteService extends BaseService
@@ -14,28 +12,28 @@
         {
             $sth = $this->db->prepare(
                 "INSERT INTO produkte (
-                    name, 
-                    formal_name, 
-                    preis, 
-                    drucker_id_level_2, 
-                    aktiv, 
-                    sortierindex, 
-                    produkteinteilungen_id, 
-                    grundprodukte_id, 
+                    name,
+                    formal_name,
+                    preis,
+                    drucker_id_level_2,
+                    aktiv,
+                    sortierindex,
+                    produkteinteilungen_id,
+                    grundprodukte_id,
                     grundprodukte_multiplikator,
                     celebration_active,
                     celebration_last,
                     celebration_prefix,
                     celebration_suffix
                 ) VALUES (
-                    :name, 
-                    :formal_name, 
-                    :preis, 
-                    :drucker_id_level_2, 
-                    :aktiv, 
-                    :sortierindex, 
-                    :produkteinteilungen_id, 
-                    :grundprodukte_id, 
+                    :name,
+                    :formal_name,
+                    :preis,
+                    :drucker_id_level_2,
+                    :aktiv,
+                    :sortierindex,
+                    :produkteinteilungen_id,
+                    :grundprodukte_id,
                     :grundprodukte_multiplikator,
                     :celebration_active,
                     :celebration_last,
@@ -94,23 +92,23 @@
             $grundprodukte_multiplikator = $data['grundprodukte_multiplikator'] > 0 ? $data['grundprodukte_multiplikator'] : null;
 
             $sth = $this->db->prepare(
-                "UPDATE 
-                    produkte 
-                SET 
-                    name = :name, 
-                    formal_name = :formal_name, 
-                    preis = :preis, 
-                    drucker_id_level_2 = :drucker_id_level_2, 
-                    aktiv = :aktiv, 
-                    sortierindex = :sortierindex, 
-                    produkteinteilungen_id = :produkteinteilungen_id, 
-                    grundprodukte_id = :grundprodukte_id, 
+                "UPDATE
+                    produkte
+                SET
+                    name = :name,
+                    formal_name = :formal_name,
+                    preis = :preis,
+                    drucker_id_level_2 = :drucker_id_level_2,
+                    aktiv = :aktiv,
+                    sortierindex = :sortierindex,
+                    produkteinteilungen_id = :produkteinteilungen_id,
+                    grundprodukte_id = :grundprodukte_id,
                     grundprodukte_multiplikator = :grundprodukte_multiplikator,
                     celebration_active = :celebration_active,
                     celebration_last = :celebration_last,
                     celebration_prefix = :celebration_prefix,
                     celebration_suffix = :celebration_suffix
-                WHERE 
+                WHERE
                     id = :id
                 "
             );
@@ -129,7 +127,36 @@
             $sth->bindParam(':celebration_prefix', $data['celebration_prefix'], PDO::PARAM_STR);
             $sth->bindParam(':celebration_suffix', $data['celebration_suffix'], PDO::PARAM_STR);
             $sth->execute();
-            
+
+            // 1. Remove all Eigenschaften
+            $sth = $this->db->prepare("DELETE FROM produkte_eigenschaften WHERE produkte_id = :produkte_id");
+            $sth->bindParam(':produkte_id', $data['id'], PDO::PARAM_INT);
+            $sth->execute();
+
+            // 2. Add Eigenschaften from Array
+            $sth = $this->db->prepare(
+                "INSERT INTO
+                    produkte_eigenschaften (
+                        produkte_id,
+                        eigenschaften_id,
+                        in_produkt_enthalten
+                    )
+                VALUES
+                    (
+                        :produkte_id,
+                        :eigenschaften_id,
+                        :in_produkt_enthalten
+                    )
+                "
+            );
+
+            foreach ($data['eigenschaften'] as $produktEigenschaft) {
+                $sth->bindParam(':produkte_id', $data['id'], PDO::PARAM_INT);
+                $sth->bindParam(':eigenschaften_id', $produktEigenschaft['id'], PDO::PARAM_INT);
+                $sth->bindParam(':in_produkt_enthalten', $produktEigenschaft['in_produkt_enthalten'], PDO::PARAM_INT);
+                $sth->execute();
+            }
+
             return $this->read($data['id']);
         }
 
