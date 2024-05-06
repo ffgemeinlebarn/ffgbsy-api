@@ -82,6 +82,35 @@ final class ProduktkategorienService extends BaseService
         $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
         $sth->execute();
 
+        // 1. Remove all Eigenschaften
+        $sth = $this->db->prepare("DELETE FROM produktkategorien_eigenschaften WHERE produktkategorien_id = :produktkategorien_id");
+        $sth->bindParam(':produktkategorien_id', $data['id'], PDO::PARAM_INT);
+        $sth->execute();
+
+        // 2. Add Eigenschaften from Array
+        $sth = $this->db->prepare(
+            "INSERT INTO
+                    produktkategorien_eigenschaften (
+                        produktkategorien_id,
+                        eigenschaften_id,
+                        in_produkt_enthalten
+                    )
+                VALUES
+                    (
+                        :produktkategorien_id,
+                        :eigenschaften_id,
+                        :in_produkt_enthalten
+                    )
+                "
+        );
+
+        foreach ($data['eigenschaften'] as $produktkategorieEigenschaft) {
+            $sth->bindParam(':produktkategorien_id', $data['id'], PDO::PARAM_INT);
+            $sth->bindParam(':eigenschaften_id', $produktkategorieEigenschaft['id'], PDO::PARAM_INT);
+            $sth->bindParam(':in_produkt_enthalten', $produktkategorieEigenschaft['in_produkt_enthalten'], PDO::PARAM_INT);
+            $sth->execute();
+        }
+
         return $this->read($data['id']);
     }
 

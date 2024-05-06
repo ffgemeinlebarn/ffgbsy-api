@@ -43,9 +43,8 @@ final class ProdukteController extends BaseController
     {
         $this->request = $request;
         $data = $this->produkteService->read();
-        
-        foreach($data as $item)
-        {
+
+        foreach ($data as $item) {
             $item->produkteinteilung = $this->produkteinteilungenService->read($item->produkteinteilungen_id);
             $item->produkteinteilung->produktkategorie = $this->produktkategorienService->read($item->produkteinteilung->produktkategorien_id);
             $item->grundprodukt = $item->grundprodukte_id != null ? $this->grundprodukteService->read($item->grundprodukte_id) : null;
@@ -60,6 +59,7 @@ final class ProdukteController extends BaseController
         $data = $this->produkteService->read($args['id']);
         $data->produkteinteilung = $this->produkteinteilungenService->read($data->produkteinteilungen_id);
         $data->produkteinteilung->produktkategorie = $this->produktkategorienService->read($data->produkteinteilung->produktkategorien_id);
+        $data->produkteinteilung->produktkategorie->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->produkteinteilung->produktkategorien_id);
         $data->grundprodukt = $data->grundprodukte_id != null ? $this->grundprodukteService->read($data->grundprodukte_id) : null;
         $data->eigenschaften = $this->eigenschaftenService->readAllByProdukt($data->id);
         return $this->responseAsJson($response, $data);
@@ -68,7 +68,14 @@ final class ProdukteController extends BaseController
     public function update(Request $request, Response $response): Response
     {
         $this->request = $request;
-        $data = $this->produkteService->update($request->getParsedBody());
+        $produkt = $this->produkteService->update($request->getParsedBody());
+
+        $data = $this->produkteService->read($produkt->id);
+        $data->produkteinteilung = $this->produkteinteilungenService->read($data->produkteinteilungen_id);
+        $data->produkteinteilung->produktkategorie = $this->produktkategorienService->read($data->produkteinteilung->produktkategorien_id);
+        $data->produkteinteilung->produktkategorie->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->produkteinteilung->produktkategorien_id);
+        $data->grundprodukt = $data->grundprodukte_id != null ? $this->grundprodukteService->read($data->grundprodukte_id) : null;
+        $data->eigenschaften = $this->eigenschaftenService->readAllByProdukt($data->id);
         return $this->responseAsJson($response, $data);
     }
 

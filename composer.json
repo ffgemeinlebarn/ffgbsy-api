@@ -1,16 +1,18 @@
 {
     "name": "jakob.fyi/ffgbsy",
-    "description": "A Slim Framework skeleton application for rapid development",
+    "description": "A API with Slim Framework",
     "keywords": [],
     "homepage": "http://github.com/slimphp/Slim-Skeleton",
     "license": "MIT",
-    "authors": [{
-        "name": "Jakob Vesely",
-        "email": "dev@jakob.fyi",
-        "homepage": "https://www.jakob.fyi"
-    }],
+    "authors": [
+        {
+            "name": "Jakob Vesely",
+            "email": "contact@jakob.fyi",
+            "homepage": "https://www.jakob.fyi"
+        }
+    ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "ext-json": "*",
         "mike42/escpos-php": "^4.0",
         "monolog/monolog": "^2.6",
@@ -28,7 +30,10 @@
     },
     "config": {
         "process-timeout": 0,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     },
     "autoload": {
         "psr-4": {
