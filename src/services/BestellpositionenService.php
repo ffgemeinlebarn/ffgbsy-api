@@ -6,6 +6,7 @@ namespace FFGBSY\Services;
 
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use PDO;
 use FFGBSY\Services\ProdukteService;
 use FFGBSY\Services\EigenschaftenService;
@@ -15,11 +16,11 @@ final class BestellpositionenService extends BaseService
     private ProdukteService $produkteService;
     private EigenschaftenService $eigenschaftenService;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
         $this->produkteService = $container->get('produkte');
         $this->eigenschaftenService = $container->get('eigenschaften');
-        parent::__construct($container);
+        parent::__construct($container, $logger);
     }
 
     public function addToBestellung($bestellungId, $data)
@@ -42,21 +43,21 @@ final class BestellpositionenService extends BaseService
     public function read($id)
     {
         $sth = $this->db->prepare(
-            "SELECT 
+            "SELECT
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
-                FROM 
-                    bestellpositionen 
-                LEFT JOIN 
-                    produkte ON produkte.id = bestellpositionen.produkte_id 
-                LEFT JOIN 
+                FROM
+                    bestellpositionen
+                LEFT JOIN
+                    produkte ON produkte.id = bestellpositionen.produkte_id
+                LEFT JOIN
                     produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
-                LEFT JOIN 
+                LEFT JOIN
                     produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
-                LEFT JOIN 
+                LEFT JOIN
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
                 WHERE
                     bestellpositionen.id = :id"
@@ -98,23 +99,23 @@ final class BestellpositionenService extends BaseService
         }
 
         $sth = $this->db->prepare(
-            "SELECT 
+            "SELECT
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
-                FROM 
-                    bestellpositionen 
-                LEFT JOIN 
-                    produkte ON produkte.id = bestellpositionen.produkte_id 
-                LEFT JOIN 
+                FROM
+                    bestellpositionen
+                LEFT JOIN
+                    produkte ON produkte.id = bestellpositionen.produkte_id
+                LEFT JOIN
                     produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
-                LEFT JOIN 
+                LEFT JOIN
                     produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
-                LEFT JOIN 
+                LEFT JOIN
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
-                WHERE 
+                WHERE
                     bestellpositionen.bestellungen_id = :bestellungen_id AND
                     bestellpositionen.anzahl > :von AND
                     bestellpositionen.anzahl < :bis
@@ -135,25 +136,25 @@ final class BestellpositionenService extends BaseService
     public function readByBon($bonId)
     {
         $sth = $this->db->prepare(
-            "SELECT 
+            "SELECT
                     bestellpositionen.*,
                     (produkte.preis * bestellpositionen.anzahl) AS summe_ohne_eigenschaften,
                     produktbereiche.drucker_id_level_0,
                     produktkategorien.drucker_id_level_1,
                     produkte.drucker_id_level_2
-                FROM 
-                    bestellpositionen 
-                LEFT JOIN 
-                    bons_bestellpositionen ON bons_bestellpositionen.bestellpositionen_id = bestellpositionen.id 
-                LEFT JOIN 
-                    produkte ON produkte.id = bestellpositionen.produkte_id 
-                LEFT JOIN 
+                FROM
+                    bestellpositionen
+                LEFT JOIN
+                    bons_bestellpositionen ON bons_bestellpositionen.bestellpositionen_id = bestellpositionen.id
+                LEFT JOIN
+                    produkte ON produkte.id = bestellpositionen.produkte_id
+                LEFT JOIN
                     produkteinteilungen ON produkteinteilungen.id = produkte.produkteinteilungen_id
-                LEFT JOIN 
+                LEFT JOIN
                     produktkategorien ON produktkategorien.id = produkteinteilungen.produktkategorien_id
-                LEFT JOIN 
+                LEFT JOIN
                     produktbereiche ON produktbereiche.id = produktkategorien.produktbereiche_id
-                WHERE 
+                WHERE
                     bons_bestellpositionen.bons_id = :bons_id
                 GROUP BY
                     bestellpositionen.id"
