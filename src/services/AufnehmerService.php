@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FFGBSY\Services;
 
-use Monolog\Logger;
 use PDO;
 
 final class AufnehmerService extends BaseService
@@ -23,8 +22,6 @@ final class AufnehmerService extends BaseService
 
     public function read($id = null)
     {
-        $this->logger->error("Aasd"); // log(Logger::DEBUG, "Hello Word");
-
         if ($id != null) {
             $sth = $this->db->prepare("SELECT * FROM aufnehmer WHERE id = :id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
