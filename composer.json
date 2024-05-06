@@ -11,10 +11,25 @@
             "homepage": "https://www.jakob.fyi"
         }
     ],
+    "repositories": {
+        "mike42/gfx-php": {
+            "type": "package",
+            "package": {
+                "name": "mike42/gfx-php",
+                "version": "0.6.1",
+                "source": {
+                    "url": "https://github.com/mike42/gfx-php.git",
+                    "type": "git",
+                    "reference": "origin/feature/56-php-version"
+                }
+            }
+        }
+    },
     "require": {
         "php": "^8.0",
         "ext-json": "*",
         "mike42/escpos-php": "^4.0",
+        "mike42/gfx-php": "0.6.1",
         "monolog/monolog": "^2.6",
         "php-di/php-di": "^6.4",
         "slim/psr7": "^1.5",
@@ -41,7 +56,8 @@
             "FFGBSY\\Application\\": "src/app/",
             "FFGBSY\\Services\\": "src/services/",
             "FFGBSY\\Controller\\": "src/controller/",
-            "FFGBSY\\": "src/"
+            "FFGBSY\\": "src/",
+            "Mike42\\GfxPhp\\": "vendor/mike42/gfx-php/src/Mike42/GfxPhp"
         }
     },
     "autoload-dev": {
