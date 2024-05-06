@@ -1,162 +1,260 @@
 <?php
 
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace FFGBSY\Services;
+namespace FFGBSY\Services;
 
-    use DI\ContainerBuilder;
-    use Psr\Container\ContainerInterface;
-    use PDO;
+use PDO;
 
-    final class EigenschaftenService extends BaseService
+final class EigenschaftenService extends BaseService
+{
+    public function create($data)
     {
-        public function create($data)
-        {
-            $sth = $this->db->prepare("INSERT INTO eigenschaften (name, preis, sortierindex) VALUES (:name, :preis, :sortierindex)");
-            $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
-            $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
-            $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
-            $sth->execute();
+        $sth = $this->db->prepare(
+            "INSERT INTO eigenschaften
+                (name, preis, sortierindex)
+            VALUES
+                (:name, :preis, :sortierindex)
+            "
+        );
+        $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
+        $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
+        $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
+        $sth->execute();
 
-            return $this->read($this->db->lastInsertId());
-        }
+        return $this->read($this->db->lastInsertId());
+    }
 
-        public function read($id = null)
-        {
-            if ($id != null)
-            {
-                $sth = $this->db->prepare("SELECT * FROM eigenschaften WHERE id=:id");
-                $sth->bindParam(':id', $id, PDO::PARAM_INT);
-                return $this->singleRead($sth);
-            }
-            else
-            {
-                $sth = $this->db->prepare("SELECT * FROM eigenschaften ORDER BY sortierindex ASC");
-                return $this->multiRead($sth);
-            }
-        }
-
-        public function readAllByProdukt($id)
-        {
-            $sth = $this->db->prepare("SELECT eigenschaften.*, produkte_eigenschaften.in_produkt_enthalten FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
+    public function read($id = null)
+    {
+        if ($id != null) {
+            $sth = $this->db->prepare("SELECT * FROM eigenschaften WHERE id=:id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
-            $eigenschaften = $this->multiRead($sth);
-            
-            $arr = [];
-            foreach($eigenschaften as $eigenschaft)
-            {
-                $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
-                $arr["_{$eigenschaft->id}"] = $eigenschaft;
-            }
+            return $this->singleRead($sth);
+        } else {
+            $sth = $this->db->prepare("SELECT * FROM eigenschaften ORDER BY sortierindex ASC");
+            return $this->multiRead($sth);
+        }
+    }
 
-            return array_values($arr);
+    public function readAllByProdukt($id)
+    {
+        $sth = $this->db->prepare(
+            "SELECT
+                eigenschaften.*,
+                produkte_eigenschaften.in_produkt_enthalten
+            FROM
+                produkte_eigenschaften
+            LEFT JOIN
+                eigenschaften
+                    ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id
+            WHERE
+                produkte_eigenschaften.produkte_id = :id
+            ORDER BY
+                eigenschaften.sortierindex ASC
+            "
+        );
+        $sth->bindParam(':id', $id, PDO::PARAM_INT);
+        $eigenschaften = $this->multiRead($sth);
+
+        $arr = [];
+        foreach ($eigenschaften as $eigenschaft) {
+            $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
+            $arr["_{$eigenschaft->id}"] = $eigenschaft;
         }
 
-        public function readAllByProduktAndProduktkategorie($produktId, $produktkategorienId)
-        {
-            $sth = $this->db->prepare("SELECT eigenschaften.*, produkte_eigenschaften.in_produkt_enthalten FROM produkte_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id WHERE produkte_eigenschaften.produkte_id = :id ORDER BY eigenschaften.sortierindex ASC");
-            $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
-            $eigenschaften = $this->multiRead($sth);
+        return array_values($arr);
+    }
 
-            $sth = $this->db->prepare("SELECT eigenschaften.*, produktkategorien_eigenschaften.in_produkt_enthalten FROM produktkategorien_eigenschaften LEFT JOIN eigenschaften ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id WHERE produktkategorien_eigenschaften.produktkategorien_id = :id ORDER BY eigenschaften.sortierindex ASC");
-            $sth->bindParam(':id', $produktkategorienId, PDO::PARAM_INT);
-            $eigenschaften = array_merge($eigenschaften, $this->multiRead($sth));
-            
-            $arr = [];
-            foreach($eigenschaften as $eigenschaft)
-            {
-                $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
-                $arr["_{$eigenschaft->id}"] = $eigenschaft;
-            }
+    public function readAllByProduktkategorie($produktkategorienId)
+    {
+        $sth = $this->db->prepare(
+            "SELECT
+                eigenschaften.*,
+                produktkategorien_eigenschaften.in_produkt_enthalten
+            FROM
+                produktkategorien_eigenschaften
+            LEFT JOIN
+                eigenschaften
+                    ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id
+            WHERE
+                produktkategorien_eigenschaften.produktkategorien_id = :id
+            ORDER BY
+                eigenschaften.sortierindex ASC
+            "
+        );
+        $sth->bindParam(':id', $produktkategorienId, PDO::PARAM_INT);
+        $eigenschaften = $this->multiRead($sth);
 
-            return array_values($arr);
+        $arr = [];
+        foreach ($eigenschaften as $eigenschaft) {
+            $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
+            $arr["_{$eigenschaft->id}"] = $eigenschaft;
         }
 
-        public function update($data)
-        {
-            $sth = $this->db->prepare("UPDATE eigenschaften SET name = :name, preis = :preis, sortierindex = :sortierindex WHERE id = :id");
-            $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
-            $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
-            $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
-            $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
-            $sth->execute();
-            
-            return $this->read($data['id']);
+        return array_values($arr);
+    }
+
+    public function readAllByProduktAndProduktkategorie($produktId, $produktkategorienId)
+    {
+        $sth = $this->db->prepare(
+            "SELECT
+                eigenschaften.*,
+                produkte_eigenschaften.in_produkt_enthalten
+            FROM
+                produkte_eigenschaften
+            LEFT JOIN
+                eigenschaften
+                    ON eigenschaften.id = produkte_eigenschaften.eigenschaften_id
+            WHERE
+                produkte_eigenschaften.produkte_id = :id
+            ORDER BY
+                eigenschaften.sortierindex ASC
+            "
+        );
+        $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
+        $eigenschaften = $this->multiRead($sth);
+
+        $sth = $this->db->prepare(
+            "SELECT
+                eigenschaften.*,
+                produktkategorien_eigenschaften.in_produkt_enthalten
+            FROM
+                produktkategorien_eigenschaften
+            LEFT JOIN
+                eigenschaften
+                    ON eigenschaften.id = produktkategorien_eigenschaften.eigenschaften_id
+            WHERE
+                produktkategorien_eigenschaften.produktkategorien_id = :id
+            ORDER BY
+                eigenschaften.sortierindex ASC
+            "
+        );
+        $sth->bindParam(':id', $produktkategorienId, PDO::PARAM_INT);
+        $eigenschaften = array_merge($eigenschaften, $this->multiRead($sth));
+
+        $arr = [];
+        foreach ($eigenschaften as $eigenschaft) {
+            $eigenschaft->aktiv = $eigenschaft->in_produkt_enthalten;
+            $arr["_{$eigenschaft->id}"] = $eigenschaft;
         }
 
-        public function delete($id)
-        {
-            $sth = $this->db->prepare("DELETE FROM eigenschaften WHERE id = :id");
-            $sth->bindParam(':id', $id, PDO::PARAM_INT);
-            return $sth->execute();
-        }
+        return array_values($arr);
+    }
 
-        public function addToBestellposition($bestellpositionId, $data)
-        {
-            if(boolval($data['in_produkt_enthalten']) != boolval($data['aktiv']))
-            {
-                $sth = $this->db->prepare("INSERT INTO bestellpositionen_eigenschaften (bestellpositionen_id, eigenschaften_id, in_produkt_enthalten, aktiv) VALUES (:bestellpositionen_id, :eigenschaften_id, :in_produkt_enthalten, :aktiv)");
-                $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
-                $sth->bindParam(':eigenschaften_id', $data['id'], PDO::PARAM_INT);
-                $sth->bindParam(':in_produkt_enthalten', $data['in_produkt_enthalten'], PDO::PARAM_INT);
-                $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
-                $sth->execute();
-            }
+    public function update($data)
+    {
+        $sth = $this->db->prepare(
+            "UPDATE
+                eigenschaften
+            SET
+                name = :name,
+                preis = :preis,
+                sortierindex = :sortierindex
+            WHERE
+                id = :id
+            "
+        );
+        $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
+        $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
+        $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
+        $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
+        $sth->execute();
 
-            return $this->readByBestellposition($bestellpositionId);
-        }
+        return $this->read($data['id']);
+    }
 
-        public function readByBestellposition($bestellpositionId)
-        {
+    public function delete($id)
+    {
+        $sth = $this->db->prepare("DELETE FROM eigenschaften WHERE id = :id");
+        $sth->bindParam(':id', $id, PDO::PARAM_INT);
+        return $sth->execute();
+    }
+
+    public function addToBestellposition($bestellpositionId, $data)
+    {
+        if (boolval($data['in_produkt_enthalten']) != boolval($data['aktiv'])) {
             $sth = $this->db->prepare(
-                "SELECT 
-                    * 
-                FROM 
-                    eigenschaften 
-                LEFT JOIN 
-                    bestellpositionen_eigenschaften ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id 
-                WHERE 
+                "INSERT INTO
+                    bestellpositionen_eigenschaften (
+                        bestellpositionen_id,
+                        eigenschaften_id,
+                        in_produkt_enthalten,
+                        aktiv
+                    )
+                VALUES
+                    (
+                        :bestellpositionen_id,
+                        :eigenschaften_id,
+                        :in_produkt_enthalten,
+                        :aktiv
+                    )
+                "
+            );
+            $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
+            $sth->bindParam(':eigenschaften_id', $data['id'], PDO::PARAM_INT);
+            $sth->bindParam(':in_produkt_enthalten', $data['in_produkt_enthalten'], PDO::PARAM_INT);
+            $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
+            $sth->execute();
+        }
+
+        return $this->readByBestellposition($bestellpositionId);
+    }
+
+    public function readByBestellposition($bestellpositionId)
+    {
+        $sth = $this->db->prepare(
+            "SELECT
+                    *
+                FROM
+                    eigenschaften
+                LEFT JOIN
+                    bestellpositionen_eigenschaften
+                        ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id
+                WHERE
                     bestellpositionen_eigenschaften.bestellpositionen_id = :bestellpositionen_id AND
                     bestellpositionen_eigenschaften.in_produkt_enthalten = 0 AND
                     bestellpositionen_eigenschaften.aktiv = 1
-            ");
-            $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
-            $sth->execute();
-            $mit = $this->multiRead($sth);
-            
-            $sth = $this->db->prepare(
-                "SELECT 
-                    * 
-                FROM 
-                    eigenschaften 
-                LEFT JOIN 
-                    bestellpositionen_eigenschaften ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id 
-                WHERE 
+            "
+        );
+        $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
+        $sth->execute();
+        $mit = $this->multiRead($sth);
+
+        $sth = $this->db->prepare(
+            "SELECT
+                    *
+                FROM
+                    eigenschaften
+                LEFT JOIN
+                    bestellpositionen_eigenschaften
+                        ON eigenschaften.id = bestellpositionen_eigenschaften.eigenschaften_id
+                WHERE
                     bestellpositionen_eigenschaften.bestellpositionen_id = :bestellpositionen_id AND
                     bestellpositionen_eigenschaften.in_produkt_enthalten = 1 AND
                     bestellpositionen_eigenschaften.aktiv = 0
-            ");
-            $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
-            $sth->execute();
-            $ohne = $this->multiRead($sth);
+            "
+        );
+        $sth->bindParam(':bestellpositionen_id', $bestellpositionId, PDO::PARAM_INT);
+        $sth->execute();
+        $ohne = $this->multiRead($sth);
 
-            $return = new \stdClass();
-            $return->mit = $mit;
-            $return->ohne = $ohne;
+        $return = new \stdClass();
+        $return->mit = $mit;
+        $return->ohne = $ohne;
 
-            return $return;
-        }
-
-        protected function singleMap($obj)
-        {
-            $obj->id = $this->asNumber($obj->id);
-            $obj->preis = $this->asDecimal($obj->preis);
-            $obj->sortierindex = $this->asNumber($obj->sortierindex);
-            if (isset($obj->in_produkt_enthalten))
-            {
-                $obj->in_produkt_enthalten = $this->asBool($obj->in_produkt_enthalten);
-            }
-            $obj->aktiv = isset($obj->aktiv) ? $this->asBool($obj->aktiv) : false;
-            return $obj;
-        }
+        return $return;
     }
+
+    protected function singleMap($obj)
+    {
+        $obj->id = $this->asNumber($obj->id);
+        $obj->preis = $this->asDecimal($obj->preis);
+        $obj->sortierindex = $this->asNumber($obj->sortierindex);
+        if (isset($obj->in_produkt_enthalten)) {
+            $obj->in_produkt_enthalten = $this->asBool($obj->in_produkt_enthalten);
+        }
+        $obj->aktiv = isset($obj->aktiv) ? $this->asBool($obj->aktiv) : false;
+        return $obj;
+    }
+}

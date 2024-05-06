@@ -8,15 +8,20 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use FFGBSY\Services\ProduktkategorienService;
+use FFGBSY\Services\ProduktbereicheService;
+use FFGBSY\Services\EigenschaftenService;
 
 final class ProduktkategorienController extends BaseController
 {
     private ProduktkategorienService $produktkategorienService;
+    private ProduktbereicheService $produktbereicheService;
+    private EigenschaftenService $eigenschaftenService;
 
     public function __construct(ContainerInterface $container)
     {
         $this->produktkategorienService = $container->get('produktkategorien');
         $this->produktbereicheService = $container->get('produktbereiche');
+        $this->eigenschaftenService = $container->get('eigenschaften');
     }
 
     public function create(Request $request, Response $response): Response
@@ -44,6 +49,7 @@ final class ProduktkategorienController extends BaseController
         $this->request = $request;
         $data = $this->produktkategorienService->read($args['id']);
         $data->produktbereich = $this->produktbereicheService->read($data->produktbereiche_id);
+        $data->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->id);
         return $this->responseAsJson($response, $data);
     }
 
@@ -52,6 +58,7 @@ final class ProduktkategorienController extends BaseController
         $this->request = $request;
         $data = $this->produktkategorienService->update($request->getParsedBody());
         $data->produktbereich = $this->produktbereicheService->read($data->produktbereiche_id);
+        $data->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->id);
         return $this->responseAsJson($response, $data);
     }
 
