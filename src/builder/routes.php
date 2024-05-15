@@ -25,28 +25,25 @@ use FFGBSY\Controller\NotificationsController;
 use FFGBSY\Controller\DebugController;
 use FFGBSY\Controller\LogsController;
 use FFGBSY\Controller\TestsController;
+use FFGBSY\Controller\SetupController;
 
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
 
-return function (App $app) 
-{
-    $app->options('/{routes:.*}', function (Request $request, Response $response)
-    {
+return function (App $app) {
+    $app->options('/{routes:.*}', function (Request $request, Response $response) {
         // CORS Pre-Flight OPTIONS Request Handler
         return $response;
     });
 
-    $app->get('/', function (Request $request, Response $response)
-    {
+    $app->get('/', function (Request $request, Response $response) {
         $datetime = new \DateTime("now");
         $timestamp = $datetime->format(DATE_RFC3339);
         $response->getBody()->write($timestamp);
-        return $response;
+        return $response->withHeader('Content-Type', 'text/plain');
     });
 
-    $app->group('/aufnehmer', function (Group $group)
-    {
+    $app->group('/aufnehmer', function (Group $group) {
         $controller = AufnehmerController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -55,8 +52,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/tischkategorien', function (Group $group)
-    {
+    $app->group('/tischkategorien', function (Group $group) {
         $controller = TischkategorienController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -65,8 +61,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/tische', function (Group $group)
-    {
+    $app->group('/tische', function (Group $group) {
         $controller = TischeController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -75,8 +70,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/drucker', function (Group $group)
-    {
+    $app->group('/drucker', function (Group $group) {
         $controller = DruckerController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -85,8 +79,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/grundprodukte', function (Group $group)
-    {
+    $app->group('/grundprodukte', function (Group $group) {
         $controller = GrundprodukteController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -95,8 +88,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/produktbereiche', function (Group $group)
-    {
+    $app->group('/produktbereiche', function (Group $group) {
         $controller = ProduktbereicheController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -105,8 +97,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/produktkategorien', function (Group $group)
-    {
+    $app->group('/produktkategorien', function (Group $group) {
         $controller = ProduktkategorienController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -115,8 +106,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/produkte', function (Group $group)
-    {
+    $app->group('/produkte', function (Group $group) {
         $controller = ProdukteController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -125,8 +115,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/eigenschaften', function (Group $group)
-    {
+    $app->group('/eigenschaften', function (Group $group) {
         $controller = EigenschaftenController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -135,8 +124,7 @@ return function (App $app)
         $group->delete(PATH_ID, "$controller:delete");
     });
 
-    $app->group('/bestellungen', function (Group $group)
-    {
+    $app->group('/bestellungen', function (Group $group) {
         $controller = BestellungenController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
@@ -144,8 +132,7 @@ return function (App $app)
         $group->post('/{bestellungen_id}/bestellpositionen/{bestellpositionen_id}', "$controller:stornoBestellposition");
     });
 
-    $app->group('/bons', function (Group $group)
-    {
+    $app->group('/bons', function (Group $group) {
         $controller = BonsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_ID, "$controller:read");
@@ -154,20 +141,20 @@ return function (App $app)
         $group->post('/{id}/druck', "$controller:printSingle");
     });
 
-    $app->group('/daten', function (Group $group)
-    {
+    $app->group('/daten', function (Group $group) {
         $controller = DatenController::class;
         $group->get('/latest', "$controller:latest");
     });
 
-    $app->group('/status', function (Group $group)
-    {
+    $app->group('/status', function (Group $group) {
         $controller = StatusController::class;
+        $group->get('/api', "$controller:api");
+        $group->get('/drucker', "$controller:drucker");
+
         $group->get('/systemstatus', "$controller:systemstatus");
     });
 
-    $app->group('/statistiken', function (Group $group)
-    {
+    $app->group('/statistiken', function (Group $group) {
         $controller = StatistikenController::class;
         $group->get('/timeline', "$controller:timeline");
         $group->get('/kennzahlen', "$controller:kennzahlen");
@@ -175,8 +162,7 @@ return function (App $app)
         $group->get('/produktkategorien', "$controller:produktkategorien");
     });
 
-    $app->group('/notifications', function (Group $group)
-    {
+    $app->group('/notifications', function (Group $group) {
         $controller = NotificationsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_ID, "$controller:readSingle");
@@ -184,21 +170,24 @@ return function (App $app)
         $group->get('/since/{since}', "$controller:readSince");
     });
 
-    $app->group('/logs', function (Group $group)
-    {
+    $app->group('/logs', function (Group $group) {
         $controller = LogsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:read");
     });
 
-    $app->group('/tests', function (Group $group)
-    {
+    $app->group('/setup', function (Group $group) {
+        $controller = SetupController::class;
+        $group->post('/database', "$controller:setupDatabase");
+        $group->post('/seed', "$controller:seedData");
+    });
+
+    $app->group('/tests', function (Group $group) {
         $controller = TestsController::class;
         $group->post('/random-bestellung', "$controller:randomBestellung");
     });
 
-    $app->group('/debug', function (Group $group)
-    {
+    $app->group('/debug', function (Group $group) {
         $controller = DebugController::class;
         $group->get('/celebration', "$controller:celebration");
     });

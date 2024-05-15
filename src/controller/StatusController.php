@@ -21,6 +21,22 @@ final class StatusController extends BaseController
         $this->grundprodukteService = $container->get('grundprodukte');
     }
 
+    public function api(Request $request, Response $response): Response
+    {
+        $datetime = new \DateTime("now");
+        $timestamp = $datetime->format(DATE_RFC3339);
+
+        return $this->responseAsJson($response, [
+            "up" => true,
+            "timestamp" => $timestamp
+        ]);
+    }
+
+    public function drucker(Request $request, Response $response): Response
+    {
+        return $this->responseAsJson($response, $this->druckerService->checkConnections());
+    }
+
     public function systemstatus(Request $request, Response $response): Response
     {
         return $this->responseAsJson($response, [

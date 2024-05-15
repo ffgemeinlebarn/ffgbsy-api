@@ -36,9 +36,8 @@ final class ProduktkategorienController extends BaseController
         $this->request = $request;
         $data = $this->produktkategorienService->read();
 
-        foreach($data as $item)
-        {
-            $data->produktbereich = $this->produktbereicheService->read($data->produktbereiche_id);
+        foreach ($data as $item) {
+            $item->produktbereich = $this->produktbereicheService->read($item->produktbereiche_id);
         }
 
         return $this->responseAsJson($response, $data);

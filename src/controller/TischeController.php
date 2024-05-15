@@ -13,6 +13,7 @@ use FFGBSY\Services\TischkategorienService;
 final class TischeController extends BaseController
 {
     private TischeService $tischeService;
+    private TischkategorienService $tischkategorienService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -32,8 +33,7 @@ final class TischeController extends BaseController
         $this->request = $request;
         $data = $this->tischeService->read();
 
-        foreach($data as $item)
-        {
+        foreach ($data as $item) {
             $item->tischkategorie = $this->tischkategorienService->read($item->tischkategorien_id);
         }
 

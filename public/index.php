@@ -24,6 +24,7 @@ use FFGBSY\Services\StatistikenService;
 use FFGBSY\Services\CelebrationService;
 use FFGBSY\Services\NotificationsService;
 use FFGBSY\Services\LogsService;
+use FFGBSY\Services\SetupService;
 
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
@@ -72,7 +73,8 @@ $containerBuilder->addDefinitions([
     'statistiken' => fn (ContainerInterface $c, LoggerInterface $logger) => new StatistikenService($c, $logger),
     'celebration' => fn (ContainerInterface $c, LoggerInterface $logger) => new CelebrationService($c, $logger),
     'notifications' => fn (ContainerInterface $c, LoggerInterface $logger) => new NotificationsService($c, $logger),
-    'logs' => fn (ContainerInterface $c, LoggerInterface $logger) => new LogsService($c, $logger)
+    'logs' => fn (ContainerInterface $c, LoggerInterface $logger) => new LogsService($c, $logger),
+    'setup' => fn (ContainerInterface $c, LoggerInterface $logger) => new SetupService($c, $logger)
 ]);
 
 $containerBuilder->addDefinitions([
