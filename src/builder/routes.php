@@ -13,6 +13,7 @@ use FFGBSY\Controller\DruckerController;
 use FFGBSY\Controller\GrundprodukteController;
 use FFGBSY\Controller\ProduktbereicheController;
 use FFGBSY\Controller\ProduktkategorienController;
+use FFGBSY\Controller\ProdukteinteilungenController;
 use FFGBSY\Controller\ProdukteController;
 use FFGBSY\Controller\EigenschaftenController;
 use FFGBSY\Controller\BestellungenController;
@@ -106,6 +107,15 @@ return function (App $app) {
         $group->delete(PATH_ID, "$controller:delete");
     });
 
+    $app->group('/produkteinteilungen', function (Group $group) {
+        $controller = ProdukteinteilungenController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
+        $group->get(PATH_ID, "$controller:readSingle");
+        $group->put(PATH_ID, "$controller:update");
+        $group->delete(PATH_ID, "$controller:delete");
+    });
+
     $app->group('/produkte', function (Group $group) {
         $controller = ProdukteController::class;
         $group->post(PATH_EMPTY, "$controller:create");
@@ -150,6 +160,7 @@ return function (App $app) {
         $controller = StatusController::class;
         $group->get('/api', "$controller:api");
         $group->get('/drucker', "$controller:drucker");
+        $group->get('/drucker/{id}', "$controller:druckerSingle");
 
         $group->get('/systemstatus', "$controller:systemstatus");
     });
