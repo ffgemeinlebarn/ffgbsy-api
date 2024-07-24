@@ -80,7 +80,7 @@ $containerBuilder->addDefinitions([
 $containerBuilder->addDefinitions([
     LoggerInterface::class => function () {
         $logger = new Logger('ffgbsy');
-        $streamHandler = new StreamHandler(__DIR__ . '/var/log/ffgbsy/error.log', 100);
+        $streamHandler = new StreamHandler('/var/log/ffgbsy/error.log', 100);
         $logger->pushHandler($streamHandler);
 
         return $logger;
@@ -122,7 +122,7 @@ $app->addRoutingMiddleware();
 
 // Error Middleware & Logging
 $logger = new Logger('ffgbsy');
-$streamHandler = new StreamHandler(__DIR__ . '/var/log/ffgbsy/error.log', 100);
+$streamHandler = new StreamHandler('/var/log/ffgbsy/error.log', 100);
 $logger->pushHandler($streamHandler);
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);

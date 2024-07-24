@@ -51,9 +51,15 @@ final class ProdukteController extends BaseController
         $data = $this->produkteService->read();
 
         foreach ($data as $item) {
+            $item->drucker = $item->drucker_id_level_2 ? $this->druckerService->read($item->drucker_id_level_2) : null;
             $item->produkteinteilung = $this->produkteinteilungenService->read($item->produkteinteilungen_id);
             $item->produkteinteilung->produktkategorie = $this->produktkategorienService->read($item->produkteinteilung->produktkategorien_id);
+            $item->produkteinteilung->produktkategorie->drucker = $item->produkteinteilung->produktkategorie->drucker_id_level_1 ? $this->druckerService->read($item->produkteinteilung->produktkategorie->drucker_id_level_1) : null;
+            $item->produkteinteilung->produktkategorie->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($item->produkteinteilung->produktkategorien_id);
+            $item->produkteinteilung->produktkategorie->produktbereich = $this->produktbereicheService->read($item->produkteinteilung->produktkategorie->produktbereiche_id);
+            $item->produkteinteilung->produktkategorie->produktbereich->drucker = $item->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0 ? $this->druckerService->read($item->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0) : null;
             $item->grundprodukt = $item->grundprodukte_id != null ? $this->grundprodukteService->read($item->grundprodukte_id) : null;
+            $item->eigenschaften = $this->eigenschaftenService->readAllByProdukt($item->id);
         }
 
         return $this->responseAsJson($response, $data);
@@ -69,7 +75,7 @@ final class ProdukteController extends BaseController
         $data->produkteinteilung->produktkategorie->drucker = $data->produkteinteilung->produktkategorie->drucker_id_level_1 ? $this->druckerService->read($data->produkteinteilung->produktkategorie->drucker_id_level_1) : null;
         $data->produkteinteilung->produktkategorie->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->produkteinteilung->produktkategorien_id);
         $data->produkteinteilung->produktkategorie->produktbereich = $this->produktbereicheService->read($data->produkteinteilung->produktkategorie->produktbereiche_id);
-        $data->produkteinteilung->produktkategorie->produktbereich->drucker = $data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0 ? $this->produktbereicheService->read($data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0) : null;
+        $data->produkteinteilung->produktkategorie->produktbereich->drucker = $data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0 ? $this->druckerService->read($data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0) : null;
         $data->grundprodukt = $data->grundprodukte_id != null ? $this->grundprodukteService->read($data->grundprodukte_id) : null;
         $data->eigenschaften = $this->eigenschaftenService->readAllByProdukt($data->id);
         return $this->responseAsJson($response, $data);
