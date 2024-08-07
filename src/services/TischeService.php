@@ -37,6 +37,13 @@
             }
         }
 
+        public function readByTischkategorieId($id)
+        {
+            $sth = $this->db->prepare("SELECT * FROM tische WHERE tischkategorien_id=:id");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            return $this->multiRead($sth);
+        }
+
         public function readByBon($id)
         {
             $sth = $this->db->prepare("SELECT tische.* FROM bons LEFT JOIN bestellungen ON bestellungen.id = bons.bestellungen_id LEFT JOIN tische ON tische.id = bestellungen.tische_id WHERE bons.id = :id LIMIT 1");
@@ -44,7 +51,7 @@
             $sth->execute();
             return $this->singleRead($sth);
         }
-        
+
         public function update($data)
         {
             $sth = $this->db->prepare("UPDATE tische SET reihe = :reihe, nummer = :nummer, tischkategorien_id = :tischkategorien_id, sortierindex = :sortierindex WHERE id=:id");
@@ -54,7 +61,7 @@
             $sth->bindParam(':tischkategorien_id', $data['tischkategorie']['id'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->execute();
-            
+
             return $this->read($data['id']);
         }
 

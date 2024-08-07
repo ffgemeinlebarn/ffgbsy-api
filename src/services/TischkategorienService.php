@@ -42,7 +42,7 @@
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->execute();
-            
+
             return $this->read($data['id']);
         }
 
