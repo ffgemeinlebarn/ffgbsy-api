@@ -75,7 +75,7 @@ final class ProdukteController extends BaseController
         $data->produkteinteilung->produktkategorie->drucker = $data->produkteinteilung->produktkategorie->drucker_id_level_1 ? $this->druckerService->read($data->produkteinteilung->produktkategorie->drucker_id_level_1) : null;
         $data->produkteinteilung->produktkategorie->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->produkteinteilung->produktkategorien_id);
         $data->produkteinteilung->produktkategorie->produktbereich = $this->produktbereicheService->read($data->produkteinteilung->produktkategorie->produktbereiche_id);
-        $data->produkteinteilung->produktkategorie->produktbereich->drucker = $data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0 ? $this->druckerService->read($data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0) : null;
+        $data->produkteinteilung->produktkategorie->produktbereich->drucker = $data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0 != null ? $this->druckerService->read($data->produkteinteilung->produktkategorie->produktbereich->drucker_id_level_0) : null;
         $data->grundprodukt = $data->grundprodukte_id != null ? $this->grundprodukteService->read($data->grundprodukte_id) : null;
         $data->eigenschaften = $this->eigenschaftenService->readAllByProdukt($data->id);
         return $this->responseAsJson($response, $data);

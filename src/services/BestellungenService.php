@@ -71,7 +71,7 @@ final class BestellungenService extends BaseService
             $bestellung = $this->singleRead($sth);
 
             $bestellung->summe = 0;
-            $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
+            $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestellung', $bestellung->id);
             $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
             foreach ($bestellung->bestellpositionen as $position) {
                 $bestellung->summe += $position->summe;
@@ -81,7 +81,7 @@ final class BestellungenService extends BaseService
             }
             $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
             $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
-            $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestell', $bestellung->id);
+            $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestellung', $bestellung->id);
             $bestellung->stornobons = $this->bonsService->readByTypeAndBestellung('storno', $bestellung->id);
 
             return $bestellung;
@@ -124,14 +124,14 @@ final class BestellungenService extends BaseService
 
             foreach ($bestellungen as $bestellung) {
                 $bestellung->summe = 0;
-                $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestell', $bestellung->id);
+                $bestellung->bestellpositionen = $this->bestellpositionenService->readByTypeAndBestellung('bestellung', $bestellung->id);
                 $bestellung->stornopositionen = $this->bestellpositionenService->readByTypeAndBestellung('storno', $bestellung->id);
                 foreach ($bestellung->bestellpositionen as $position) {
                     $bestellung->summe += $position->summe;
                 }
                 $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
-                $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestell', $bestellung->id);
+                $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestellung', $bestellung->id);
                 $bestellung->stornobons = $this->bonsService->readByTypeAndBestellung('storno', $bestellung->id);
             }
 

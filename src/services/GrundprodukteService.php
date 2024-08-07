@@ -11,7 +11,7 @@
     final class GrundprodukteService extends BaseService
     {
         public function create($data)
-        {
+        {   
             $sth = $this->db->prepare("INSERT INTO grundprodukte (name, bestand, einheit) VALUES (:name, :bestand, :einheit)");
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':bestand', $data['bestand'], PDO::PARAM_INT);
@@ -44,7 +44,7 @@
             $sth->bindParam(':bestand', $data['bestand'], PDO::PARAM_INT);
             $sth->bindParam(':einheit', $data['einheit'], PDO::PARAM_STR);
             $sth->execute();
-
+            
             return $this->read($data['id']);
         }
 
@@ -58,14 +58,14 @@
         public function checkAvailablityByProduktId($produktId, $anzahl = 1)
         {
             $sth = $this->db->prepare(
-                "SELECT
+                "SELECT 
                     produkte.grundprodukte_multiplikator,
                     grundprodukte.bestand
-                FROM
-                    produkte
-                LEFT JOIN
+                FROM 
+                    produkte 
+                LEFT JOIN 
                     grundprodukte ON grundprodukte.id = produkte.grundprodukte_id
-                WHERE
+                WHERE 
                 produkte.id = :id");
             $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
             $sth->execute();
@@ -78,15 +78,15 @@
         public function reduceByProduktId($produktId, $anzahl = 1)
         {
             $sth = $this->db->prepare(
-                "SELECT
+                "SELECT 
                     grundprodukte.id,
                     produkte.grundprodukte_multiplikator,
                     grundprodukte.bestand
-                FROM
-                    produkte
-                LEFT JOIN
+                FROM 
+                    produkte 
+                LEFT JOIN 
                     grundprodukte ON grundprodukte.id = produkte.grundprodukte_id
-                WHERE
+                WHERE 
                     produkte.id = :id");
             $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
             $sth->execute();
@@ -96,17 +96,17 @@
             if ($grundprodukt->bestand !== null)
             {
                 $neuerBestand = $grundprodukt->bestand - ($grundprodukt->grundprodukte_multiplikator * $anzahl);
-
+    
                 $sth = $this->db->prepare(
                     "UPDATE
-                        grundprodukte
-                    SET
+                        grundprodukte 
+                    SET 
                         bestand = :bestand
-                    WHERE
+                    WHERE 
                         id = :id");
                 $sth->bindParam(':bestand', $neuerBestand, PDO::PARAM_INT);
                 $sth->bindParam(':id', $grundprodukt->id, PDO::PARAM_INT);
-
+                
                 return $sth->execute();
             }
 

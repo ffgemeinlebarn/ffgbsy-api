@@ -48,6 +48,130 @@ final class BonsDruckService extends BaseService
         return $this->multiRead($sth);
     }
 
+    public function countTries($bonId)
+    {
+        $sth = $this->db->prepare("SELECT COUNT(*) as count FROM bons_druck WHERE bons_id = :bons_id");
+        $sth->bindParam(':bons_id', $bonId, PDO::PARAM_INT);
+
+        if ($sth->execute()) {
+            return $sth->fetch(PDO::FETCH_OBJ)->count;
+        }
+
+        return 0;
+    }
+
+    public function countSuccesses($bonId)
+    {
+        $sth = $this->db->prepare("SELECT COUNT(*) as count FROM bons_druck WHERE bons_id = :bons_id AND success = true");
+        $sth->bindParam(':bons_id', $bonId, PDO::PARAM_INT);
+
+        if ($sth->execute()) {
+            return $sth->fetch(PDO::FETCH_OBJ)->count;
+        }
+
+        return 0;
+    }
+
+    public function countFails($bonId)
+    {
+        $sth = $this->db->prepare("SELECT COUNT(*) as count FROM bons_druck WHERE bons_id = :bons_id AND success = false");
+        $sth->bindParam(':bons_id', $bonId, PDO::PARAM_INT);
+
+        if ($sth->execute()) {
+            return $sth->fetch(PDO::FETCH_OBJ)->count;
+        }
+
+        return 0;
+    }
+
+    public function readFailedBonsPrinted()
+    {
+        $sth = $this->db->prepare("
+            SELECT 
+                bestellungen.timestamp_beendet,
+                bestellungen.id AS bestellung_id,
+                aufnehmer.vorname,
+                aufnehmer.nachname,
+                tische.reihe,
+                tische.nummer,
+                bons.id AS bons_id,
+                bons.drucker_id,
+--                bons_druck.id AS bons_druck_id,
+                SUM(CASE WHEN bons_druck.success = 1 THEN 1 ELSE 0 END) AS succeeded,
+                SUM(CASE WHEN bons_druck.success = 0 THEN 1 ELSE 0 END) AS failed
+            FROM 
+                bons_druck
+            LEFT JOIN
+                bons ON bons.id = bons_druck.bons_id
+            LEFT JOIN
+                bestellungen ON bestellungen.id = bons.bestellungen_id
+            LEFT JOIN
+                aufnehmer ON aufnehmer.id = bestellungen.aufnehmer_id
+            LEFT JOIN
+                tische ON tische.id = bestellungen.tische_id
+            GROUP BY
+                bons_druck.bons_id
+            HAVING
+                failed > 0 AND
+                succeeded > 0
+            ORDER BY
+                bestellungen.timestamp_beendet DESC
+        ");
+
+        if ($sth->execute()) {
+            $arr = [];
+            foreach ($sth->fetchAll(PDO::FETCH_OBJ) as $item) {
+                array_push($arr, $item);
+            }
+
+            return $arr;
+        }
+    }
+
+    public function readFailedBonsNotPrinted()
+    {
+        $sth = $this->db->prepare("
+            SELECT 
+                bestellungen.timestamp_beendet,
+                bestellungen.id AS bestellung_id,
+                aufnehmer.vorname,
+                aufnehmer.nachname,
+                tische.reihe,
+                tische.nummer,
+                bons.id AS bons_id,
+                bons.drucker_id,
+--                bons_druck.id AS bons_druck_id,
+                SUM(CASE WHEN bons_druck.success = 1 THEN 1 ELSE 0 END) AS succeeded,
+                SUM(CASE WHEN bons_druck.success = 0 THEN 1 ELSE 0 END) AS failed
+            FROM 
+                bons_druck
+            LEFT JOIN
+                bons ON bons.id = bons_druck.bons_id
+            LEFT JOIN
+                bestellungen ON bestellungen.id = bons.bestellungen_id
+            LEFT JOIN
+                aufnehmer ON aufnehmer.id = bestellungen.aufnehmer_id
+            LEFT JOIN
+                tische ON tische.id = bestellungen.tische_id
+            GROUP BY
+                bons_druck.bons_id
+            HAVING
+                failed > 0 AND
+                succeeded = 0
+            ORDER BY
+                bestellungen.timestamp_beendet DESC
+        ");
+
+        if ($sth->execute()) {
+            $arr = [];
+            foreach ($sth->fetchAll(PDO::FETCH_OBJ) as $item) {
+                array_push($arr, $item);
+            }
+
+            return $arr;
+        }
+    }
+
     public function updateResult($id, $success, $message)
     {
         $sth = $this->db->prepare("UPDATE bons_druck SET success = :success, message = :message WHERE id = :id");

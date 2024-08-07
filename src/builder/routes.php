@@ -145,10 +145,13 @@ return function (App $app) {
     $app->group('/bons', function (Group $group) {
         $controller = BonsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:read");
         $group->get('/bestellungen/{id}/{type}', "$controller:readByTypeAndBestellung");
         $group->post('/druck', "$controller:printMultiple");
         $group->post('/{id}/druck', "$controller:printSingle");
+        // $group->get('/failed/printed', "$controller:readFailedBonsPrinted");
+        // $group->get('/failed/not-printed', "$controller:readFailedBonsNotPrinted");
     });
 
     $app->group('/daten', function (Group $group) {

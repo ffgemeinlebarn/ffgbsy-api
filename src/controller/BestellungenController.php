@@ -46,14 +46,14 @@ final class BestellungenController extends BaseController
         $bestellung = $this->bestellungenService->create($input);
 
         // 3. Create Bons
-        $affectedDruckerIds = $this->bonsService->getAffectedDruckerIdsForBestellung('bestell', $bestellung->id);
+        $affectedDruckerIds = $this->bonsService->getAffectedDruckerIdsForBestellung('bestellung', $bestellung->id);
         foreach($affectedDruckerIds as $druckerId)
         {
             $this->bonsService->create([
-                "type" => "bestell",
+                "type" => "bestellung",
                 "bestellungen_id" => $bestellung->id,
                 "drucker_id" => $druckerId,
-                "bestellpositionen" => $this->bestellpositionenService->readByTypeAndBestellungAndDrucker('bestell', $bestellung->id, $druckerId)
+                "bestellpositionen" => $this->bestellpositionenService->readByTypeAndBestellungAndDrucker('bestellung', $bestellung->id, $druckerId)
             ]);
         }
         

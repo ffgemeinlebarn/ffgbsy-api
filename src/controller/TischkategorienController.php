@@ -39,7 +39,7 @@ final class TischkategorienController extends BaseController
                 $item->tische = $this->tischeService->readByTischkategorieId($item->id);
             }
         }
-
+        
         return $this->responseAsJson($response, $data);
     }
 
