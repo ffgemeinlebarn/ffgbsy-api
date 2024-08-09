@@ -41,6 +41,9 @@
                     :celebration_suffix
                 )"
             );
+            
+            $grundprodukte_multiplikator = $data['grundprodukte_multiplikator'] > 0 ? $data['grundprodukte_multiplikator'] : null;
+
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
             $sth->bindParam(':formal_name', $data['formal_name'], PDO::PARAM_STR);
             $sth->bindParam(':preis', $data['preis'], PDO::PARAM_STR);
@@ -48,8 +51,8 @@
             $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->bindParam(':produkteinteilungen_id', $data['produkteinteilung']['id'], PDO::PARAM_INT);
-            $sth->bindParam(':grundprodukte_id', $data['grundprodukt']['id'], PDO::PARAM_STR);
-            $sth->bindParam(':grundprodukte_multiplikator', $data['grundprodukte_multiplikator'], PDO::PARAM_INT);
+            $sth->bindParam(':grundprodukte_id', $data['grundprodukte_id'], PDO::PARAM_INT);
+            $sth->bindParam(':grundprodukte_multiplikator', $grundprodukte_multiplikator, PDO::PARAM_INT);
             $sth->bindParam(':celebration_active', $data['celebration_active'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_last', $data['celebration_last'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_prefix', $data['celebration_prefix'], PDO::PARAM_STR);
@@ -119,8 +122,8 @@
             $sth->bindParam(':drucker_id_level_2', $data['drucker_id_level_2'], PDO::PARAM_INT);
             $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
-            $sth->bindParam(':produkteinteilungen_id', $data['produkteinteilung']['id'], PDO::PARAM_INT);
-            $sth->bindParam(':grundprodukte_id', $data['grundprodukt']['id'], PDO::PARAM_STR);
+            $sth->bindParam(':produkteinteilungen_id', $data['produkteinteilungen_id'], PDO::PARAM_INT);
+            $sth->bindParam(':grundprodukte_id', $data['grundprodukte_id'], PDO::PARAM_INT);
             $sth->bindParam(':grundprodukte_multiplikator', $grundprodukte_multiplikator, PDO::PARAM_INT);
             $sth->bindParam(':celebration_active', $data['celebration_active'], PDO::PARAM_INT);
             $sth->bindParam(':celebration_last', $data['celebration_last'], PDO::PARAM_INT);
@@ -175,8 +178,8 @@
             $obj->aktiv = $this->asBool($obj->aktiv);
             $obj->sortierindex = $this->asNumber($obj->sortierindex);
             $obj->produkteinteilungen_id = $this->asNumber($obj->produkteinteilungen_id);
-            $obj->grundprodukte_id = $this->asNumber($obj->grundprodukte_id);
-            $obj->grundprodukte_multiplikator = $this->asNumber($obj->grundprodukte_multiplikator);
+            $obj->grundprodukte_id = $this->asNumberOrNull($obj->grundprodukte_id);
+            $obj->grundprodukte_multiplikator = $this->asNumberOrNull($obj->grundprodukte_multiplikator);
             $obj->celebration_active = $this->asBool($obj->celebration_active);
             $obj->celebration_last = $this->asNumber($obj->celebration_last);
             return $obj;

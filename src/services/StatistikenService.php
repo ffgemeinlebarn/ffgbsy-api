@@ -325,4 +325,43 @@ final class StatistikenService extends BaseService
 
         return $data;
     }
+
+    public function produkte()
+    {
+        $sth = $this->db->prepare("SELECT DATE(bestellungen.timestamp_beendet) AS datum FROM `bestellungen` GROUP BY DATE(bestellungen.timestamp_beendet) ORDER BY datum ASC");
+        $sth->execute();
+        
+        $data = [];
+        $alleTage = [];
+        $datasets = [];
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
+            array_push($alleTage, $dataset['datum']);
+        }
+
+        $sth = $this->db->prepare("SELECT produkte.id, produkte.name, SUM(bestellpositionen.anzahl) as anzahl, DATE(bestellungen.timestamp_beendet) AS datum FROM `bestellpositionen` LEFT JOIN produkte ON produkte.id = bestellpositionen.produkte_id LEFT JOIN bestellungen ON bestellungen.id = bestellpositionen.bestellungen_id GROUP BY produkte.id, DATE(bestellungen.timestamp_beendet) ORDER BY anzahl DESC LIMIT 50");
+        $sth->execute();
+
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
+            array_push($datasets, $dataset);
+            $index = '_' . $dataset['id'];
+
+            $data[$index]['id'] = $dataset['id'];
+            $data[$index]['name'] = $dataset['name'];
+            $data[$index]['data'] = [];
+
+            foreach($alleTage as $tag){
+                $data[$index]['data'][$tag] = 0;
+            }
+        }
+
+        foreach ($datasets as $dataset) {
+            array_push($datasets, $dataset);
+            $index = '_' . $dataset['id'];
+            $tag = $dataset['datum'];
+
+            $data[$index]['data'][$tag] = intval($dataset['anzahl']);
+        }
+
+        return array_values($data);
+    }
 }

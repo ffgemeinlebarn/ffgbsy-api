@@ -7,54 +7,34 @@ namespace FFGBSY\Controller;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use FFGBSY\Services\PrintService;
+use FFGBSY\Services\BonsDruckService;
+use FFGBSY\Services\PrintBonsService;
 
 final class PrintController extends BaseController
 {
-    private PrintService $printService;
+    private PrintBonsService $printBonsService;
 
     public function __construct(ContainerInterface $container)
     {
-        $this->printService = $container->get('print');
-    }
-
-    // public function printBestellung(Request $request, Response $response, $args): Response
-    // {
-    //     $data = $this->printService->printBestellung($args['id']);
-    //     return $this->responseAsJson($response, $data);
-    // }
-
-    // public function printBon(Request $request, Response $response, $args): Response
-    // {
-    //     $data = $this->printService->printBon($args['bestellungen_id'], $args['drucker_id']);
-    //     return $this->responseAsJson($response, $data);
-    // }
-
-    public function printMultipleBons(Request $request, Response $response, $args): Response
-    {
-        // $data = $this->printService->printBestellung($args['id']);
-        $data = 'printMultipleBons';
-        return $this->responseAsJson($response, $data);
+        $this->printBonsService = $container->get('printBons');
     }
 
     public function printSingleBon(Request $request, Response $response, $args): Response
     {
-        // $data = $this->printService->printBestellung($args['id']);
-        $data = 'printSingleBon';
+        $data = $this->printBonsService->printSingleBonById($args['id']);
+        return $this->responseAsJson($response, $data);
+    }
+
+    public function printMultipleBons(Request $request, Response $response, $args): Response
+    {
+        $body = $request->getParsedBody();
+        $data = $this->printBonsService->printMultipleBonsByIds($body);
         return $this->responseAsJson($response, $data);
     }
 
     public function printBestellung(Request $request, Response $response, $args): Response
     {
-        // $data = $this->printService->printBestellung($args['id']);
-        $data = 'printBestellung';
-        return $this->responseAsJson($response, $data);
-    }
-
-    public function printMissingSuccessBons(Request $request, Response $response, $args): Response
-    {
-        // $data = $this->printService->printBestellung($args['id']);
-        $data = 'printMissingSuccessBons';
+        $data = $this->printBonsService->printBestellbonsOfBestellungById($args['id']);
         return $this->responseAsJson($response, $data);
     }
 }

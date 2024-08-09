@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace FFGBSY\Services;
 
-use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use PDO;
 use FFGBSY\Services\DruckerService;
-use FFGBSY\Services\PrintService;
 
 final class BonsDruckService extends BaseService
 {
@@ -24,10 +22,10 @@ final class BonsDruckService extends BaseService
     public function createFromBon($bon)
     {
         $today = date('Y-m-d');
-        $laufnummer = $this->druckerService->getNextLaufnummer($bon['drucker']['id'], $today);
+        $laufnummer = $this->druckerService->getNextLaufnummer($bon->drucker->id, $today);
 
         $sth = $this->db->prepare("INSERT INTO bons_druck (bons_id, datum, laufnummer) VALUES (:bons_id, :datum, :laufnummer)");
-        $sth->bindParam(':bons_id', $bon['id'], PDO::PARAM_INT);
+        $sth->bindParam(':bons_id', $bon->id, PDO::PARAM_INT);
         $sth->bindParam(':datum', $today, PDO::PARAM_STR);
         $sth->bindParam(':laufnummer', $laufnummer, PDO::PARAM_INT);
         $sth->execute();

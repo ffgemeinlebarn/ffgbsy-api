@@ -31,7 +31,7 @@ final class ProduktkategorienService extends BaseService
         $sth = $this->db->prepare("INSERT INTO produktkategorien (name, color, produktbereiche_id, drucker_id_level_1, sortierindex) VALUES (:name, :color, :produktbereiche_id, :drucker_id_level_1, :sortierindex)");
         $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
         $sth->bindParam(':color', $data['color'], PDO::PARAM_STR);
-        $sth->bindParam(':produktbereiche_id', $data['produktbereich']['id'], PDO::PARAM_INT);
+        $sth->bindParam(':produktbereiche_id', $data['produktbereiche_id'], PDO::PARAM_INT);
         $sth->bindParam(':drucker_id_level_1', $data['drucker_id_level_1'], PDO::PARAM_INT);
         $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
         $sth->execute();
@@ -77,7 +77,7 @@ final class ProduktkategorienService extends BaseService
         $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
         $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
         $sth->bindParam(':color', $data['color'], PDO::PARAM_STR);
-        $sth->bindParam(':produktbereiche_id', $data['produktbereich']['id'], PDO::PARAM_INT);
+        $sth->bindParam(':produktbereiche_id', $data['produktbereiche_id'], PDO::PARAM_INT);
         $sth->bindParam(':drucker_id_level_1', $data['drucker_id_level_1'], PDO::PARAM_INT);
         $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
         $sth->execute();

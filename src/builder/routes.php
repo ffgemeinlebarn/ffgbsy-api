@@ -148,8 +148,6 @@ return function (App $app) {
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:read");
         $group->get('/bestellungen/{id}/{type}', "$controller:readByTypeAndBestellung");
-        // $group->post('/druck', "$controller:printMultiple");
-        // $group->post('/{id}/druck', "$controller:printSingle");
     });
 
     $app->group('/print', function (Group $group) {
@@ -157,7 +155,6 @@ return function (App $app) {
         $group->post('/bons', "$controller:printMultipleBons");
         $group->post('/bons/{id}', "$controller:printSingleBon");
         $group->post('/bestellungen/{id}', "$controller:printBestellung");
-        $group->post('/failed', "$controller:printMissingSuccessBons");
     });
 
     $app->group('/daten', function (Group $group) {
@@ -180,6 +177,7 @@ return function (App $app) {
         $group->get('/kennzahlen', "$controller:kennzahlen");
         $group->get('/produktbereiche', "$controller:produktbereiche");
         $group->get('/produktkategorien', "$controller:produktkategorien");
+        $group->get('/produkte', "$controller:produkte");
     });
 
     $app->group('/notifications', function (Group $group) {

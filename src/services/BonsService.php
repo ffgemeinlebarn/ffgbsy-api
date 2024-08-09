@@ -4,34 +4,30 @@ declare(strict_types=1);
 
 namespace FFGBSY\Services;
 
-use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use PDO;
 use FFGBSY\Services\DruckerService;
 use FFGBSY\Services\TischeService;
 use FFGBSY\Services\AufnehmerService;
-use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\BonsDruckService;
-use FFGBSY\Services\PrintService;
+use FFGBSY\Services\BestellpositionenService;
 
 final class BonsService extends BaseService
 {
     private DruckerService $druckerService;
     private TischeService $tischeService;
     private AufnehmerService $aufnehmerService;
-    private BestellpositionenService $bestellpositionenService;
     private BonsDruckService $bonsDruckService;
-    private PrintService $printService;
+    private BestellpositionenService $bestellpositionenService;
 
     public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
         $this->druckerService = $container->get('drucker');
         $this->tischeService = $container->get('tische');
         $this->aufnehmerService = $container->get('aufnehmer');
-        $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->bonsDruckService = $container->get('bonsDruck');
-        $this->printService = $container->get('print');
+        $this->bestellpositionenService = $container->get('bestellpositionen');
         parent::__construct($container, $logger);
     }
 
@@ -170,81 +166,6 @@ final class BonsService extends BaseService
         return $items;
     }
 
-    public function printMultiple($bons)
-    {
-        $besllbonsDrucke = [];
-
-        foreach ($bons as $bon) {
-            array_push($besllbonsDrucke, $this->printSingle($bon));
-        }
-
-        return $besllbonsDrucke;
-    }
-
-    public function printSingle($bon)
-    {
-        $bonDruck = $this->bonsDruckService->createFromBon($bon);
-        $tisch = $this->tischeService->readByBon($bon['id']);
-        $drucker = $this->druckerService->read($bon['drucker_id']);
-        $setup = $this->printService->setupPrinter($drucker);
-        $bestellpositionen = $this->bestellpositionenService->readByBon($bon['id']);
-        $aufnehmer = $this->aufnehmerService->readByBestellung($bon['bestellungen_id']);
-        $aufnehmerName = "{$aufnehmer->vorname} {$aufnehmer->nachname[0]}.";
-
-        $qrData = "{$bon['bestellungen_id']}";
-
-        if ($setup->success) {
-            $printer = $setup->printer;
-
-            if ($bon['type'] == 'bestellung') {
-                $this->printBestellbon($printer, $tisch, $drucker, $bon['bestellungen_id'], $bon['id'], $aufnehmerName, $bestellpositionen, $qrData, $bonDruck);
-            }
-
-            if ($bon['type'] == 'storno') {
-                $this->printStornobon($printer, $tisch, $drucker, $bon['bestellungen_id'], $bon['id'], $aufnehmerName, $bestellpositionen, $qrData, $bonDruck);
-            }
-
-            $this->printService->printFinish($printer);
-        }
-
-        return $this->bonsDruckService->updateResult($bonDruck->id, $setup->success, $setup->message);
-    }
-
-    private function printBestellbon($printer, $tisch, $drucker, $bestellungId, $bonId, $aufnehmerName, $bestellpositionen, $qrData, $bonDruck)
-    {
-        $this->printService->printHeader($printer);
-        $this->printService->printTisch($printer, $tisch);
-        $this->printService->printBestellpositionenHeader($printer);
-        $this->printService->printBestellpositionen($printer, $bestellpositionen);
-        $this->printService->printImprint($printer);
-        $this->printService->printQR($printer, $qrData);
-        $this->printService->printInfo($printer, $bestellungId, $bonId, $aufnehmerName, $bonDruck->timestamp);
-        $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
-    }
-
-    private function printStornobon($printer, $tisch, $drucker, $bestellungId, $bonId, $aufnehmerName, $bestellpositionen, $qrData, $bonDruck)
-    {
-        $this->printService->printStornoMark($printer);
-        $this->printService->printTisch($printer, $tisch);
-        $this->printService->printBestellpositionenHeader($printer);
-        $this->printService->printBestellpositionen($printer, $bestellpositionen);
-        $this->printService->printQR($printer, $qrData);
-        $this->printService->printInfo($printer, $bestellungId, $bonId, $aufnehmerName, $bonDruck->timestamp);
-        $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
-    }
-
-    public function getAffectedDruckerIdsForBestellung($type, $bestellungId)
-    {
-        $ids = [];
-        foreach ($this->bestellpositionenService->readByTypeAndBestellung($type, $bestellungId) as $position) {
-            if (!in_array($position->drucker_id, $ids)) {
-                $ids[] = $position->drucker_id;
-            }
-        }
-
-        return $ids;
-    }
-
     private function addNested($obj)
     {
         $obj->drucker = $this->druckerService->read($obj->drucker_id);
@@ -273,6 +194,18 @@ final class BonsService extends BaseService
         unset($obj->aufnehmer_id);
 
         return $obj;
+    }
+
+    public function getAffectedDruckerIdsForBestellung($type, $bestellungId)
+    {
+        $ids = [];
+        foreach ($this->bestellpositionenService->readByTypeAndBestellung($type, $bestellungId) as $position) {
+            if (!in_array($position->drucker_id, $ids)) {
+                $ids[] = $position->drucker_id;
+            }
+        }
+
+        return $ids;
     }
 
     protected function singleMap($obj)

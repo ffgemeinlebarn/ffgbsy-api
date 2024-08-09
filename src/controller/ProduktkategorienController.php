@@ -61,6 +61,7 @@ final class ProduktkategorienController extends BaseController
         $this->request = $request;
         $data = $this->produktkategorienService->update($request->getParsedBody());
         $data->produktbereich = $this->produktbereicheService->read($data->produktbereiche_id);
+        $data->produktbereich->drucker = $data->produktbereich->drucker_id_level_0 ? $this->druckerService->read($data->produktbereich->drucker_id_level_0) : null;
         $data->eigenschaften = $this->eigenschaftenService->readAllByProduktkategorie($data->id);
         return $this->responseAsJson($response, $data);
     }
