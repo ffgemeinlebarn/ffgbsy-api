@@ -292,6 +292,7 @@ CREATE TABLE `tische` (
   `reihe` varchar(30) NOT NULL,
   `nummer` int(11) DEFAULT NULL,
   `tischkategorien_id` int(11) NOT NULL,
+  `aktiv` tinyint(1) NOT NULL DEFAULT 1,
   `sortierindex` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -304,6 +305,7 @@ CREATE TABLE `tische` (
 CREATE TABLE `tischkategorien` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
+  `aktiv` tinyint(1) NOT NULL DEFAULT 1,
   `sortierindex` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
