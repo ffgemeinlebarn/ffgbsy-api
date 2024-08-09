@@ -80,7 +80,7 @@ final class PrintBonsService extends BaseService
             $this->printService->printFinish($printer);
         }
         else {
-            $this->adminNotificationsService->sendMessage("Bon Druck", "Druck");
+            return $this->adminNotificationsService->sendMessage("Bon Druck", "Druck");
         }
 
         return $this->bonsDruckService->updateResult($bonDruck->id, $setup->success, $setup->message);

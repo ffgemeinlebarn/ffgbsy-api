@@ -347,6 +347,7 @@ final class StatistikenService extends BaseService
 
             $data[$index]['id'] = $dataset['id'];
             $data[$index]['name'] = $dataset['name'];
+            $data[$index]['anzahl'] = 0;
             $data[$index]['data'] = [];
 
             foreach($alleTage as $tag){
@@ -359,6 +360,7 @@ final class StatistikenService extends BaseService
             $index = '_' . $dataset['id'];
             $tag = $dataset['datum'];
 
+            $data[$index]['anzahl'] += intval($dataset['anzahl']);
             $data[$index]['data'][$tag] = intval($dataset['anzahl']);
         }
 

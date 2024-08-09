@@ -169,6 +169,7 @@ return function (App $app) {
         $group->get('/drucker/{id}', "$controller:druckerSingle");
 
         $group->get('/systemstatus', "$controller:systemstatus");
+        $group->get('/phpinfo', "$controller:phpinfo");
     });
 
     $app->group('/statistiken', function (Group $group) {

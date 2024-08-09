@@ -50,4 +50,11 @@ final class StatusController extends BaseController
             "grundprodukte" => $this->grundprodukteService->read()
         ]);
     }
+
+    public function phpinfo(Request $request, Response $response): Response
+    {
+        return phpinfo();
+    }
+
+    
 }
