@@ -18,15 +18,43 @@ final class PrintController extends BaseController
         $this->printService = $container->get('print');
     }
 
-    public function printBestellung(Request $request, Response $response, $args): Response
+    // public function printBestellung(Request $request, Response $response, $args): Response
+    // {
+    //     $data = $this->printService->printBestellung($args['id']);
+    //     return $this->responseAsJson($response, $data);
+    // }
+
+    // public function printBon(Request $request, Response $response, $args): Response
+    // {
+    //     $data = $this->printService->printBon($args['bestellungen_id'], $args['drucker_id']);
+    //     return $this->responseAsJson($response, $data);
+    // }
+
+    public function printMultipleBons(Request $request, Response $response, $args): Response
     {
-        $data = $this->printService->printBestellung($args['id']);
+        // $data = $this->printService->printBestellung($args['id']);
+        $data = 'printMultipleBons';
         return $this->responseAsJson($response, $data);
     }
 
-    public function printBon(Request $request, Response $response, $args): Response
+    public function printSingleBon(Request $request, Response $response, $args): Response
     {
-        $data = $this->printService->printBon($args['bestellungen_id'], $args['drucker_id']);
+        // $data = $this->printService->printBestellung($args['id']);
+        $data = 'printSingleBon';
+        return $this->responseAsJson($response, $data);
+    }
+
+    public function printBestellung(Request $request, Response $response, $args): Response
+    {
+        // $data = $this->printService->printBestellung($args['id']);
+        $data = 'printBestellung';
+        return $this->responseAsJson($response, $data);
+    }
+
+    public function printMissingSuccessBons(Request $request, Response $response, $args): Response
+    {
+        // $data = $this->printService->printBestellung($args['id']);
+        $data = 'printMissingSuccessBons';
         return $this->responseAsJson($response, $data);
     }
 }

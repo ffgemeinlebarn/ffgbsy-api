@@ -148,10 +148,16 @@ return function (App $app) {
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:read");
         $group->get('/bestellungen/{id}/{type}', "$controller:readByTypeAndBestellung");
-        $group->post('/druck', "$controller:printMultiple");
-        $group->post('/{id}/druck', "$controller:printSingle");
-        // $group->get('/failed/printed', "$controller:readFailedBonsPrinted");
-        // $group->get('/failed/not-printed', "$controller:readFailedBonsNotPrinted");
+        // $group->post('/druck', "$controller:printMultiple");
+        // $group->post('/{id}/druck', "$controller:printSingle");
+    });
+
+    $app->group('/print', function (Group $group) {
+        $controller = PrintController::class;
+        $group->post('/bons', "$controller:printMultipleBons");
+        $group->post('/bons/{id}', "$controller:printSingleBon");
+        $group->post('/bestellungen/{id}', "$controller:printBestellung");
+        $group->post('/failed', "$controller:printMissingSuccessBons");
     });
 
     $app->group('/daten', function (Group $group) {
