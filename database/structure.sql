@@ -121,7 +121,7 @@ CREATE TABLE `bestellungen` (
 
 CREATE TABLE `bons` (
   `id` int(11) NOT NULL,
-  `type` enum('bestell', 'storno') NOT NULL,
+  `type` enum('bestellung', 'storno') NOT NULL,
   `bestellungen_id` int(11) NOT NULL,
   `drucker_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
