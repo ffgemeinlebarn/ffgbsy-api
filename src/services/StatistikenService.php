@@ -113,12 +113,20 @@ final class StatistikenService extends BaseService
 
     public function kennzahlen()
     {
-        $data = [];
+        $data = [
+            'taeglich' => [],
+            'gesamt'=> [
+                'bestellungen_anzahl' => 0,
+                'produkte_anzahl' => 0,
+                'umsatz' => 0
+            ]
+        ];
 
         $sth = $this->db->prepare(
             "SELECT
-                    REPLACE(SUM(bestellpositionen.anzahl), ',', '') AS bestellte_produkte,
-                    REPLACE(SUM(produkte.preis * bestellpositionen.anzahl), ',', '') AS summe,
+                    COUNT(DISTINCT(bestellungen.id)) AS bestellungen_anzahl,
+                    SUM(bestellpositionen.anzahl) AS produkte_anzahl,
+                    REPLACE(SUM(produkte.preis * bestellpositionen.anzahl), ',', '') AS umsatz,
                     DATE(bestellungen.timestamp_beendet) AS datum
                 FROM
                     bestellpositionen
@@ -129,17 +137,74 @@ final class StatistikenService extends BaseService
                 GROUP BY
                     datum
                 ORDER BY
-                    datum ASC"
+                    datum DESC"
         );
         $sth->execute();
 
-        $data['taeglich'] = [];
         foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
-            $dataset['bestellte_produkte'] = intval($dataset['bestellte_produkte']);
-            $dataset['summe'] = floatval($dataset['summe']);
+            $dataset['bestellungen_anzahl'] = intval($dataset['bestellungen_anzahl']);
+            $dataset['produkte_anzahl'] = intval($dataset['produkte_anzahl']);
+            $dataset['umsatz'] = floatval($dataset['umsatz']);
             $dataset['label'] = date_format(date_create($dataset['datum']), "d.m.Y");
-            array_Push($data['taeglich'], $dataset);
+            $dataset['hauptspeisen_anzahl'] = 0;
+            $dataset['bons_anzahl'] = 0;
+
+            $data['gesamt']['bestellungen_anzahl'] += $dataset['bestellungen_anzahl'];
+            $data['gesamt']['produkte_anzahl'] += $dataset['produkte_anzahl'];
+            $data['gesamt']['umsatz'] += $dataset['umsatz'];
+            $data['gesamt']['hauptspeisen_anzahl'] = 0;
+            $data['gesamt']['bons_anzahl'] = 0;
+
+            $data['taeglich']["{$dataset['datum']}"] = $dataset;
         }
+
+        // Hauptspeisen Ermittlung
+        $sth = $this->db->prepare(
+            "SELECT
+                    SUM(bestellpositionen.anzahl) AS hauptspeisen_anzahl,
+                    DATE(bestellungen.timestamp_beendet) AS datum
+                FROM
+                    bestellpositionen
+                LEFT JOIN
+                    bestellungen ON bestellpositionen.bestellungen_id = bestellungen.id
+                LEFT JOIN
+                    produkte ON produkte.id = bestellpositionen.produkte_id
+                WHERE
+                    produkte.hauptspeise = 1
+                GROUP BY
+                    datum
+                ORDER BY
+                    datum DESC"
+        );
+        $sth->execute();
+
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
+            $data['taeglich']["{$dataset['datum']}"]['hauptspeisen_anzahl'] = intval($dataset['hauptspeisen_anzahl']);
+            $data['gesamt']['hauptspeisen_anzahl'] += $data['taeglich']["{$dataset['datum']}"]['hauptspeisen_anzahl'];
+        }
+
+        // Bons Ermittlung
+        $sth = $this->db->prepare(
+            "SELECT
+                    COUNT(bons_druck.id) AS bons_anzahl,
+                    DATE(bons_druck.timestamp) AS datum
+                FROM
+                    bons_druck
+                WHERE
+                    bons_druck.success = 1
+                GROUP BY
+                    DATE(bons_druck.timestamp)
+                ORDER BY
+                    DATE(bons_druck.timestamp) DESC"
+        );
+        $sth->execute();
+
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
+            $data['taeglich']["{$dataset['datum']}"]['bons_anzahl'] = intval($dataset['bons_anzahl']);
+            $data['gesamt']['bons_anzahl'] += $data['taeglich']["{$dataset['datum']}"]['bons_anzahl'];
+        }
+
+        $data['taeglich'] = array_values($data['taeglich']);
 
         return $data;
     }
@@ -326,44 +391,104 @@ final class StatistikenService extends BaseService
         return $data;
     }
 
-    public function produkte()
+
+
+    public function produkte($limit = 50)
     {
-        $sth = $this->db->prepare("SELECT DATE(bestellungen.timestamp_beendet) AS datum FROM `bestellungen` GROUP BY DATE(bestellungen.timestamp_beendet) ORDER BY datum ASC");
+
+        $sth = $this->db->prepare(
+            "SELECT
+                    DATE(bestellungen.timestamp_beendet) AS datum
+                FROM
+                    bestellungen
+                GROUP BY
+                    datum
+                ORDER BY
+                    datum ASC"
+        );
         $sth->execute();
-        
-        $data = [];
-        $alleTage = [];
-        $datasets = [];
-        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
-            array_push($alleTage, $dataset['datum']);
-        }
 
-        $sth = $this->db->prepare("SELECT produkte.id, produkte.name, SUM(bestellpositionen.anzahl) as anzahl, DATE(bestellungen.timestamp_beendet) AS datum FROM `bestellpositionen` LEFT JOIN produkte ON produkte.id = bestellpositionen.produkte_id LEFT JOIN bestellungen ON bestellungen.id = bestellpositionen.bestellungen_id GROUP BY produkte.id, DATE(bestellungen.timestamp_beendet) ORDER BY anzahl DESC LIMIT 50");
+        $data = [
+            "header" => $sth->fetchAll(PDO::FETCH_ASSOC),
+            "data" => []
+        ];
+
+        $sth = $this->db->prepare(
+            "SELECT
+                    produkte.id,
+                    produkte.name,
+                    SUM(bestellpositionen.anzahl) AS anzahl
+                FROM
+                    produkte
+                LEFT JOIN
+                    bestellpositionen ON bestellpositionen.produkte_id = produkte.id
+                GROUP BY
+                    produkte.id
+                ORDER BY
+                    anzahl DESC
+                LIMIT 
+                    :limit"
+        );
+        $sth->bindParam(':limit', $limit, PDO::PARAM_INT);
         $sth->execute();
 
         foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
-            array_push($datasets, $dataset);
-            $index = '_' . $dataset['id'];
+            $data["data"]["_{$dataset['id']}"] = [
+                "id" => $dataset['id'],
+                "produkt" => $dataset['name'],
+                "data" => [],
+                "anzahl" => 0,
+                "umsatz" => 0.0
+            ];
 
-            $data[$index]['id'] = $dataset['id'];
-            $data[$index]['name'] = $dataset['name'];
-            $data[$index]['anzahl'] = 0;
-            $data[$index]['data'] = [];
-
-            foreach($alleTage as $tag){
-                $data[$index]['data'][$tag] = 0;
+            foreach ($data['header'] as $header) {
+                $data["data"]["_{$dataset['id']}"]['data'][$header['datum']] = [
+                    "datum" => $header['datum'],
+                    "anzahl" => 0,
+                    "umsatz" => 0.0
+                ];
             }
         }
 
-        foreach ($datasets as $dataset) {
-            array_push($datasets, $dataset);
-            $index = '_' . $dataset['id'];
-            $tag = $dataset['datum'];
+        $sth = $this->db->prepare(
+            "SELECT
+                    REPLACE(SUM(bestellpositionen.anzahl), ',', '') AS bestellte_produkte,
+                    REPLACE(SUM(produkte.preis * bestellpositionen.anzahl), ',', '') AS summe,
+                    DATE(bestellungen.timestamp_beendet) AS datum,
+                    produkte.id AS produkte_id
+                FROM
+                    bestellpositionen
+                LEFT JOIN
+                    bestellungen ON bestellpositionen.bestellungen_id = bestellungen.id
+                LEFT JOIN
+                    produkte ON produkte.id = bestellpositionen.produkte_id
+                GROUP BY
+                    datum, produkte.id
+                ORDER BY
+                    datum ASC, produkte.id ASC"
+        );
+        $sth->execute();
 
-            $data[$index]['anzahl'] += intval($dataset['anzahl']);
-            $data[$index]['data'][$tag] = intval($dataset['anzahl']);
+        foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $dataset) {
+            $datum = $dataset['datum'];
+            $produkte_id = $dataset['produkte_id'];
+
+            if (isset($data["data"]["_$produkte_id"])){
+                $data["data"]["_$produkte_id"]['data'][$datum]["anzahl"] = intval($dataset['bestellte_produkte']);
+                $data["data"]["_$produkte_id"]['data'][$datum]["umsatz"] = floatval($dataset['summe']);
+            }
         }
 
-        return array_values($data);
+        foreach ($data["data"] as $produkt) {
+            $data["data"]["_{$produkt['id']}"]["data"] = array_values($produkt["data"]);
+            foreach ($produkt["data"] as $item) {
+                $data["data"]["_{$produkt['id']}"]["anzahl"] += $item["anzahl"];
+                $data["data"]["_{$produkt['id']}"]["umsatz"] += $item["umsatz"];
+            }
+        }
+
+        $data["data"] = array_values($data["data"]);
+
+        return $data;
     }
 }

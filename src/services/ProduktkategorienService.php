@@ -46,14 +46,14 @@ final class ProduktkategorienService extends BaseService
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             return $this->singleRead($sth);
         } else {
-            $sth = $this->db->prepare("SELECT * FROM produktkategorien");
+            $sth = $this->db->prepare("SELECT * FROM produktkategorien ORDER BY sortierindex ASC");
             return $this->multiRead($sth);
         }
     }
 
     public function readAllNested()
     {
-        $sth = $this->db->prepare("SELECT * FROM produktkategorien");
+        $sth = $this->db->prepare("SELECT * FROM produktkategorien ORDER BY sortierindex ASC");
         $produktkategorien = $this->multiRead($sth);
 
         foreach ($produktkategorien as $produktkategorie) {
