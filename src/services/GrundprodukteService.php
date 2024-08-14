@@ -55,25 +55,59 @@
             return $sth->execute();
         }
 
-        public function checkAvailablityByProduktId($produktId, $anzahl = 1)
-        {
-            $sth = $this->db->prepare(
-                "SELECT 
-                    produkte.grundprodukte_multiplikator,
-                    grundprodukte.bestand
-                FROM 
-                    produkte 
-                LEFT JOIN 
-                    grundprodukte ON grundprodukte.id = produkte.grundprodukte_id
-                WHERE 
-                produkte.id = :id");
-            $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
-            $sth->execute();
+        // public function checkAnzahlLeft($grundproduktId)
+        // {
+        //     $sth = $this->db->prepare(
+        //         "SELECT 
+        //             grundprodukte.bestand
+        //         FROM 
+        //             grundprodukte 
+        //         WHERE 
+        //             grundprodukte.id = :id");
+        //     $sth->bindParam(':id', $grundproduktId, PDO::PARAM_INT);
+        //     $sth->execute();
 
-            $data = $sth->fetch(PDO::FETCH_OBJ);
+        //     $data = $sth->fetch(PDO::FETCH_OBJ);
 
-            return $data->bestand === NULL || ($data->grundprodukte_multiplikator * $anzahl) <= $data->bestand;
-        }
+        //     return $this->asNumberOrNull($data->bestand);
+        // }
+
+        // public function checkAvailability($grundproduktId, $anzahl = 1)
+        // {
+        //     $sth = $this->db->prepare(
+        //         "SELECT 
+        //             grundprodukte.bestand
+        //         FROM 
+        //             grundprodukte 
+        //         WHERE 
+        //             grundprodukte.id = :id");
+        //     $sth->bindParam(':id', $grundproduktId, PDO::PARAM_INT);
+        //     $sth->execute();
+
+        //     $data = $sth->fetch(PDO::FETCH_OBJ);
+
+        //     return $data->bestand === null || $anzahl <= $data->bestand;
+        // }
+
+        // public function checkAvailablityByProduktId($produktId, $anzahl = 1)
+        // {
+        //     $sth = $this->db->prepare(
+        //         "SELECT 
+        //             produkte.grundprodukte_multiplikator,
+        //             grundprodukte.bestand
+        //         FROM 
+        //             produkte 
+        //         LEFT JOIN 
+        //             grundprodukte ON grundprodukte.id = produkte.grundprodukte_id
+        //         WHERE 
+        //         produkte.id = :id");
+        //     $sth->bindParam(':id', $produktId, PDO::PARAM_INT);
+        //     $sth->execute();
+
+        //     $data = $sth->fetch(PDO::FETCH_OBJ);
+
+        //     return $data->bestand === NULL || ($data->grundprodukte_multiplikator * $anzahl) <= $data->bestand;
+        // }
 
         public function reduceByProduktId($produktId, $anzahl = 1)
         {

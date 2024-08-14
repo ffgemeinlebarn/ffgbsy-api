@@ -38,7 +38,7 @@
 
         public function readByTischkategorieId($id)
         {
-            $sth = $this->db->prepare("SELECT * FROM tische WHERE tischkategorien_id=:id");
+            $sth = $this->db->prepare("SELECT * FROM tische WHERE tischkategorien_id=:id ORDER BY sortierindex ASC");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             return $this->multiRead($sth);
         }

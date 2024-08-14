@@ -9,13 +9,13 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use PDO;
 use FFGBSY\Services\BonsService;
-use FFGBSY\Application\Exceptions\HttpBadRequestException;
 use FFGBSY\Services\CelebrationService;
 use FFGBSY\Services\GrundprodukteService;
 use FFGBSY\Services\ProdukteService;
 use FFGBSY\Services\AufnehmerService;
 use FFGBSY\Services\TischeService;
 use FFGBSY\Services\BestellpositionenService;
+use stdClass;
 
 final class BestellungenService extends BaseService
 {
@@ -141,23 +141,61 @@ final class BestellungenService extends BaseService
 
     public function checkAvailabilityForBestellpositionen($bestellpositionen)
     {
-        $notAvailableProdukte = [];
-        foreach ($bestellpositionen as $position) {
-            $availability = $this->grundprodukteService->checkAvailablityByProduktId($position['produkt']['id'], $position['anzahl']);
+        $neededGrundprodukte = [];
 
-            if (!$availability) {
-                array_push($notAvailableProdukte, $position['produkt']['name']);
+        foreach ($bestellpositionen as $position) {
+
+            if ($position['produkt']['grundprodukte_id']){
+
+                if(!isset($neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"])){
+                    $neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"] = [
+                        "produkt_name" => $position['produkt']['name'],
+                        "grundprodukte_id" => $position['produkt']['grundprodukte_id'],
+                        "anzahl" => 0
+                    ];
+                }
+
+                $neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"]['anzahl'] += ($position['produkt']['grundprodukte_multiplikator'] * $position['anzahl']);
+                    
             }
         }
 
-        if (($num = count($notAvailableProdukte)) > 0) {
-            $produkt = ($num > 1) ? "Die Produkte" : "Das Produkt";
-            $ist = ($num > 1) ? "sind" : "ist";
+        $data = new stdClass();
+        $data->success = true;
+        $data->checks = [];
 
-            throw new HttpBadRequestException("Die Bestellung wurde nicht angelegt. $produkt '" . implode("', '", $notAvailableProdukte) . "' $ist aufgrund nicht vorhandener Grundprodukte aktuell leider nicht verfügbar!");
+        foreach(array_values($neededGrundprodukte) as $need){
+            $grundprodukt = $this->grundprodukteService->read($need['grundprodukte_id']);
+
+            if ($grundprodukt->bestand === null)
+            {
+                $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist unlimitiert verfügbar!";
+            }
+            elseif ($grundprodukt->bestand >= $need['anzahl']){
+                $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist verfügbar!";
+            }
+            elseif ($grundprodukt->bestand > 0)
+            {
+                $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist nicht ausreichend verfügbar! ({$need['anzahl']} benötigt, nur {$grundprodukt->bestand} verfügbar)";
+                $data->success = false;
+            }
+            else
+            {
+                $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist leider gar nicht mehr verfügbar!";
+                $data->success = false;
+            }
+
+            $check = new stdClass();
+            $check->success = $grundprodukt->bestand >= $need['anzahl'] || $grundprodukt->bestand == null;
+            $check->produkt_name = $need['produkt_name'];
+            $check->needed_anzahl = $need['anzahl'];
+            $check->grundprodukt = $grundprodukt;
+            $check->message = $message;
+
+            $data->checks[] = $check;
         }
 
-        return false;
+        return $data;
     }
 
     protected function singleMap($obj)

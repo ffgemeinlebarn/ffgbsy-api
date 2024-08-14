@@ -31,6 +31,8 @@ use FFGBSY\Controller\SetupController;
 const PATH_ID    = '/{id}';
 const PATH_EMPTY = '';
 
+date_default_timezone_set("Europe/Vienna");
+
 return function (App $app) {
     $app->options('/{routes:.*}', function (Request $request, Response $response) {
         // CORS Pre-Flight OPTIONS Request Handler
@@ -136,6 +138,7 @@ return function (App $app) {
 
     $app->group('/bestellungen', function (Group $group) {
         $controller = BestellungenController::class;
+        $group->post('/availability', "$controller:checkAvailability");
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");

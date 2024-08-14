@@ -7,6 +7,7 @@ namespace FFGBSY\Controller;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use FFGBSY\Application\Exceptions\HttpBadRequestException;
 use FFGBSY\Services\BestellungenService;
 use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\GrundprodukteService;
@@ -30,6 +31,15 @@ final class BestellungenController extends BaseController
         $this->bonsService = $container->get('bons');
     }
 
+    public function checkAvailability(Request $request, Response $response): Response
+    {
+        $input = $request->getParsedBody();
+        
+        $data = $this->bestellungenService->checkAvailabilityForBestellpositionen($input['bestellpositionen']);
+        
+        return $this->responseAsJson($response, $data);
+    }
+
     public function create(Request $request, Response $response): Response
     {
         $input = $request->getParsedBody();
@@ -37,9 +47,17 @@ final class BestellungenController extends BaseController
         $input['device_ip'] = $params['REMOTE_ADDR'] ?? null;
         
         // 1. Check Grundprodukte
-        if ($notAvailabile = $this->bestellungenService->checkAvailabilityForBestellpositionen($input['bestellpositionen']))
+        $availability = $this->bestellungenService->checkAvailabilityForBestellpositionen($input['bestellpositionen']);
+        if (!$availability->success)
         {
-            return $this->responseAsJson($response, $notAvailabile);
+            $err = new \stdClass();
+            $err->statusCode = 400;
+            $err->error = new \stdClass();
+            $err->error->type = "BAD_REQUEST";
+            $err->error->description = "AvailabilityCheck";
+            $err->error->data = $availability;
+            
+            return $this->responseAsJson($response, $err, 400);
         }
         
         // 2. Create Bestellung
