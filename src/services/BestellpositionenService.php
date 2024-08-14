@@ -88,14 +88,14 @@ final class BestellpositionenService extends BaseService
 
     public function readByTypeAndBestellung($type, $bestellungId)
     {
-        if ($type == 'bestell') {
+        if ($type == 'bestellung') {
             $von = 0;
             $bis = 999;
         } elseif ($type == 'storno') {
             $von = -999;
             $bis = 0;
         } else {
-            throw new \Exception("Type der Position ist weder 'bestell' noch 'storno'!");
+            throw new \Exception("Type der Position ist weder 'bestellung' noch 'storno'!");
         }
 
         $sth = $this->db->prepare(

@@ -37,6 +37,11 @@ final class StatusController extends BaseController
         return $this->responseAsJson($response, $this->druckerService->checkConnections());
     }
 
+    public function druckerSingle(Request $request, Response $response, $args): Response
+    {
+        return $this->responseAsJson($response, $this->druckerService->checkConnection($args['id']));
+    }
+
     public function systemstatus(Request $request, Response $response): Response
     {
         return $this->responseAsJson($response, [
@@ -45,4 +50,11 @@ final class StatusController extends BaseController
             "grundprodukte" => $this->grundprodukteService->read()
         ]);
     }
+
+    public function phpinfo(Request $request, Response $response): Response
+    {
+        return phpinfo();
+    }
+
+    
 }

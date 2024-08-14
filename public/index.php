@@ -18,6 +18,7 @@ use FFGBSY\Services\BestellungenService;
 use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\ConstantsService;
 use FFGBSY\Services\PrintService;
+use FFGBSY\Services\PrintBonsService;
 use FFGBSY\Services\BonsService;
 use FFGBSY\Services\BonsDruckService;
 use FFGBSY\Services\StatistikenService;
@@ -25,6 +26,7 @@ use FFGBSY\Services\CelebrationService;
 use FFGBSY\Services\NotificationsService;
 use FFGBSY\Services\LogsService;
 use FFGBSY\Services\SetupService;
+use FFGBSY\Services\AdminNotificationsService;
 
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
@@ -54,6 +56,7 @@ $settings($containerBuilder);
 $database($containerBuilder);
 
 $containerBuilder->addDefinitions([
+    'adminNotifications' => fn (ContainerInterface $c, LoggerInterface $logger) => new AdminNotificationsService($c, $logger),
     'aufnehmer' => fn (ContainerInterface $c, LoggerInterface $logger) => new AufnehmerService($c, $logger),
     'tischkategorien' => fn (ContainerInterface $c, LoggerInterface $logger) => new TischkategorienService($c, $logger),
     'tische' => fn (ContainerInterface $c, LoggerInterface $logger) => new TischeService($c, $logger),
@@ -70,6 +73,7 @@ $containerBuilder->addDefinitions([
     'bonsDruck' => fn (ContainerInterface $c, LoggerInterface $logger) => new BonsDruckService($c, $logger),
     'constants' => fn (ContainerInterface $c, LoggerInterface $logger) => new ConstantsService($c, $logger),
     'print' => fn (ContainerInterface $c, LoggerInterface $logger) => new PrintService($c, $logger),
+    'printBons' => fn (ContainerInterface $c, LoggerInterface $logger) => new PrintBonsService($c, $logger),
     'statistiken' => fn (ContainerInterface $c, LoggerInterface $logger) => new StatistikenService($c, $logger),
     'celebration' => fn (ContainerInterface $c, LoggerInterface $logger) => new CelebrationService($c, $logger),
     'notifications' => fn (ContainerInterface $c, LoggerInterface $logger) => new NotificationsService($c, $logger),
@@ -80,7 +84,7 @@ $containerBuilder->addDefinitions([
 $containerBuilder->addDefinitions([
     LoggerInterface::class => function () {
         $logger = new Logger('ffgbsy');
-        $streamHandler = new StreamHandler(__DIR__ . '/var/log/ffgbsy/error.log', 100);
+        $streamHandler = new StreamHandler('/var/log/ffgbsy/error.log', 100);
         $logger->pushHandler($streamHandler);
 
         return $logger;
@@ -122,7 +126,7 @@ $app->addRoutingMiddleware();
 
 // Error Middleware & Logging
 $logger = new Logger('ffgbsy');
-$streamHandler = new StreamHandler(__DIR__ . '/var/log/ffgbsy/error.log', 100);
+$streamHandler = new StreamHandler('/var/log/ffgbsy/error.log', 100);
 $logger->pushHandler($streamHandler);
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);

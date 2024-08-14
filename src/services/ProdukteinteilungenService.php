@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace FFGBSY\Services;
 
-use DI\ContainerBuilder;
-use Psr\Container\ContainerInterface;
 use PDO;
 
 final class ProdukteinteilungenService extends BaseService
@@ -27,7 +25,7 @@ final class ProdukteinteilungenService extends BaseService
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             return $this->singleRead($sth);
         } else {
-            $sth = $this->db->prepare("SELECT * FROM produkteinteilungen");
+            $sth = $this->db->prepare("SELECT * FROM produkteinteilungen ORDER BY sortierindex ASC");
             return $this->multiRead($sth);
         }
     }

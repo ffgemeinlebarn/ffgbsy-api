@@ -4,16 +4,15 @@
 
     namespace FFGBSY\Services;
 
-    use DI\ContainerBuilder;
-    use Psr\Container\ContainerInterface;
     use PDO;
 
     final class TischkategorienService extends BaseService
     {
         public function create($data)
         {
-            $sth = $this->db->prepare("INSERT INTO tischkategorien (name, sortierindex) VALUES (:name, :sortierindex)");
+            $sth = $this->db->prepare("INSERT INTO tischkategorien (name, aktiv, sortierindex) VALUES (:name, :aktiv, :sortierindex)");
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
+            $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->execute();
 
@@ -37,9 +36,10 @@
 
         public function update($data)
         {
-            $sth = $this->db->prepare("UPDATE tischkategorien SET name=:name, sortierindex=:sortierindex WHERE id=:id");
+            $sth = $this->db->prepare("UPDATE tischkategorien SET name=:name, aktiv=:aktiv, sortierindex=:sortierindex WHERE id=:id");
             $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
             $sth->bindParam(':name', $data['name'], PDO::PARAM_STR);
+            $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
             $sth->bindParam(':sortierindex', $data['sortierindex'], PDO::PARAM_INT);
             $sth->execute();
             
@@ -56,6 +56,7 @@
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
+            $obj->aktiv = $this->asBool($obj->aktiv);
             $obj->sortierindex = $this->asNumber($obj->sortierindex);
             return $obj;
         }

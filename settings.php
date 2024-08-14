@@ -16,6 +16,12 @@ return function (ContainerBuilder $containerBuilder) {
                     'database' => getenv('DB_DATABASE'),
                     'username' => getenv('DB_USERNAME'),
                     'password' => getenv('DB_PASSWORD')
+                ],
+                'notifications' => [
+                    'smtpHost' => getenv('MAIL_NOTIFICATION_SMTP_HOST'),
+                    'smtpUser' => getenv('MAIL_NOTIFICATION_SMTP_USER'),
+                    'smtpPassword' => getenv('MAIL_NOTIFICATION_SMTP_PASSWORD'),
+                    'receiver' => getenv('MAIL_NOTIFICATION_RECEIVER')
                 ]
             ];
         }

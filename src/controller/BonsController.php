@@ -30,21 +30,15 @@ final class BonsController extends BaseController
         return $this->responseAsJson($response, $data);
     }
 
+    public function readAll(Request $request, Response $response, $args): Response
+    {
+        $data = $this->bonsService->read(null, $request->getQueryParams());
+        return $this->responseAsJson($response, $data);
+    }
+
     public function readByTypeAndBestellung(Request $request, Response $response, $args): Response
     {
         $data = $this->bonsService->readByTypeAndBestellung($args['type'], $args['id']);
-        return $this->responseAsJson($response, $data);
-    }
-
-    public function printSingle(Request $request, Response $response, $args): Response
-    {
-        $data = $this->bonsService->printSingle($request->getParsedBody());
-        return $this->responseAsJson($response, $data);
-    }
-
-    public function printMultiple(Request $request, Response $response): Response
-    {
-        $data = $this->bonsService->printMultiple($request->getParsedBody());
         return $this->responseAsJson($response, $data);
     }
 }

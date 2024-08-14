@@ -4,34 +4,30 @@ declare(strict_types=1);
 
 namespace FFGBSY\Services;
 
-use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use PDO;
 use FFGBSY\Services\DruckerService;
 use FFGBSY\Services\TischeService;
 use FFGBSY\Services\AufnehmerService;
-use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\BonsDruckService;
-use FFGBSY\Services\PrintService;
+use FFGBSY\Services\BestellpositionenService;
 
 final class BonsService extends BaseService
 {
     private DruckerService $druckerService;
     private TischeService $tischeService;
     private AufnehmerService $aufnehmerService;
-    private BestellpositionenService $bestellpositionenService;
     private BonsDruckService $bonsDruckService;
-    private PrintService $printService;
+    private BestellpositionenService $bestellpositionenService;
 
     public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
         $this->druckerService = $container->get('drucker');
         $this->tischeService = $container->get('tische');
         $this->aufnehmerService = $container->get('aufnehmer');
-        $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->bonsDruckService = $container->get('bonsDruck');
-        $this->printService = $container->get('print');
+        $this->bestellpositionenService = $container->get('bestellpositionen');
         parent::__construct($container, $logger);
     }
 
@@ -58,11 +54,103 @@ final class BonsService extends BaseService
         return $this->read($bonId);
     }
 
-    public function read($id)
+    public function read($id = null, $filter = [])
     {
-        $sth = $this->db->prepare("SELECT * FROM bons WHERE id = :id");
-        $sth->bindParam(':id', $id, PDO::PARAM_INT);
-        return $this->addNested($this->singleRead($sth));
+        if ($id != null) {
+            $sth = $this->db->prepare(
+                "SELECT
+                    bons.*,
+                    bestellungen.tische_id,
+                    bestellungen.aufnehmer_id,
+                    bestellungen.timestamp_begonnen,
+                    bestellungen.timestamp_beendet
+                FROM
+                    bons
+                LEFT JOIN 
+                    bestellungen ON bestellungen.id = bons.bestellungen_id
+                WHERE
+                    bons.id = :id");
+            $sth->bindParam(':id', $id, PDO::PARAM_INT);
+
+            return $this->addNested($this->singleRead($sth));
+        } else {
+            $sql =
+                "SELECT
+                    bons.*,
+                    bestellungen.tische_id,
+                    bestellungen.aufnehmer_id,
+                    bestellungen.timestamp_begonnen,
+                    bestellungen.timestamp_beendet,
+                    (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id) as tries,
+                    (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id AND bons_druck.success = true) as successes,
+                    (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id AND bons_druck.success = false) as fails
+                FROM
+                    bons
+                LEFT JOIN 
+                    bestellungen ON bestellungen.id = bons.bestellungen_id
+                WHERE
+                    1=1";
+
+            $missingSuccessfulDruck = isset($filter['missingSuccessfulDruck']) ? $this->asBool($filter['missingSuccessfulDruck']) : false;
+            $multipleDrucke = isset($filter['multipleDrucke']) ? $this->asBool($filter['multipleDrucke']) : false;
+            $drucker = isset($filter['druckerId']);
+            $tisch = isset($filter['tischId']);
+            $limit = isset($filter['limit']);
+            $type = isset($filter['type']);
+
+            if ($drucker) {
+                $sql .= " AND bons.drucker_id = :drucker_id";
+            }
+
+            if ($tisch) {
+                $sql .= " AND bestellungen.tische_id = :tische_id";
+            }
+
+            if ($type) {
+                $sql .= " AND bons.type = :type";
+            }
+
+            if ($missingSuccessfulDruck) {
+                $sql .= " AND (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id AND bons_druck.success = true) = 0";
+            }
+
+            if ($multipleDrucke) {
+                $sql .= " AND (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id) > 0";
+            }
+            
+            $sql .= " ORDER BY bestellungen.timestamp_beendet DESC";
+
+            if ($limit) {
+                $sql .= " LIMIT :limit";
+            }
+
+            $sth = $this->db->prepare($sql);
+
+            if ($drucker) {
+                $sth->bindParam(':drucker_id', $filter['druckerId'], PDO::PARAM_INT);
+            }
+
+            if ($tisch) {
+                $sth->bindParam(':tische_id', $filter['tischId'], PDO::PARAM_INT);
+            }
+
+            if ($limit) {
+                $sth->bindParam(':limit', $filter['limit'], PDO::PARAM_INT);
+            }
+
+            if ($type) {
+                $sth->bindParam(':type', $filter['type'], PDO::PARAM_STR);
+            }
+
+            $sth->execute();
+            $bons = $this->multiRead($sth);
+
+            foreach ($bons as $bon) {
+                $bon = $this->addNested($bon);
+            }
+
+            return $bons;
+        }
     }
 
     public function readByTypeAndBestellung($type, $bestellungId)
@@ -74,72 +162,38 @@ final class BonsService extends BaseService
         $items = $this->multiRead($sth);
         foreach ($items as $item) {
             $item = $this->addNested($item);
-            $item->drucke = $this->bonsDruckService->readByBon($item->id);
         }
         return $items;
     }
 
-    public function printMultiple($bons)
+    private function addNested($obj)
     {
-        $besllbonsDrucke = [];
-
-        foreach ($bons as $bon) {
-            array_push($besllbonsDrucke, $this->printSingle($bon));
+        $obj->drucker = $this->druckerService->read($obj->drucker_id);
+        $obj->drucke = $this->bonsDruckService->readByBon($obj->id);
+        $obj->bestellung = new \stdClass();
+        $obj->bestellung->id = $obj->bestellungen_id;
+        
+        if (isset($obj->timestamp_begonnen)){
+            $obj->bestellung->timestamp_begonnen = $obj->timestamp_begonnen;
+        }
+        if (isset($obj->timestamp_beendet)){
+            $obj->bestellung->timestamp_beendet = $obj->timestamp_beendet;
+        }
+        if (isset($obj->aufnehmer_id)){
+            $obj->bestellung->aufnehmer = $this->aufnehmerService->read($obj->aufnehmer_id);
+        }
+        if (isset($obj->tische_id)){
+            $obj->bestellung->tisch = $this->tischeService->read($obj->tische_id);
         }
 
-        return $besllbonsDrucke;
-    }
+        // unset($obj->drucker_id);
+        // unset($obj->bestellungen_id);
+        unset($obj->timestamp_begonnen);
+        unset($obj->timestamp_beendet);
+        unset($obj->tische_id);
+        unset($obj->aufnehmer_id);
 
-    public function printSingle($bon)
-    {
-        $bonDruck = $this->bonsDruckService->createFromBon($bon);
-        $tisch = $this->tischeService->readByBon($bon['id']);
-        $drucker = $this->druckerService->read($bon['drucker_id']);
-        $setup = $this->printService->setupPrinter($drucker);
-        $bestellpositionen = $this->bestellpositionenService->readByBon($bon['id']);
-        $aufnehmer = $this->aufnehmerService->readByBestellung($bon['bestellungen_id']);
-        $aufnehmerName = "{$aufnehmer->vorname} {$aufnehmer->nachname[0]}.";
-
-        $qrData = "{$bon['bestellungen_id']}";
-
-        if ($setup->success) {
-            $printer = $setup->printer;
-
-            if ($bon['type'] == 'bestell') {
-                $this->printBestellbon($printer, $tisch, $drucker, $bon['bestellungen_id'], $bon['id'], $aufnehmerName, $bestellpositionen, $qrData, $bonDruck);
-            }
-
-            if ($bon['type'] == 'storno') {
-                $this->printStornobon($printer, $tisch, $drucker, $bon['bestellungen_id'], $bon['id'], $aufnehmerName, $bestellpositionen, $qrData, $bonDruck);
-            }
-
-            $this->printService->printFinish($printer);
-        }
-
-        return $this->bonsDruckService->updateResult($bonDruck->id, $setup->success, $setup->message);
-    }
-
-    private function printBestellbon($printer, $tisch, $drucker, $bestellungId, $bonId, $aufnehmerName, $bestellpositionen, $qrData, $bonDruck)
-    {
-        $this->printService->printHeader($printer);
-        $this->printService->printTisch($printer, $tisch);
-        $this->printService->printBestellpositionenHeader($printer);
-        $this->printService->printBestellpositionen($printer, $bestellpositionen);
-        $this->printService->printImprint($printer);
-        $this->printService->printQR($printer, $qrData);
-        $this->printService->printInfo($printer, $bestellungId, $bonId, $aufnehmerName, $bonDruck->timestamp);
-        $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
-    }
-
-    private function printStornobon($printer, $tisch, $drucker, $bestellungId, $bonId, $aufnehmerName, $bestellpositionen, $qrData, $bonDruck)
-    {
-        $this->printService->printStornoMark($printer);
-        $this->printService->printTisch($printer, $tisch);
-        $this->printService->printBestellpositionenHeader($printer);
-        $this->printService->printBestellpositionen($printer, $bestellpositionen);
-        $this->printService->printQR($printer, $qrData);
-        $this->printService->printInfo($printer, $bestellungId, $bonId, $aufnehmerName, $bonDruck->timestamp);
-        $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
+        return $obj;
     }
 
     public function getAffectedDruckerIdsForBestellung($type, $bestellungId)
@@ -154,18 +208,12 @@ final class BonsService extends BaseService
         return $ids;
     }
 
-    private function addNested($obj)
-    {
-        $obj->drucker = $this->druckerService->read($obj->drucker_id);
-        $obj->drucker = $this->druckerService->read($obj->drucker_id);
-        return $obj;
-    }
-
     protected function singleMap($obj)
     {
         $obj->id = $this->asNumber($obj->id);
         $obj->bestellungen_id = $this->asNumber($obj->bestellungen_id);
         $obj->drucker_id = $this->asNumber($obj->drucker_id);
+
         return $obj;
     }
 }

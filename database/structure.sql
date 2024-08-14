@@ -1,15 +1,21 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jul 26, 2022 at 08:21 PM
--- Server version: 10.4.21-MariaDB
--- PHP Version: 8.0.10
+-- Host: database
+-- Generation Time: Aug 12, 2024 at 06:13 AM
+-- Server version: 8.4.1
+-- PHP Version: 8.2.21
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+02:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `ffgbsy`
@@ -18,32 +24,100 @@ SET time_zone = "+02:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `logs`
+-- Table structure for table `aufnehmer`
 --
 
-CREATE TABLE `logs` (
-  `id` int(11) NOT NULL,
-  `level` int(11) NOT NULL,
-  `message` varchar(500) NOT NULL,
-  `additional` varchar(300) DEFAULT NULL,
-  `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
-  `device_name` varchar(50) DEFAULT NULL,
-  `device_ip` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `aufnehmer` (
+  `id` int NOT NULL,
+  `vorname` varchar(50) DEFAULT NULL,
+  `nachname` varchar(50) DEFAULT NULL,
+  `aktiv` tinyint(1) NOT NULL DEFAULT '0',
+  `zoom_level` int NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `notifications`
+-- Table structure for table `bestellpositionen`
 --
 
-CREATE TABLE `notifications` (
-  `id` int(11) NOT NULL,
-  `title` varchar(50) NOT NULL,
-  `message` varchar(300) DEFAULT NULL,
-  `author` varchar(50) DEFAULT NULL,
-  `timestamp` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `bestellpositionen` (
+  `id` int NOT NULL,
+  `anzahl` int NOT NULL,
+  `produkte_id` int NOT NULL,
+  `notiz` text,
+  `bestellungen_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bestellpositionen_eigenschaften`
+--
+
+CREATE TABLE `bestellpositionen_eigenschaften` (
+  `bestellpositionen_id` int NOT NULL,
+  `eigenschaften_id` int NOT NULL,
+  `in_produkt_enthalten` tinyint(1) DEFAULT NULL,
+  `aktiv` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bestellungen`
+--
+
+CREATE TABLE `bestellungen` (
+  `id` int NOT NULL,
+  `tische_id` int NOT NULL,
+  `timestamp_begonnen` datetime NOT NULL,
+  `timestamp_beendet` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `aufnehmer_id` int NOT NULL,
+  `device_name` varchar(50) NOT NULL,
+  `device_ip` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bons`
+--
+
+CREATE TABLE `bons` (
+  `id` int NOT NULL,
+  `type` enum('bestellung','storno') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `bestellungen_id` int NOT NULL,
+  `drucker_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bons_bestellpositionen`
+--
+
+CREATE TABLE `bons_bestellpositionen` (
+  `id` int NOT NULL,
+  `bons_id` int NOT NULL,
+  `bestellpositionen_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bons_druck`
+--
+
+CREATE TABLE `bons_druck` (
+  `id` int NOT NULL,
+  `bons_id` int NOT NULL,
+  `datum` date NOT NULL,
+  `laufnummer` int NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `success` tinyint(1) DEFAULT NULL,
+  `message` varchar(300) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -54,105 +128,7 @@ CREATE TABLE `notifications` (
 CREATE TABLE `constants` (
   `name` varchar(50) NOT NULL,
   `value` varchar(300) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `aufnehmer`
---
-
-CREATE TABLE `aufnehmer` (
-  `id` int(11) NOT NULL,
-  `vorname` varchar(50) DEFAULT NULL,
-  `nachname` varchar(50) DEFAULT NULL,
-  `aktiv` tinyint(1) NOT NULL DEFAULT 0,
-  `zoom_level` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bestellpositionen`
---
-
-CREATE TABLE `bestellpositionen` (
-  `id` int(11) NOT NULL,
-  `anzahl` int(11) NOT NULL,
-  `produkte_id` int(11) NOT NULL,
-  `notiz` text DEFAULT NULL,
-  `bestellungen_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bestellpositionen_eigenschaften`
---
-
-CREATE TABLE `bestellpositionen_eigenschaften` (
-  `bestellpositionen_id` int(11) NOT NULL,
-  `eigenschaften_id` int(11) NOT NULL,
-  `in_produkt_enthalten` tinyint(1) DEFAULT NULL,
-  `aktiv` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bestellungen`
---
-
-CREATE TABLE `bestellungen` (
-  `id` int(11) NOT NULL,
-  `tische_id` int(11) NOT NULL,
-  `timestamp_begonnen` datetime NOT NULL,
-  `timestamp_beendet` datetime NOT NULL DEFAULT current_timestamp(),
-  `aufnehmer_id` int(11) NOT NULL,
-  `device_name` varchar(50) NOT NULL,
-  `device_ip` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bons`
---
-
-CREATE TABLE `bons` (
-  `id` int(11) NOT NULL,
-  `type` enum('bestell', 'storno') NOT NULL,
-  `bestellungen_id` int(11) NOT NULL,
-  `drucker_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bons_druck`
---
-
-CREATE TABLE `bons_druck` (
-  `id` int(11) NOT NULL,
-  `bons_id` int(11) NOT NULL,
-  `datum` date NOT NULL,
-  `laufnummer` int(11) NOT NULL,
-  `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
-  `success` tinyint(1) DEFAULT NULL,
-  `message` varchar(300) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bons_bestellpositionen`
---
-
-CREATE TABLE `bons_bestellpositionen` (
-  `id` int(11) NOT NULL,
-  `bons_id` int(11) NOT NULL,
-  `bestellpositionen_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -161,11 +137,11 @@ CREATE TABLE `bons_bestellpositionen` (
 --
 
 CREATE TABLE `drucker` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
   `ip` varchar(30) NOT NULL,
-  `port` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `port` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -174,11 +150,11 @@ CREATE TABLE `drucker` (
 --
 
 CREATE TABLE `eigenschaften` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
-  `preis` decimal(19,2) NOT NULL DEFAULT 0.00,
-  `sortierindex` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `preis` decimal(19,2) NOT NULL DEFAULT '0.00',
+  `sortierindex` int NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -187,11 +163,70 @@ CREATE TABLE `eigenschaften` (
 --
 
 CREATE TABLE `grundprodukte` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
-  `bestand` int(11) DEFAULT NULL,
+  `bestand` int DEFAULT NULL,
   `einheit` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `historical_statistics_days`
+--
+
+CREATE TABLE `historical_statistics_days` (
+  `id` int NOT NULL,
+  `historical_statistics_events_id` int NOT NULL,
+  `datum` date NOT NULL,
+  `umsatz` int NOT NULL DEFAULT '0',
+  `bestellungen_anzahl` int NOT NULL DEFAULT '0',
+  `produkte_anzahl` int NOT NULL DEFAULT '0',
+  `hauptspeisen_anzahl` int NOT NULL DEFAULT '0',
+  `speisen_anzahl` int NOT NULL DEFAULT '0',
+  `getraenke_anzahl` int NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `historical_statistics_events`
+--
+
+CREATE TABLE `historical_statistics_events` (
+  `id` int NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `logs`
+--
+
+CREATE TABLE `logs` (
+  `id` int NOT NULL,
+  `level` int NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `additional` varchar(300) DEFAULT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `device_name` varchar(50) DEFAULT NULL,
+  `device_ip` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `message` varchar(300) DEFAULT NULL,
+  `author` varchar(50) DEFAULT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -200,11 +235,11 @@ CREATE TABLE `grundprodukte` (
 --
 
 CREATE TABLE `produktbereiche` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
   `color` varchar(30) DEFAULT NULL,
-  `drucker_id_level_0` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `drucker_id_level_0` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -213,21 +248,22 @@ CREATE TABLE `produktbereiche` (
 --
 
 CREATE TABLE `produkte` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
   `formal_name` varchar(50) DEFAULT NULL,
   `preis` decimal(19,2) NOT NULL,
-  `drucker_id_level_2` int(11) DEFAULT NULL,
-  `aktiv` tinyint(1) NOT NULL DEFAULT 1,
-  `sortierindex` int(11) DEFAULT NULL,
-  `produkteinteilungen_id` int(11) NOT NULL,
-  `grundprodukte_id` int(11) DEFAULT NULL,
-  `grundprodukte_multiplikator` int(11) DEFAULT NULL,
-  `celebration_active` tinyint(1) NOT NULL DEFAULT 0,
-  `celebration_last` int(11) NOT NULL DEFAULT 0,
+  `drucker_id_level_2` int DEFAULT NULL,
+  `aktiv` tinyint(1) NOT NULL DEFAULT '1',
+  `sortierindex` int DEFAULT NULL,
+  `produkteinteilungen_id` int NOT NULL,
+  `grundprodukte_id` int DEFAULT NULL,
+  `grundprodukte_multiplikator` int DEFAULT NULL,
+  `celebration_active` tinyint(1) NOT NULL DEFAULT '0',
+  `celebration_last` int NOT NULL DEFAULT '0',
   `celebration_prefix` varchar(30) DEFAULT NULL,
-  `celebration_suffix` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `celebration_suffix` varchar(30) DEFAULT NULL,
+  `hauptspeise` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -236,11 +272,11 @@ CREATE TABLE `produkte` (
 --
 
 CREATE TABLE `produkteinteilungen` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
-  `produktkategorien_id` int(11) NOT NULL,
-  `sortierindex` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `produktkategorien_id` int NOT NULL,
+  `sortierindex` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -249,10 +285,10 @@ CREATE TABLE `produkteinteilungen` (
 --
 
 CREATE TABLE `produkte_eigenschaften` (
-  `produkte_id` int(11) NOT NULL,
-  `eigenschaften_id` int(11) NOT NULL,
+  `produkte_id` int NOT NULL,
+  `eigenschaften_id` int NOT NULL,
   `in_produkt_enthalten` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -261,13 +297,13 @@ CREATE TABLE `produkte_eigenschaften` (
 --
 
 CREATE TABLE `produktkategorien` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
   `color` varchar(30) NOT NULL,
-  `produktbereiche_id` int(11) NOT NULL,
-  `drucker_id_level_1` int(11) DEFAULT NULL,
-  `sortierindex` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `produktbereiche_id` int NOT NULL,
+  `drucker_id_level_1` int DEFAULT NULL,
+  `sortierindex` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -276,10 +312,10 @@ CREATE TABLE `produktkategorien` (
 --
 
 CREATE TABLE `produktkategorien_eigenschaften` (
-  `produktkategorien_id` int(11) NOT NULL,
-  `eigenschaften_id` int(11) NOT NULL,
-  `in_produkt_enthalten` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `produktkategorien_id` int NOT NULL,
+  `eigenschaften_id` int NOT NULL,
+  `in_produkt_enthalten` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -288,12 +324,13 @@ CREATE TABLE `produktkategorien_eigenschaften` (
 --
 
 CREATE TABLE `tische` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `reihe` varchar(30) NOT NULL,
-  `nummer` int(11) DEFAULT NULL,
-  `tischkategorien_id` int(11) NOT NULL,
-  `sortierindex` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `nummer` int DEFAULT NULL,
+  `tischkategorien_id` int NOT NULL,
+  `aktiv` tinyint(1) NOT NULL DEFAULT '1',
+  `sortierindex` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
 
@@ -302,32 +339,15 @@ CREATE TABLE `tische` (
 --
 
 CREATE TABLE `tischkategorien` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
-  `sortierindex` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `aktiv` tinyint(1) NOT NULL DEFAULT '1',
+  `sortierindex` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `logs`
---
-ALTER TABLE `logs`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `notifications`
---
-ALTER TABLE `notifications`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `constants`
---
-ALTER TABLE `constants`
-  ADD PRIMARY KEY (`name`);
 
 --
 -- Indexes for table `aufnehmer`
@@ -366,6 +386,14 @@ ALTER TABLE `bons`
   ADD KEY `fk_bons_drucker_id` (`drucker_id`);
 
 --
+-- Indexes for table `bons_bestellpositionen`
+--
+ALTER TABLE `bons_bestellpositionen`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_bons_bestellpositionen_bons_id` (`bons_id`),
+  ADD KEY `fk_bons_bestellpositionen_bestellpositionen_id` (`bestellpositionen_id`);
+
+--
 -- Indexes for table `bons_druck`
 --
 ALTER TABLE `bons_druck`
@@ -373,12 +401,10 @@ ALTER TABLE `bons_druck`
   ADD KEY `fk_bons_druck_bons_id` (`bons_id`);
 
 --
--- Indexes for table `bons_bestellpositionen`
+-- Indexes for table `constants`
 --
-ALTER TABLE `bons_bestellpositionen`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_bons_bestellpositionen_bons_id` (`bons_id`),
-  ADD KEY `fk_bons_bestellpositionen_bestellpositionen_id` (`bestellpositionen_id`);
+ALTER TABLE `constants`
+  ADD PRIMARY KEY (`name`);
 
 --
 -- Indexes for table `drucker`
@@ -396,6 +422,31 @@ ALTER TABLE `eigenschaften`
 -- Indexes for table `grundprodukte`
 --
 ALTER TABLE `grundprodukte`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `historical_statistics_days`
+--
+ALTER TABLE `historical_statistics_days`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_historical_tatistics_days_historical_statistics_events` (`historical_statistics_events_id`);
+
+--
+-- Indexes for table `historical_statistics_events`
+--
+ALTER TABLE `historical_statistics_events`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -425,7 +476,8 @@ ALTER TABLE `produkteinteilungen`
 -- Indexes for table `produkte_eigenschaften`
 --
 ALTER TABLE `produkte_eigenschaften`
-  ADD PRIMARY KEY (`produkte_id`,`eigenschaften_id`);
+  ADD PRIMARY KEY (`produkte_id`,`eigenschaften_id`),
+  ADD KEY `fk_produkte_eigenschaften_eigenschaften_id` (`eigenschaften_id`);
 
 --
 -- Indexes for table `produktkategorien`
@@ -439,7 +491,8 @@ ALTER TABLE `produktkategorien`
 -- Indexes for table `produktkategorien_eigenschaften`
 --
 ALTER TABLE `produktkategorien_eigenschaften`
-  ADD PRIMARY KEY (`produktkategorien_id`,`eigenschaften_id`);
+  ADD PRIMARY KEY (`produktkategorien_id`,`eigenschaften_id`),
+  ADD KEY `fk_produktkategorien_eigenschaften_eigenschaften_id` (`eigenschaften_id`);
 
 --
 -- Indexes for table `tische`
@@ -458,165 +511,129 @@ ALTER TABLE `tischkategorien`
 --
 
 --
--- AUTO_INCREMENT for table `logs`
---
-ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `notifications`
---
-ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `aufnehmer`
 --
 ALTER TABLE `aufnehmer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bestellpositionen`
 --
 ALTER TABLE `bestellpositionen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bestellungen`
 --
 ALTER TABLE `bestellungen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bons`
 --
 ALTER TABLE `bons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `bons_druck`
---
-ALTER TABLE `bons_druck`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bons_bestellpositionen`
 --
 ALTER TABLE `bons_bestellpositionen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `bons_druck`
+--
+ALTER TABLE `bons_druck`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `drucker`
 --
 ALTER TABLE `drucker`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `eigenschaften`
 --
 ALTER TABLE `eigenschaften`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `grundprodukte`
 --
 ALTER TABLE `grundprodukte`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `historical_statistics_days`
+--
+ALTER TABLE `historical_statistics_days`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `historical_statistics_events`
+--
+ALTER TABLE `historical_statistics_events`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `produktbereiche`
 --
 ALTER TABLE `produktbereiche`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `produkte`
 --
 ALTER TABLE `produkte`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `produkteinteilungen`
 --
 ALTER TABLE `produkteinteilungen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `produktkategorien`
 --
 ALTER TABLE `produktkategorien`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tische`
 --
 ALTER TABLE `tische`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tischkategorien`
 --
 ALTER TABLE `tischkategorien`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `produktkategorie`
---
-ALTER TABLE `produktbereiche`
-  ADD CONSTRAINT `fk_produktbereiche_drucker_id_level_0` FOREIGN KEY (`drucker_id_level_0`) REFERENCES `drucker` (`id`);
-COMMIT;
-
---
--- Constraints for table `produktkategorie`
---
-ALTER TABLE `produktkategorien`
-  ADD CONSTRAINT `fk_produktkategorien_produktbereiche_id` FOREIGN KEY (`produktbereiche_id`) REFERENCES `produktbereiche` (`id`),
-  ADD CONSTRAINT `fk_produktkategorien_drucker_id_level_1` FOREIGN KEY (`drucker_id_level_1`) REFERENCES `drucker` (`id`);
-COMMIT;
-
---
--- Constraints for table `produkte_eigenschaften`
---
-ALTER TABLE `produkte_eigenschaften`
-  ADD CONSTRAINT `fk_produkte_eigenschaften_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_produkte_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`);
-COMMIT;
-
---
--- Constraints for table `produktkategorien_eigenschaften`
---
-ALTER TABLE `produktkategorien_eigenschaften`
-  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`);
-COMMIT;
-
---
--- Constraints for table `produkteinteilungen`
---
-ALTER TABLE `produkteinteilungen`
-  ADD CONSTRAINT `fk_produkteinteilungen_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`);
-COMMIT;
-
---
--- Constraints for table `produkte`
---
-ALTER TABLE `produkte`
-  ADD CONSTRAINT `fk_produkte_produkteinteilungen_id` FOREIGN KEY (`produkteinteilungen_id`) REFERENCES `produkteinteilungen` (`id`),
-  ADD CONSTRAINT `fk_produkte_grundprodukte_id` FOREIGN KEY (`grundprodukte_id`) REFERENCES `grundprodukte` (`id`),
-  ADD CONSTRAINT `fk_produkte_drucker_id_level_2` FOREIGN KEY (`drucker_id_level_2`) REFERENCES `drucker` (`id`);
-COMMIT;
-
---
 -- Constraints for table `bestellpositionen`
 --
 ALTER TABLE `bestellpositionen`
-  ADD CONSTRAINT `fk_bestellpositionen_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`),
-  ADD CONSTRAINT `fk_bestellpositionen_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`) ON DELETE CASCADE;
-COMMIT;
+  ADD CONSTRAINT `fk_bestellpositionen_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_bestellpositionen_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`);
 
 --
 -- Constraints for table `bestellungen`
@@ -624,7 +641,6 @@ COMMIT;
 ALTER TABLE `bestellungen`
   ADD CONSTRAINT `fk_bestellungen_aufnehmer_id` FOREIGN KEY (`aufnehmer_id`) REFERENCES `aufnehmer` (`id`),
   ADD CONSTRAINT `fk_bestellungen_tische_id` FOREIGN KEY (`tische_id`) REFERENCES `tische` (`id`);
-COMMIT;
 
 --
 -- Constraints for table `bons`
@@ -632,19 +648,68 @@ COMMIT;
 ALTER TABLE `bons`
   ADD CONSTRAINT `fk_bons_bestellungen_id` FOREIGN KEY (`bestellungen_id`) REFERENCES `bestellungen` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_bons_drucker_id` FOREIGN KEY (`drucker_id`) REFERENCES `drucker` (`id`);
-COMMIT;
+
+--
+-- Constraints for table `bons_bestellpositionen`
+--
+ALTER TABLE `bons_bestellpositionen`
+  ADD CONSTRAINT `fk_bons_bestellpositionen_bestellpositionen_id` FOREIGN KEY (`bestellpositionen_id`) REFERENCES `bestellpositionen` (`id`),
+  ADD CONSTRAINT `fk_bons_bestellpositionen_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `bons_druck`
 --
 ALTER TABLE `bons_druck`
   ADD CONSTRAINT `fk_bons_druck_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`) ON DELETE CASCADE;
-COMMIT;
 
 --
--- Constraints for table `bons_bestellpositionen`
+-- Constraints for table `historical_statistics_days`
 --
-ALTER TABLE `bons_bestellpositionen`
-  ADD CONSTRAINT `fk_bons_bestellpositionen_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_bons_bestellpositionen_bestellpositionen_id` FOREIGN KEY (`bestellpositionen_id`) REFERENCES `bestellpositionen` (`id`);
+ALTER TABLE `historical_statistics_days`
+  ADD CONSTRAINT `fk_historical_tatistics_days_historical_statistics_events` FOREIGN KEY (`historical_statistics_events_id`) REFERENCES `historical_statistics_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `produktbereiche`
+--
+ALTER TABLE `produktbereiche`
+  ADD CONSTRAINT `fk_produktbereiche_drucker_id_level_0` FOREIGN KEY (`drucker_id_level_0`) REFERENCES `drucker` (`id`);
+
+--
+-- Constraints for table `produkte`
+--
+ALTER TABLE `produkte`
+  ADD CONSTRAINT `fk_produkte_drucker_id_level_2` FOREIGN KEY (`drucker_id_level_2`) REFERENCES `drucker` (`id`),
+  ADD CONSTRAINT `fk_produkte_grundprodukte_id` FOREIGN KEY (`grundprodukte_id`) REFERENCES `grundprodukte` (`id`),
+  ADD CONSTRAINT `fk_produkte_produkteinteilungen_id` FOREIGN KEY (`produkteinteilungen_id`) REFERENCES `produkteinteilungen` (`id`);
+
+--
+-- Constraints for table `produkteinteilungen`
+--
+ALTER TABLE `produkteinteilungen`
+  ADD CONSTRAINT `fk_produkteinteilungen_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`);
+
+--
+-- Constraints for table `produkte_eigenschaften`
+--
+ALTER TABLE `produkte_eigenschaften`
+  ADD CONSTRAINT `fk_produkte_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`),
+  ADD CONSTRAINT `fk_produkte_eigenschaften_produkte_id` FOREIGN KEY (`produkte_id`) REFERENCES `produkte` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `produktkategorien`
+--
+ALTER TABLE `produktkategorien`
+  ADD CONSTRAINT `fk_produktkategorien_drucker_id_level_1` FOREIGN KEY (`drucker_id_level_1`) REFERENCES `drucker` (`id`),
+  ADD CONSTRAINT `fk_produktkategorien_produktbereiche_id` FOREIGN KEY (`produktbereiche_id`) REFERENCES `produktbereiche` (`id`);
+
+--
+-- Constraints for table `produktkategorien_eigenschaften`
+--
+ALTER TABLE `produktkategorien_eigenschaften`
+  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_eigenschaften_id` FOREIGN KEY (`eigenschaften_id`) REFERENCES `eigenschaften` (`id`),
+  ADD CONSTRAINT `fk_produktkategorien_eigenschaften_produktkategorien_id` FOREIGN KEY (`produktkategorien_id`) REFERENCES `produktkategorien` (`id`) ON DELETE CASCADE;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

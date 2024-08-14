@@ -201,11 +201,11 @@ final class PrintService extends BaseService
         $printer->feed(1);
     }
 
-    public function printInfo($printer, $bestellungId, $bonId, $aufnehmerName, $timestamp)
+    public function printInfo($printer, $bestellungId, $bonId, $bonDruckId, $aufnehmerName, $timestamp)
     {
         $gedruckt = date_format(date_create($timestamp), "d.m.Y H:i:s");
 
-        $printer->text("BS-{$bestellungId} / BO-{$bonId} / {$aufnehmerName}\n");
+        $printer->text("BS-{$bestellungId} / BO-{$bonId} / BD-{$bonDruckId} / {$aufnehmerName}\n");
         $printer->text("$gedruckt\n");
     }
 

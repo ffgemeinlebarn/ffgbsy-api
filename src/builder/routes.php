@@ -13,6 +13,7 @@ use FFGBSY\Controller\DruckerController;
 use FFGBSY\Controller\GrundprodukteController;
 use FFGBSY\Controller\ProduktbereicheController;
 use FFGBSY\Controller\ProduktkategorienController;
+use FFGBSY\Controller\ProdukteinteilungenController;
 use FFGBSY\Controller\ProdukteController;
 use FFGBSY\Controller\EigenschaftenController;
 use FFGBSY\Controller\BestellungenController;
@@ -106,6 +107,15 @@ return function (App $app) {
         $group->delete(PATH_ID, "$controller:delete");
     });
 
+    $app->group('/produkteinteilungen', function (Group $group) {
+        $controller = ProdukteinteilungenController::class;
+        $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
+        $group->get(PATH_ID, "$controller:readSingle");
+        $group->put(PATH_ID, "$controller:update");
+        $group->delete(PATH_ID, "$controller:delete");
+    });
+
     $app->group('/produkte', function (Group $group) {
         $controller = ProdukteController::class;
         $group->post(PATH_EMPTY, "$controller:create");
@@ -135,10 +145,16 @@ return function (App $app) {
     $app->group('/bons', function (Group $group) {
         $controller = BonsController::class;
         $group->post(PATH_EMPTY, "$controller:create");
+        $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:read");
         $group->get('/bestellungen/{id}/{type}', "$controller:readByTypeAndBestellung");
-        $group->post('/druck', "$controller:printMultiple");
-        $group->post('/{id}/druck', "$controller:printSingle");
+    });
+
+    $app->group('/print', function (Group $group) {
+        $controller = PrintController::class;
+        $group->post('/bons', "$controller:printMultipleBons");
+        $group->post('/bons/{id}', "$controller:printSingleBon");
+        $group->post('/bestellungen/{id}', "$controller:printBestellung");
     });
 
     $app->group('/daten', function (Group $group) {
@@ -150,8 +166,10 @@ return function (App $app) {
         $controller = StatusController::class;
         $group->get('/api', "$controller:api");
         $group->get('/drucker', "$controller:drucker");
+        $group->get('/drucker/{id}', "$controller:druckerSingle");
 
         $group->get('/systemstatus', "$controller:systemstatus");
+        $group->get('/phpinfo', "$controller:phpinfo");
     });
 
     $app->group('/statistiken', function (Group $group) {
@@ -160,6 +178,7 @@ return function (App $app) {
         $group->get('/kennzahlen', "$controller:kennzahlen");
         $group->get('/produktbereiche', "$controller:produktbereiche");
         $group->get('/produktkategorien', "$controller:produktkategorien");
+        $group->get('/produkte', "$controller:produkte");
     });
 
     $app->group('/notifications', function (Group $group) {

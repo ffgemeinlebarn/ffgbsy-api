@@ -116,7 +116,6 @@
         protected function singleMap($obj)
         {
             $obj->id = $this->asNumber($obj->id);
-            $obj->bestand = $this->asNumberOrNull($obj->bestand);
             return $obj;
         }
     }
