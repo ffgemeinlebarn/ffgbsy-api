@@ -186,7 +186,7 @@ final class BestellungenService extends BaseService
             }
 
             $check = new stdClass();
-            $check->success = $grundprodukt->bestand >= $need['anzahl'] || $grundprodukt->bestand == null;
+            $check->success = ($grundprodukt->bestand >= $need['anzahl']) || $grundprodukt->bestand === null;
             $check->produkt_name = $need['produkt_name'];
             $check->needed_anzahl = $need['anzahl'];
             $check->grundprodukt = $grundprodukt;
