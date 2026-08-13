@@ -239,11 +239,7 @@ final class EigenschaftenService extends BaseService
         $sth->execute();
         $ohne = $this->multiRead($sth);
 
-        $return = new \stdClass();
-        $return->mit = $mit;
-        $return->ohne = $ohne;
-
-        return $return;
+        return [...$mit, ...$ohne];
     }
 
     protected function singleMap($obj)

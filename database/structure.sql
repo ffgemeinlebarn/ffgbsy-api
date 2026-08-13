@@ -24,15 +24,57 @@ SET time_zone = "+02:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `aufnehmer`
+-- Table structure for table `abrechnungen`
 --
 
-CREATE TABLE `aufnehmer` (
+CREATE TABLE `abrechnungen` (
+  `id` int NOT NULL,
+  `stelle` varchar(50) DEFAULT 'schank',
+  `kellner_id` int NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `summe` decimal(19,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+--
+-- Table structure for table `abrechnungen_bons`
+--
+
+CREATE TABLE `abrechnungen_bons` (
+  `id` int NOT NULL,
+  `abrechnungen_id` int NOT NULL,
+  `bons_id` int NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rueckrechnungen`
+--
+
+CREATE TABLE `rueckrechnungen` (
+  `id` int NOT NULL,
+  `stelle` varchar(50) DEFAULT 'schank',
+  `kellner_id` int NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `summe` decimal(19,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personen`
+--
+
+CREATE TABLE `personen` (
   `id` int NOT NULL,
   `vorname` varchar(50) DEFAULT NULL,
   `nachname` varchar(50) DEFAULT NULL,
   `aktiv` tinyint(1) NOT NULL DEFAULT '0',
-  `zoom_level` int NOT NULL DEFAULT '1'
+  `zoom_level` int NOT NULL DEFAULT '1',
+  `aufnehmer` tinyint(1) NOT NULL DEFAULT '0',
+  `kellner` tinyint(1) NOT NULL DEFAULT '0',
+  `abrechner` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- --------------------------------------------------------
@@ -350,9 +392,31 @@ CREATE TABLE `tischkategorien` (
 --
 
 --
--- Indexes for table `aufnehmer`
+-- Indexes for table `abrechnungen`
 --
-ALTER TABLE `aufnehmer`
+ALTER TABLE `abrechnungen`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_abrechnungen_kellner_id` (`kellner_id`);
+
+--
+-- Indexes for table `abrechnungen_bons`
+--
+ALTER TABLE `abrechnungen_bons`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_abrechnungen_bons_bons_id` (`bons_id`),
+  ADD KEY `fk_abrechnungen_bons_abrechnungen_id` (`abrechnungen_id`);
+
+--
+-- Indexes for table `rueckrechnungen`
+--
+ALTER TABLE `rueckrechnungen`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_rueckrechnungen_kellner_id` (`kellner_id`);
+
+--
+-- Indexes for table `personen`
+--
+ALTER TABLE `personen`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -511,9 +575,27 @@ ALTER TABLE `tischkategorien`
 --
 
 --
--- AUTO_INCREMENT for table `aufnehmer`
+-- AUTO_INCREMENT for table `abrechnungen`
 --
-ALTER TABLE `aufnehmer`
+ALTER TABLE `abrechnungen`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `abrechnungen_bons`
+--
+ALTER TABLE `abrechnungen_bons`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `rueckrechnungen`
+--
+ALTER TABLE `rueckrechnungen`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `personen`
+--
+ALTER TABLE `personen`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
@@ -629,6 +711,25 @@ ALTER TABLE `tischkategorien`
 --
 
 --
+-- Constraints for table `abrechnungen`
+--
+ALTER TABLE `abrechnungen`
+  ADD CONSTRAINT `fk_abrechnungen_kellner_id` FOREIGN KEY (`kellner_id`) REFERENCES `personen` (`id`);
+
+--
+-- Constraints for table `abrechnungen`
+--
+ALTER TABLE `abrechnungen_bons`
+  ADD CONSTRAINT `fk_abrechnungen_bons_bons_id` FOREIGN KEY (`bons_id`) REFERENCES `bons` (`id`),
+  ADD CONSTRAINT `fk_abrechnungen_bons_abrechnungen_id` FOREIGN KEY (`abrechnungen_id`) REFERENCES `abrechnungen` (`id`);
+
+--
+-- Constraints for table `rueckrechnungen`
+--
+ALTER TABLE `rueckrechnungen`
+  ADD CONSTRAINT `fk_rueckrechnungen_kellner_id` FOREIGN KEY (`kellner_id`) REFERENCES `personen` (`id`);
+
+--
 -- Constraints for table `bestellpositionen`
 --
 ALTER TABLE `bestellpositionen`
@@ -639,7 +740,7 @@ ALTER TABLE `bestellpositionen`
 -- Constraints for table `bestellungen`
 --
 ALTER TABLE `bestellungen`
-  ADD CONSTRAINT `fk_bestellungen_aufnehmer_id` FOREIGN KEY (`aufnehmer_id`) REFERENCES `aufnehmer` (`id`),
+  ADD CONSTRAINT `fk_bestellungen_aufnehmer_id` FOREIGN KEY (`aufnehmer_id`) REFERENCES `personen` (`id`),
   ADD CONSTRAINT `fk_bestellungen_tische_id` FOREIGN KEY (`tische_id`) REFERENCES `tische` (`id`);
 
 --

@@ -13,7 +13,7 @@ use FFGBSY\Services\BonsDruckService;
 use FFGBSY\Services\PrintService;
 use FFGBSY\Services\DruckerService;
 use FFGBSY\Services\TischeService;
-use FFGBSY\Services\AufnehmerService;
+use FFGBSY\Services\PersonenService;
 use FFGBSY\Services\BestellpositionenService;
 use FFGBSY\Services\AdminNotificationsService;
 
@@ -25,7 +25,7 @@ final class PrintBonsService extends BaseService
     private DruckerService $druckerService;
     private PrintService $printService;
     private TischeService $tischeService;
-    private AufnehmerService $aufnehmerService;
+    private PersonenService $personenService;
     private BestellpositionenService $bestellpositionenService;
     private AdminNotificationsService $adminNotificationsService;
 
@@ -37,7 +37,7 @@ final class PrintBonsService extends BaseService
         $this->printService = $container->get('print');
         $this->druckerService = $container->get('drucker');
         $this->tischeService = $container->get('tische');
-        $this->aufnehmerService = $container->get('aufnehmer');
+        $this->personenService = $container->get('personen');
         $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->adminNotificationsService = $container->get('adminNotifications');
         parent::__construct($container, $logger);
@@ -78,8 +78,7 @@ final class PrintBonsService extends BaseService
             }
 
             $this->printService->printFinish($printer);
-        }
-        else {
+        } else {
             $this->adminNotificationsService->sendMessage("Bon Druck fehlgeschlagen", "Bon: {$bon->id}\nBestellung:{$bon->bestellung->id}\nDrucker: {$drucker->name} ({$drucker->id})");
         }
 
@@ -92,7 +91,7 @@ final class PrintBonsService extends BaseService
         $bonIds = array_map(function ($bon) {
             return $bon->id;
         }, $bestellung->bestellbons);
-        
+
         return $this->printMultipleBonsByIds($bonIds);
     }
 
@@ -105,6 +104,7 @@ final class PrintBonsService extends BaseService
         $this->printService->printImprint($printer);
         $this->printService->printInfo($printer, $bestellungId, $bonId, $bonDruck->id, $aufnehmerName, $bonDruck->timestamp);
         $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
+        $this->printService->printBonIdBarcode($printer, $bonId);
     }
 
     private function printStornobon($printer, $tisch, $drucker, $bestellungId, $bonId, $aufnehmerName, $bestellpositionen, $bonDruck)
@@ -115,5 +115,6 @@ final class PrintBonsService extends BaseService
         $this->printService->printBestellpositionen($printer, $bestellpositionen);
         $this->printService->printInfo($printer, $bestellungId, $bonId, $bonDruck->id, $aufnehmerName, $bonDruck->timestamp);
         $this->printService->printLaufnummernBlock($printer, $drucker->name, $bonDruck->laufnummer);
+        $this->printService->printBonIdBarcode($printer, $bonId);
     }
 }

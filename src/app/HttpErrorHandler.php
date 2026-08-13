@@ -35,25 +35,20 @@ class HttpErrorHandler extends SlimErrorHandler
         $error->setFile(basename($exception->getFile()));
         $error->setLine($exception->getLine());
 
-        if ($exception instanceof HttpBadRequestException)
-        {
+        if ($exception instanceof HttpNotFoundException) {
+            $error->setType(ActionError::RESOURCE_NOT_FOUND);
+            $statusCode = 404;
+        } elseif ($exception instanceof HttpMethodNotAllowedException) {
+            $error->setType(ActionError::NOT_ALLOWED);
+        } elseif ($exception instanceof HttpUnauthorizedException) {
+            $error->setType(ActionError::UNAUTHENTICATED);
+        } elseif ($exception instanceof HttpForbiddenException) {
+            $error->setType(ActionError::INSUFFICIENT_PRIVILEGES);
+        } elseif ($exception instanceof HttpBadRequestException) {
             $error->setType(ActionError::BAD_REQUEST);
-            $statusCode = $exception->getCode();
+        } elseif ($exception instanceof HttpNotImplementedException) {
+            $error->setType(ActionError::NOT_IMPLEMENTED);
         }
-
-        // if ($exception instanceof HttpNotFoundException) {
-        //     $error->setType(ActionError::RESOURCE_NOT_FOUND);
-        // } elseif ($exception instanceof HttpMethodNotAllowedException) {
-        //     $error->setType(ActionError::NOT_ALLOWED);
-        // } elseif ($exception instanceof HttpUnauthorizedException) {
-        //     $error->setType(ActionError::UNAUTHENTICATED);
-        // } elseif ($exception instanceof HttpForbiddenException) {
-        //     $error->setType(ActionError::INSUFFICIENT_PRIVILEGES);
-        // } elseif ($exception instanceof HttpBadRequestException) {
-        //     $error->setType(ActionError::BAD_REQUEST);
-        // } elseif ($exception instanceof HttpNotImplementedException) {
-        //     $error->setType(ActionError::NOT_IMPLEMENTED);
-        // }
 
         $payload = new ActionPayload($statusCode, null, $error);
         $encodedPayload = json_encode($payload, JSON_PRETTY_PRINT);

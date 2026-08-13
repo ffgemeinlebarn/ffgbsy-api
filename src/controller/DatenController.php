@@ -7,7 +7,7 @@ namespace FFGBSY\Controller;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use FFGBSY\Services\AufnehmerService;
+use FFGBSY\Services\PersonenService;
 use FFGBSY\Services\TischeService;
 use FFGBSY\Services\TischkategorienService;
 use FFGBSY\Services\ProdukteinteilungenService;
@@ -17,7 +17,7 @@ use FFGBSY\Services\ProdukteService;
 
 final class DatenController extends BaseController
 {
-    private AufnehmerService $aufnehmerService;
+    private PersonenService $personenService;
     private TischeService $tischeService;
     private TischkategorienService $tischkategorienService;
     private ProdukteinteilungenService $produkteinteilungenService;
@@ -29,7 +29,7 @@ final class DatenController extends BaseController
 
     public function __construct(ContainerInterface $container)
     {
-        $this->aufnehmerService = $container->get('aufnehmer');
+        $this->personenService = $container->get('personen');
         $this->tischeService = $container->get('tische');
         $this->tischkategorienService = $container->get('tischkategorien');
         $this->produkteinteilungenService = $container->get('produkteinteilungen');
@@ -44,36 +44,37 @@ final class DatenController extends BaseController
     {
         $data = new \stdClass();
 
-        $data->aufnehmer = $this->aufnehmerService->readAllActive();
+        $data->personen = $this->personenService->readAllActive();
         $data->tische = $this->tischeService->read();
         $data->tischkategorien = $this->tischkategorienService->read();
         $data->produkteinteilungen = $this->produkteinteilungenService->read();
         $data->produktbereiche = $this->produktbereicheService->read();
         $data->produktkategorien = $this->produktkategorienService->readAllNested();
         $data->produkte = $this->produkteService->readAllActive();
-        
+
         $sth = $this->database->prepare(
-            "SELECT 
+            "SELECT
                 UPDATE_TIME
-            FROM   
+            FROM
                 information_schema.tables
             WHERE
                 TABLE_SCHEMA = '$this->databaseName'
-            AND (TABLE_NAME = 'aufnehmer' OR 
-                TABLE_NAME = 'drucker' OR 
-                TABLE_NAME = 'eigenschaften' OR 
-                TABLE_NAME = 'geraete' OR 
-                TABLE_NAME = 'produktbreiche' OR 
-                TABLE_NAME = 'produkte' OR 
-                TABLE_NAME = 'produkteinteilungen' OR 
-                TABLE_NAME = 'produkte_eigenschaften' OR 
-                TABLE_NAME = 'produktkategorien' OR 
-                TABLE_NAME = 'produktkategorien_eigenschaften' OR 
-                TABLE_NAME = 'tische' OR 
+            AND (TABLE_NAME = 'aufnehmer' OR
+                TABLE_NAME = 'drucker' OR
+                TABLE_NAME = 'eigenschaften' OR
+                TABLE_NAME = 'geraete' OR
+                TABLE_NAME = 'produktbreiche' OR
+                TABLE_NAME = 'produkte' OR
+                TABLE_NAME = 'produkteinteilungen' OR
+                TABLE_NAME = 'produkte_eigenschaften' OR
+                TABLE_NAME = 'produktkategorien' OR
+                TABLE_NAME = 'produktkategorien_eigenschaften' OR
+                TABLE_NAME = 'tische' OR
                 TABLE_NAME = 'tischkategorien')
-            ORDER BY 
+            ORDER BY
                 UPDATE_TIME DESC
-            LIMIT 1");
+            LIMIT 1"
+        );
         $sth->execute();
         $datetime = new \DateTime($sth->fetch()['UPDATE_TIME'] ?? "now");
         $data->timestamp = $datetime->format(DATE_RFC3339);

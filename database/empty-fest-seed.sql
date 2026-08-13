@@ -16,35 +16,65 @@ SET time_zone = "+02:00";
 --
 
 --
--- Dumping data for table `aufnehmer`
+-- Dumping data for table `personen`
 --
 
-INSERT INTO `aufnehmer` (`id`, `vorname`, `nachname`, `aktiv`, `zoom_level`) VALUES
-(1, 'Jakob', 'Vesely', 1, 1),
-(2, 'Matthias', 'Hintenberger', 0, 1),
-(3, 'Michael', 'Redl', 1, 1),
-(4, 'Anne', 'Pfiel', 1, 3),
-(5, 'Andreas', 'Strohmayer', 1, 3),
-(6, 'Elisabeth', 'Marik', 1, 3),
-(7, 'Heinz', 'Redl jun.', 1, 1),
-(8, 'Heinz', 'Redl sen.', 1, 2),
-(9, 'Kathrin', 'Redl-Swift', 0, 0),
-(10, 'Kathrin', 'Strohmayer', 0, 1),
-(11, 'Kathrin', 'Holzheu', 1, 2),
-(12, 'Marlene', 'Kaller', 0, 3),
-(13, 'Andreas', 'Pfiel', 1, 3),
-(14, 'Marcel', 'Czech', 1, 1),
-(15, 'Theresa', 'Süss', 1, 1),
-(16, 'Elisabth', 'Haas', 1, 1),
-(17, 'Iris ', 'Strasser', 1, 1),
-(18, 'Elisabeth', 'Redl', 1, 1);
-
+INSERT INTO `personen` (`id`, `vorname`, `nachname`, `aktiv`, `zoom_level`, `aufnehmer`, `kellner`, `abrechner`) VALUES
+(1, 'Jakob', 'Vesely', 1, 1, 1, 1, 1),
+(2, 'Matthias', 'Hintenberger', 0, 1, 1, 0, 0),
+(3, 'Michael', 'Redl', 1, 1, 1, 1, 1),
+(4, 'Anne', 'Pfiel', 1, 3, 1, 0, 0),
+(5, 'Andreas', 'Strohmayer', 1, 3, 1, 0, 0),
+(6, 'Elisabeth', 'Marik', 1, 3, 1, 0, 0),
+(7, 'Heinz', 'Redl jun.', 1, 1, 1, 0, 0),
+(8, 'Heinz', 'Redl sen.', 1, 2, 1, 0, 0),
+(9, 'Kathrin', 'Redl-Swift', 0, 1, 1, 0, 0),
+(10, 'Kathrin', 'Strohmayer', 0, 1, 1, 0, 0),
+(11, 'Kathrin', 'Holzheu', 1, 2, 1, 0, 0),
+(12, 'Andreas', 'Pfiel', 1, 3, 1, 0, 1),
+(13, 'Marcel', 'Czech', 1, 1, 1, 1, 0),
+(14, 'Theresa', 'Süss', 1, 1, 1, 0, 0),
+(15, 'Elisabth', 'Haas', 1, 1, 1, 1, 0),
+(16, 'Iris ', 'Strasser', 1, 1, 1, 0, 0),
+(17, 'Elisabeth', 'Redl', 1, 1, 1, 0, 0),
+(18, 'Nicole', 'Czech', 1, 1, 0, 1, 0),
+(19, 'Emil', 'Fellinger', 1, 1, 0, 1, 0),
+(20, 'Amelie', '', 1, 1, 0, 1, 0),
+(21, 'Bernhard', 'Feuchtinger', 1, 1, 0, 1, 0),
+(22, 'Therese', 'Feuchtinger', 1, 1, 0, 1, 0),
+(23, 'Lisi', 'Gerstenmaier', 1, 1, 0, 1, 0),
+(24, 'Marlene', 'Gerstenmaier', 1, 1, 0, 1, 0),
+(25, 'Viktoria', 'Gramer', 1, 1, 0, 1, 0),
+(26, 'Magdalena', 'Graßl', 1, 1, 0, 1, 0),
+(27, 'Georg', 'Kaiser', 1, 1, 0, 1, 0),
+(28, 'Leonie', 'Kreitzer', 1, 1, 0, 1, 0),
+(29, 'Daniela', 'Löffler', 1, 1, 0, 1, 0),
+(30, 'Bojan', 'Markovic', 1, 1, 0, 1, 0),
+(31, 'Sandra', 'Posch', 1, 1, 0, 1, 0),
+(32, 'Andreas', 'Reisecker', 1, 1, 0, 1, 0),
+(33, 'Chiara', 'Rentmeister', 1, 1, 0, 1, 0),
+(34, 'Barbara', 'Rossecker', 1, 1, 0, 1, 0),
+(35, 'Lisa', 'Rossecker', 1, 1, 0, 1, 0),
+(36, 'Marie', 'Schadinger', 1, 1, 0, 1, 0),
+(37, 'Jakob', 'Schmidt', 1, 1, 0, 1, 0),
+(38, 'Nora', 'Schmidt', 1, 1, 0, 1, 0),
+(39, 'Valentina', 'Strohdorfer', 1, 1, 0, 1, 0),
+(40, 'Valerie', 'Strohdorfer', 1, 1, 0, 1, 0),
+(41, 'Valy', '', 1, 1, 0, 1, 0),
+(42, 'Erich', 'Süss', 1, 1, 0, 1, 0),
+(43, 'Sophia', 'Track', 1, 1, 0, 1, 0),
+(44, 'Rebekka', 'Weiß', 1, 1, 0, 1, 0),
+(45, 'Carina', 'Zehetner', 1, 1, 0, 1, 0),
+(46, 'Franz', 'Haas', 1, 1, 0, 0, 1),
+(47, 'Roman', 'Groiss', 1, 1, 0, 0, 1),
+(48, 'Andreas', 'Reschenhofer', 1, 1, 0, 0, 1),
+(49, 'Walter', 'Bernard', 1, 1, 0, 0, 1);
 --
 -- Dumping data for table `constants`
 --
 
 INSERT INTO `constants` (`name`, `value`) VALUES
-('event_date', '13., 15. und 17. August 2024'),
+('event_date', '14. bis 16. August 2026'),
 ('event_image', '../assets/bon-header.png'),
 ('event_name', 'FF Fest Gemeinlebarn'),
 ('organisation_address', 'Ortsstraße 10, 3133 Gemeinlebarn'),
@@ -117,6 +147,65 @@ INSERT INTO `produktbereiche` (`id`, `name`, `color`, `drucker_id_level_0`) VALU
 (2, 'Speisen', '#0772A1', NULL),
 (3, 'Mehlspeisen & Kaffee', '#FF3100', 5),
 (4, 'Extras', '#000000', NULL);
+
+--
+-- Dumping data for table `produktkategorien`
+--
+
+INSERT INTO `produktkategorien` (`id`, `name`, `color`, `produktbereiche_id`, `drucker_id_level_1`, `sortierindex`) VALUES
+(1, 'Bier', 'color-1', 1, NULL, 10),
+(2, 'Wein', 'color-1', 1, NULL, 20),
+(3, 'Extras', 'color-4', 4, NULL, 100),
+(4, 'Säfte', 'color-1', 1, NULL, 40),
+(5, 'Limo & Wasser', 'color-1', 1, NULL, 50),
+(6, 'Limo gespritzt', 'color-1', 1, NULL, 60),
+(7, 'Kaffee & Toast', 'color-2', 3, NULL, 65),
+(8, 'Kotelett, Spieß & Würstel', 'color-3', 2, 2, 70),
+(9, 'Hendl & Vegetarisch', 'color-3', 2, 4, 80);
+
+--
+-- Dumping data for table `produkteinteilungen`
+--
+
+INSERT INTO `produkteinteilungen` (`id`, `name`, `produktkategorien_id`, `sortierindex`) VALUES
+(1, 'Krügerl', 1, 10),
+(2, 'Seidel', 1, 20),
+(3, 'Radler und Alkoholfrei', 1, 30),
+(4, 'Gespritzer weiß', 2, 340),
+(5, 'Kaisergespritzer weiß', 2, 50),
+(6, 'Wein weiß pur', 2, 60),
+(7, 'Cola mit Wein weiß', 2, 70),
+(8, 'Almdudler mit Wein weiß', 2, 80),
+(9, 'Frucade mit Wein weiß', 2, 90),
+(10, 'Apfelsaft', 4, 100),
+(11, 'Traubensaft', 4, 110),
+(12, 'Hollersaft', 4, 120),
+(13, 'Limonaden in Flaschen', 5, 130),
+(14, 'Soda', 5, 140),
+(15, 'Mineral', 5, 150),
+(16, 'Leitungswasser', 5, 160),
+(17, 'Almdudler', 6, 170),
+(18, 'Frucade', 6, 180),
+(19, 'Cola', 6, 190),
+(20, 'Kotelett', 8, 200),
+(21, 'Putenspieß', 8, 210),
+(22, 'Grillwürste', 8, 220),
+(23, 'Pommes', 8, 265),
+(24, 'Extra Portionen', 8, 267),
+(25, 'Grillhendl', 9, 250),
+(26, 'Vegetarisches', 9, 260),
+(27, 'Kaffee', 7, 270),
+(28, 'Mehlspeisen', 7, 280),
+(29, 'Toasts', 7, 290),
+(30, 'Gespritzer rot', 2, 40),
+(31, 'Wein pur rot', 2, 60),
+(32, 'Cola mit Wein rot', 2, 70),
+(33, 'Almdudler mit Wein rot', 2, 80),
+(34, 'Frucade mit Wein rot', 2, 90),
+(35, 'Schank', 3, 2000),
+(36, 'Grillhütte', 3, 2010),
+(37, 'Hendlhütte', 3, 2020),
+(38, 'Mehlspeisenhütte', 3, 2030);
 
 --
 -- Dumping data for table `produkte`
@@ -246,50 +335,6 @@ INSERT INTO `produkte` (`id`, `name`, `formal_name`, `preis`, `drucker_id_level_
 (161, 'Käsetoast', '', 3.50, NULL, 1, 885, 29, NULL, NULL, 0, 0, NULL, NULL, 0);
 
 --
--- Dumping data for table `produkteinteilungen`
---
-
-INSERT INTO `produkteinteilungen` (`id`, `name`, `produktkategorien_id`, `sortierindex`) VALUES
-(1, 'Krügerl', 1, 10),
-(2, 'Seidel', 1, 20),
-(3, 'Radler und Alkoholfrei', 1, 30),
-(4, 'Gespritzer weiß', 2, 340),
-(5, 'Kaisergespritzer weiß', 2, 50),
-(6, 'Wein weiß pur', 2, 60),
-(7, 'Cola mit Wein weiß', 2, 70),
-(8, 'Almdudler mit Wein weiß', 2, 80),
-(9, 'Frucade mit Wein weiß', 2, 90),
-(10, 'Apfelsaft', 4, 100),
-(11, 'Traubensaft', 4, 110),
-(12, 'Hollersaft', 4, 120),
-(13, 'Limonaden in Flaschen', 5, 130),
-(14, 'Soda', 5, 140),
-(15, 'Mineral', 5, 150),
-(16, 'Leitungswasser', 5, 160),
-(17, 'Almdudler', 6, 170),
-(18, 'Frucade', 6, 180),
-(19, 'Cola', 6, 190),
-(20, 'Kotelett', 8, 200),
-(21, 'Putenspieß', 8, 210),
-(22, 'Grillwürste', 8, 220),
-(23, 'Pommes', 8, 265),
-(24, 'Extra Portionen', 8, 267),
-(25, 'Grillhendl', 9, 250),
-(26, 'Vegetarisches', 9, 260),
-(27, 'Kaffee', 7, 270),
-(28, 'Mehlspeisen', 7, 280),
-(29, 'Toasts', 7, 290),
-(30, 'Gespritzer rot', 2, 40),
-(31, 'Wein pur rot', 2, 60),
-(32, 'Cola mit Wein rot', 2, 70),
-(33, 'Almdudler mit Wein rot', 2, 80),
-(34, 'Frucade mit Wein rot', 2, 90),
-(35, 'Schank', 3, 2000),
-(36, 'Grillhütte', 3, 2010),
-(37, 'Hendlhütte', 3, 2020),
-(38, 'Mehlspeisenhütte', 3, 2030);
-
---
 -- Dumping data for table `produkte_eigenschaften`
 --
 
@@ -357,21 +402,6 @@ INSERT INTO `produkte_eigenschaften` (`produkte_id`, `eigenschaften_id`, `in_pro
 (147, 26, 0),
 (161, 1, 0),
 (161, 2, 1);
-
---
--- Dumping data for table `produktkategorien`
---
-
-INSERT INTO `produktkategorien` (`id`, `name`, `color`, `produktbereiche_id`, `drucker_id_level_1`, `sortierindex`) VALUES
-(1, 'Bier', 'color-1', 1, NULL, 10),
-(2, 'Wein', 'color-1', 1, NULL, 20),
-(3, 'Extras', 'color-4', 4, NULL, 100),
-(4, 'Säfte', 'color-1', 1, NULL, 40),
-(5, 'Limo & Wasser', 'color-1', 1, NULL, 50),
-(6, 'Limo gespritzt', 'color-1', 1, NULL, 60),
-(7, 'Kaffee & Toast', 'color-2', 3, NULL, 65),
-(8, 'Kotelett, Spieß & Würstel', 'color-3', 2, 2, 70),
-(9, 'Hendl & Vegetarisch', 'color-3', 2, 4, 80);
 
 --
 -- Dumping data for table `produktkategorien_eigenschaften`

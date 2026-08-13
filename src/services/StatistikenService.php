@@ -115,7 +115,7 @@ final class StatistikenService extends BaseService
     {
         $data = [
             'taeglich' => [],
-            'gesamt'=> [
+            'gesamt' => [
                 'bestellungen_anzahl' => 0,
                 'produkte_anzahl' => 0,
                 'umsatz' => 0
@@ -426,7 +426,7 @@ final class StatistikenService extends BaseService
                     produkte.id
                 ORDER BY
                     anzahl DESC
-                LIMIT 
+                LIMIT
                     :limit"
         );
         $sth->bindParam(':limit', $limit, PDO::PARAM_INT);
@@ -473,7 +473,7 @@ final class StatistikenService extends BaseService
             $datum = $dataset['datum'];
             $produkte_id = $dataset['produkte_id'];
 
-            if (isset($data["data"]["_$produkte_id"])){
+            if (isset($data["data"]["_$produkte_id"])) {
                 $data["data"]["_$produkte_id"]['data'][$datum]["anzahl"] = intval($dataset['bestellte_produkte']);
                 $data["data"]["_$produkte_id"]['data'][$datum]["umsatz"] = floatval($dataset['summe']);
             }

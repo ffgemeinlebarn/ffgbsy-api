@@ -12,7 +12,7 @@ use FFGBSY\Services\BonsService;
 use FFGBSY\Services\CelebrationService;
 use FFGBSY\Services\GrundprodukteService;
 use FFGBSY\Services\ProdukteService;
-use FFGBSY\Services\AufnehmerService;
+use FFGBSY\Services\PersonenService;
 use FFGBSY\Services\TischeService;
 use FFGBSY\Services\BestellpositionenService;
 use stdClass;
@@ -21,7 +21,7 @@ final class BestellungenService extends BaseService
 {
     private GrundprodukteService $grundprodukteService;
     private ProdukteService $produkteService;
-    private AufnehmerService $aufnehmerService;
+    private PersonenService $personenService;
     private TischeService $tischeService;
     private BestellpositionenService $bestellpositionenService;
     private BonsService $bonsService;
@@ -31,7 +31,7 @@ final class BestellungenService extends BaseService
     {
         $this->grundprodukteService = $container->get('grundprodukte');
         $this->produkteService = $container->get('produkte');
-        $this->aufnehmerService = $container->get('aufnehmer');
+        $this->personenService = $container->get('personen');
         $this->tischeService = $container->get('tische');
         $this->bestellpositionenService = $container->get('bestellpositionen');
         $this->bonsService = $container->get('bons');
@@ -44,7 +44,7 @@ final class BestellungenService extends BaseService
         $sth = $this->db->prepare("INSERT INTO bestellungen (tische_id, timestamp_begonnen, aufnehmer_id, device_name, device_ip) VALUES (:tische_id, :timestamp_begonnen, :aufnehmer_id, :device_name, :device_ip)");
         $sth->bindParam(':tische_id', $data['tisch']['id'], PDO::PARAM_INT);
         $sth->bindParam(':timestamp_begonnen', $data['timestamp_begonnen'], PDO::PARAM_STR);
-        $sth->bindParam(':aufnehmer_id', $data['aufnehmer']['id'], PDO::PARAM_INT);
+        $sth->bindParam(':aufnehmer_id', $data['aufnehmer_id'], PDO::PARAM_INT);
         $sth->bindParam(':device_name', $data['device_name'], PDO::PARAM_STR);
         $sth->bindParam(':device_ip', $data['device_ip'], PDO::PARAM_STR);
         $sth->execute();
@@ -79,7 +79,7 @@ final class BestellungenService extends BaseService
             foreach ($bestellung->stornopositionen as $position) {
                 $bestellung->summe += $position->summe;
             }
-            $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
+            $bestellung->aufnehmer = $this->personenService->read($bestellung->aufnehmer_id);
             $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
             $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestellung', $bestellung->id);
             $bestellung->stornobons = $this->bonsService->readByTypeAndBestellung('storno', $bestellung->id);
@@ -129,7 +129,7 @@ final class BestellungenService extends BaseService
                 foreach ($bestellung->bestellpositionen as $position) {
                     $bestellung->summe += $position->summe;
                 }
-                $bestellung->aufnehmer = $this->aufnehmerService->read($bestellung->aufnehmer_id);
+                $bestellung->aufnehmer = $this->personenService->read($bestellung->aufnehmer_id);
                 $bestellung->tisch = $this->tischeService->read($bestellung->tische_id);
                 $bestellung->bestellbons = $this->bonsService->readByTypeAndBestellung('bestellung', $bestellung->id);
                 $bestellung->stornobons = $this->bonsService->readByTypeAndBestellung('storno', $bestellung->id);
@@ -145,9 +145,9 @@ final class BestellungenService extends BaseService
 
         foreach ($bestellpositionen as $position) {
 
-            if ($position['produkt']['grundprodukte_id']){
+            if ($position['produkt']['grundprodukte_id']) {
 
-                if(!isset($neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"])){
+                if (!isset($neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"])) {
                     $neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"] = [
                         "produkt_name" => $position['produkt']['name'],
                         "grundprodukte_id" => $position['produkt']['grundprodukte_id'],
@@ -156,7 +156,7 @@ final class BestellungenService extends BaseService
                 }
 
                 $neededGrundprodukte["_{$position['produkt']['grundprodukte_id']}"]['anzahl'] += ($position['produkt']['grundprodukte_multiplikator'] * $position['anzahl']);
-                    
+
             }
         }
 
@@ -164,23 +164,17 @@ final class BestellungenService extends BaseService
         $data->success = true;
         $data->checks = [];
 
-        foreach(array_values($neededGrundprodukte) as $need){
+        foreach (array_values($neededGrundprodukte) as $need) {
             $grundprodukt = $this->grundprodukteService->read($need['grundprodukte_id']);
 
-            if ($grundprodukt->bestand === null)
-            {
+            if ($grundprodukt->bestand === null) {
                 $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist unlimitiert verfügbar!";
-            }
-            elseif ($grundprodukt->bestand >= $need['anzahl']){
+            } elseif ($grundprodukt->bestand >= $need['anzahl']) {
                 $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist verfügbar!";
-            }
-            elseif ($grundprodukt->bestand > 0)
-            {
+            } elseif ($grundprodukt->bestand > 0) {
                 $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist nicht ausreichend verfügbar! ({$need['anzahl']} benötigt, nur {$grundprodukt->bestand} verfügbar)";
                 $data->success = false;
-            }
-            else
-            {
+            } else {
                 $message = "{$grundprodukt->name} (für das Produkt {$need['produkt_name']}) ist leider gar nicht mehr verfügbar!";
                 $data->success = false;
             }

@@ -70,19 +70,11 @@ final class BestellpositionenService extends BaseService
     {
         $bestellposition = $this->read($id);
 
-        $eigenschaften = [];
-        foreach ($bestellposition->eigenschaften->mit as $eigenschaft) {
-            array_push($eigenschaften, (array) $eigenschaft);
-        }
-        foreach ($bestellposition->eigenschaften->ohne as $eigenschaft) {
-            array_push($eigenschaften, (array) $eigenschaft);
-        }
-
         return $this->addToBestellung($bestellposition->bestellungen_id, [
             "anzahl" => ($anzahl * -1),
             "produkt" => (array) $bestellposition->produkt,
             "notiz" => $bestellposition->notiz,
-            "eigenschaften" => $eigenschaften
+            "eigenschaften" => $bestellposition->eigenschaften
         ]);
     }
 
@@ -172,12 +164,14 @@ final class BestellpositionenService extends BaseService
     {
         $bestellposition->summe_eigenschaften = 0;
 
-        foreach ($bestellposition->eigenschaften->mit as $eigenschaft) {
-            $bestellposition->summe_eigenschaften += $bestellposition->anzahl * $eigenschaft->preis;
-        }
+        foreach ($bestellposition->eigenschaften as $eigenschaft) {
+            if (!$eigenschaft->in_produkt_enthalten && $eigenschaft->aktiv) {
+                $bestellposition->summe_eigenschaften += $bestellposition->anzahl * $eigenschaft->preis;
+            }
 
-        foreach ($bestellposition->eigenschaften->ohne as $eigenschaft) {
-            $bestellposition->summe_eigenschaften -= $bestellposition->anzahl * $eigenschaft->preis;
+            if ($eigenschaft->in_produkt_enthalten && !$eigenschaft->aktiv) {
+                $bestellposition->summe_eigenschaften -= $bestellposition->anzahl * $eigenschaft->preis;
+            }
         }
 
         $bestellposition->summe = $bestellposition->summe_ohne_eigenschaften + $bestellposition->summe_eigenschaften;

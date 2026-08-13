@@ -141,21 +141,35 @@ final class PrintService extends BaseService
             $printer->text($this->utf8StrPad($this->formatEuro($position->summe_ohne_eigenschaften), 8, " ", STR_PAD_LEFT));
             $printer->text("\n");
 
-            if (count($position->eigenschaften->mit)) {
+            $mit = [];
+            $ohne = [];
+
+            foreach ($position->eigenschaften as $eigenschaft) {
+
+                if (!$eigenschaft->in_produkt_enthalten && $eigenschaft->aktiv) {
+                    array_push($mit, $eigenschaft);
+                }
+
+                if ($eigenschaft->in_produkt_enthalten && !$eigenschaft->aktiv) {
+                    array_push($ohne, $eigenschaft);
+                }
+            }
+
+            if (count($mit)) {
                 $printer->setTextSize(1, 1);
                 $printer->setDoubleStrike(false);
                 $printer->text("Mit  » " . implode(', ', array_map(function ($x) {
                     return $x->preis > 0 ? "{$x->name} (+ " . $this->formatEuro($x->preis) . ")" : $x->name;
-                }, $position->eigenschaften->mit)) . "\n");
+                }, $mit)) . "\n");
                 $printer->setDoubleStrike(true);
             }
 
-            if (count($position->eigenschaften->ohne)) {
+            if (count($ohne)) {
                 $printer->setTextSize(1, 1);
                 $printer->setDoubleStrike(false);
                 $printer->text("Ohne » " . implode(', ', array_map(function ($x) {
                     return $x->preis > 0 ? "{$x->name} (- " . $this->formatEuro($x->preis) . ")" : $x->name;
-                }, $position->eigenschaften->ohne)) . "\n");
+                }, $ohne)) . "\n");
                 $printer->setDoubleStrike(true);
             }
 
@@ -224,6 +238,11 @@ final class PrintService extends BaseService
         $printer->text("$laufnummer\n");
         $printer->setTextSize(2, 2);
         $printer->text(SHORT_LINE_AND_BREAK);
+    }
+
+    public function printBonIdBarcode($printer, $bonId)
+    {
+        $printer->barcode("BON-$bonId", Printer::BARCODE_CODE93);
     }
 
     /**********************************************************

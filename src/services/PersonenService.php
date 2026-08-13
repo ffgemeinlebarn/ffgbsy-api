@@ -6,15 +6,18 @@ namespace FFGBSY\Services;
 
 use PDO;
 
-final class AufnehmerService extends BaseService
+final class PersonenService extends BaseService
 {
     public function create($data)
     {
-        $sth = $this->db->prepare("INSERT INTO aufnehmer (vorname, nachname, aktiv, zoom_level) VALUES (:vorname, :nachname, :aktiv, :zoom_level)");
+        $sth = $this->db->prepare("INSERT INTO personen (vorname, nachname, aktiv, zoom_level, aufnehmer, kellner, abrechner) VALUES (:vorname, :nachname, :aktiv, :zoom_level, :aufnehmer, :kellner, :abrechner)");
         $sth->bindParam(':vorname', $data['vorname'], PDO::PARAM_STR);
         $sth->bindParam(':nachname', $data['nachname'], PDO::PARAM_STR);
         $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
         $sth->bindParam(':zoom_level', $data['zoom_level'], PDO::PARAM_INT);
+        $sth->bindParam(':aufnehmer', $data['aufnehmer'], PDO::PARAM_INT);
+        $sth->bindParam(':kellner', $data['kellner'], PDO::PARAM_INT);
+        $sth->bindParam(':abrechner', $data['abrechner'], PDO::PARAM_INT);
         $sth->execute();
 
         return $this->read($this->db->lastInsertId());
@@ -23,36 +26,39 @@ final class AufnehmerService extends BaseService
     public function read($id = null)
     {
         if ($id != null) {
-            $sth = $this->db->prepare("SELECT * FROM aufnehmer WHERE id = :id");
+            $sth = $this->db->prepare("SELECT * FROM personen WHERE id = :id");
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
             return $this->singleRead($sth);
         } else {
-            $sth = $this->db->prepare("SELECT * FROM aufnehmer ORDER BY nachname ASC, vorname ASC");
+            $sth = $this->db->prepare("SELECT * FROM personen ORDER BY nachname ASC, vorname ASC");
             return $this->multiRead($sth);
         }
     }
 
     public function readAllActive($id = null)
     {
-        $sth = $this->db->prepare("SELECT * FROM aufnehmer WHERE aktiv = 1 ORDER BY nachname ASC, vorname ASC");
+        $sth = $this->db->prepare("SELECT * FROM personen WHERE aktiv = 1 ORDER BY nachname ASC, vorname ASC");
         return $this->multiRead($sth);
     }
 
     public function readByBestellung($id)
     {
-        $sth = $this->db->prepare("SELECT aufnehmer.* FROM bestellungen INNER JOIN aufnehmer ON aufnehmer.id = bestellungen.aufnehmer_id WHERE bestellungen.id = :id");
+        $sth = $this->db->prepare("SELECT personen.* FROM bestellungen INNER JOIN personen ON personen.id = bestellungen.aufnehmer_id WHERE bestellungen.id = :id");
         $sth->bindParam(':id', $id, PDO::PARAM_INT);
         return $this->singleRead($sth);
     }
 
     public function update($data)
     {
-        $sth = $this->db->prepare("UPDATE aufnehmer SET vorname = :vorname, nachname = :nachname, aktiv = :aktiv, zoom_level = :zoom_level WHERE id = :id");
+        $sth = $this->db->prepare("UPDATE personen SET vorname = :vorname, nachname = :nachname, aktiv = :aktiv, zoom_level = :zoom_level, aufnehmer = :aufnehmer, kellner = :kellner, abrechner = :abrechner WHERE id = :id");
         $sth->bindParam(':id', $data['id'], PDO::PARAM_INT);
         $sth->bindParam(':vorname', $data['vorname'], PDO::PARAM_STR);
         $sth->bindParam(':nachname', $data['nachname'], PDO::PARAM_STR);
         $sth->bindParam(':aktiv', $data['aktiv'], PDO::PARAM_INT);
         $sth->bindParam(':zoom_level', $data['zoom_level'], PDO::PARAM_INT);
+        $sth->bindParam(':aufnehmer', $data['aufnehmer'], PDO::PARAM_INT);
+        $sth->bindParam(':kellner', $data['kellner'], PDO::PARAM_INT);
+        $sth->bindParam(':abrechner', $data['abrechner'], PDO::PARAM_INT);
         $sth->execute();
 
         return $this->read($data['id']);
@@ -60,7 +66,7 @@ final class AufnehmerService extends BaseService
 
     public function delete($id)
     {
-        $sth = $this->db->prepare("DELETE FROM aufnehmer WHERE id = :id");
+        $sth = $this->db->prepare("DELETE FROM personen WHERE id = :id");
         $sth->bindParam(':id', $id, PDO::PARAM_INT);
         return $sth->execute();
     }
@@ -70,6 +76,9 @@ final class AufnehmerService extends BaseService
         $obj->id = $this->asNumber($obj->id);
         $obj->aktiv = $this->asBool($obj->aktiv);
         $obj->zoom_level = $this->asNumber($obj->zoom_level);
+        $obj->aufnehmer = $this->asBool($obj->aufnehmer);
+        $obj->kellner = $this->asBool($obj->kellner);
+        $obj->abrechner = $this->asBool($obj->abrechner);
         return $obj;
     }
 }

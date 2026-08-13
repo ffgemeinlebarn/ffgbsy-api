@@ -6,7 +6,8 @@ use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use FFGBSY\Controller\AufnehmerController;
+use FFGBSY\Controller\AbrechnungenController;
+use FFGBSY\Controller\PersonenController;
 use FFGBSY\Controller\TischkategorienController;
 use FFGBSY\Controller\TischeController;
 use FFGBSY\Controller\DruckerController;
@@ -28,7 +29,7 @@ use FFGBSY\Controller\LogsController;
 use FFGBSY\Controller\TestsController;
 use FFGBSY\Controller\SetupController;
 
-const PATH_ID    = '/{id}';
+const PATH_ID = '/{id}';
 const PATH_EMPTY = '';
 
 date_default_timezone_set("Europe/Vienna");
@@ -46,8 +47,36 @@ return function (App $app) {
         return $response->withHeader('Content-Type', 'text/plain');
     });
 
-    $app->group('/aufnehmer', function (Group $group) {
-        $controller = AufnehmerController::class;
+    $app->group('/abrechnungen-overview/{stelle}', function (Group $group) {
+        $controller = AbrechnungenController::class;
+        $group->get(PATH_EMPTY, "$controller:readOverviewAll");
+        $group->get(PATH_ID, "$controller:readKellnerStatus");
+    });
+
+    $app->group('/abrechnungen', function (Group $group) {
+        $controller = AbrechnungenController::class;
+        $group->post(PATH_EMPTY, "$controller:createAbrechnung");
+        $group->delete(PATH_EMPTY, "$controller:deleteAbrechnung");
+
+    });
+
+    $app->group('/rueckrechnungen', function (Group $group) {
+        $controller = AbrechnungenController::class;
+        $group->post(PATH_EMPTY, "$controller:createRueckrechnung");
+        $group->delete(PATH_EMPTY, "$controller:deleteRueckrechnung");
+    });
+
+    $app->group('/abrechnungen', function (Group $group) {
+        $controller = AbrechnungenController::class;
+        $group->post('/abrechnung', "$controller:createAbrechnung");
+        $group->post('/rueckrechnung', "$controller:createRueckrechnung");
+        $group->get('/kellner/{id}', "$controller:readKellnerStatus");
+        $group->delete('/abrechnung', "$controller:delete");
+        $group->delete('/rueckrechnung', "$controller:delete");
+    });
+
+    $app->group('/personen', function (Group $group) {
+        $controller = PersonenController::class;
         $group->post(PATH_EMPTY, "$controller:create");
         $group->get(PATH_EMPTY, "$controller:readAll");
         $group->get(PATH_ID, "$controller:readSingle");

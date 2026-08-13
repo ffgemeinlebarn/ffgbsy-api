@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 use PDO;
 use FFGBSY\Services\DruckerService;
 use FFGBSY\Services\TischeService;
-use FFGBSY\Services\AufnehmerService;
+use FFGBSY\Services\PersonenService;
 use FFGBSY\Services\BonsDruckService;
 use FFGBSY\Services\BestellpositionenService;
 
@@ -17,7 +17,7 @@ final class BonsService extends BaseService
 {
     private DruckerService $druckerService;
     private TischeService $tischeService;
-    private AufnehmerService $aufnehmerService;
+    private PersonenService $personenService;
     private BonsDruckService $bonsDruckService;
     private BestellpositionenService $bestellpositionenService;
 
@@ -25,7 +25,7 @@ final class BonsService extends BaseService
     {
         $this->druckerService = $container->get('drucker');
         $this->tischeService = $container->get('tische');
-        $this->aufnehmerService = $container->get('aufnehmer');
+        $this->personenService = $container->get('personen');
         $this->bonsDruckService = $container->get('bonsDruck');
         $this->bestellpositionenService = $container->get('bestellpositionen');
         parent::__construct($container, $logger);
@@ -66,13 +66,48 @@ final class BonsService extends BaseService
                     bestellungen.timestamp_beendet
                 FROM
                     bons
-                LEFT JOIN 
+                LEFT JOIN
                     bestellungen ON bestellungen.id = bons.bestellungen_id
                 WHERE
-                    bons.id = :id");
+                    bons.id = :id"
+            );
             $sth->bindParam(':id', $id, PDO::PARAM_INT);
+            $data = $this->addNested($this->singleRead($sth));
 
-            return $this->addNested($this->singleRead($sth));
+            $sth = $this->db->prepare("
+                SELECT
+                    SUM(bp.anzahl * (pr.preis + IFNULL(eig_sum_mit.extra_preis, 0) - IFNULL(eig_sum_ohne.extra_preis, 0))) AS summe
+                FROM bons_bestellpositionen bbp
+                JOIN bestellpositionen bp
+                    ON bp.id = bbp.bestellpositionen_id
+                JOIN produkte pr
+                    ON pr.id = bp.produkte_id
+                LEFT JOIN (
+                    SELECT
+                        bpe.bestellpositionen_id,
+                        SUM(eig.preis) AS extra_preis
+                    FROM bestellpositionen_eigenschaften bpe
+                    JOIN eigenschaften eig ON eig.id = bpe.eigenschaften_id
+                    WHERE bpe.aktiv = 1 AND bpe.in_produkt_enthalten = 0
+                    GROUP BY bpe.bestellpositionen_id
+                ) eig_sum_mit
+                    ON eig_sum_mit.bestellpositionen_id = bp.id
+                LEFT JOIN (
+                    SELECT
+                        bpe.bestellpositionen_id,
+                        SUM(eig.preis) AS extra_preis
+                    FROM bestellpositionen_eigenschaften bpe
+                    JOIN eigenschaften eig ON eig.id = bpe.eigenschaften_id
+                    WHERE bpe.aktiv = 0 AND bpe.in_produkt_enthalten = 1
+                    GROUP BY bpe.bestellpositionen_id
+                ) eig_sum_ohne
+                    ON eig_sum_ohne.bestellpositionen_id = bp.id
+                WHERE bbp.bons_id = :bons_id
+            ");
+            $sth->execute(['bons_id' => $id]);
+            $data->summe = (float) $sth->fetchColumn();
+
+            return $data;
         } else {
             $sql =
                 "SELECT
@@ -86,7 +121,7 @@ final class BonsService extends BaseService
                     (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id AND bons_druck.success = false) as fails
                 FROM
                     bons
-                LEFT JOIN 
+                LEFT JOIN
                     bestellungen ON bestellungen.id = bons.bestellungen_id
                 WHERE
                     1=1";
@@ -117,7 +152,7 @@ final class BonsService extends BaseService
             if ($multipleDrucke) {
                 $sql .= " AND (SELECT COUNT(bons_druck.id) FROM bons_druck WHERE bons.id = bons_druck.bons_id) > 0";
             }
-            
+
             $sql .= " ORDER BY bestellungen.timestamp_beendet DESC";
 
             if ($limit) {
@@ -172,17 +207,17 @@ final class BonsService extends BaseService
         $obj->drucke = $this->bonsDruckService->readByBon($obj->id);
         $obj->bestellung = new \stdClass();
         $obj->bestellung->id = $obj->bestellungen_id;
-        
-        if (isset($obj->timestamp_begonnen)){
+
+        if (isset($obj->timestamp_begonnen)) {
             $obj->bestellung->timestamp_begonnen = $obj->timestamp_begonnen;
         }
-        if (isset($obj->timestamp_beendet)){
+        if (isset($obj->timestamp_beendet)) {
             $obj->bestellung->timestamp_beendet = $obj->timestamp_beendet;
         }
-        if (isset($obj->aufnehmer_id)){
-            $obj->bestellung->aufnehmer = $this->aufnehmerService->read($obj->aufnehmer_id);
+        if (isset($obj->aufnehmer_id)) {
+            $obj->bestellung->aufnehmer = $this->personenService->read($obj->aufnehmer_id);
         }
-        if (isset($obj->tische_id)){
+        if (isset($obj->tische_id)) {
             $obj->bestellung->tisch = $this->tischeService->read($obj->tische_id);
         }
 

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use FFGBSY\Application\ResponseEmitter;
 use FFGBSY\Application\HttpErrorHandler;
-use FFGBSY\Services\AufnehmerService;
+use FFGBSY\Services\AbrechnungenService;
+use FFGBSY\Services\PersonenService;
 use FFGBSY\Services\TischkategorienService;
 use FFGBSY\Services\TischeService;
 use FFGBSY\Services\DruckerService;
@@ -56,29 +57,30 @@ $settings($containerBuilder);
 $database($containerBuilder);
 
 $containerBuilder->addDefinitions([
-    'adminNotifications' => fn (ContainerInterface $c, LoggerInterface $logger) => new AdminNotificationsService($c, $logger),
-    'aufnehmer' => fn (ContainerInterface $c, LoggerInterface $logger) => new AufnehmerService($c, $logger),
-    'tischkategorien' => fn (ContainerInterface $c, LoggerInterface $logger) => new TischkategorienService($c, $logger),
-    'tische' => fn (ContainerInterface $c, LoggerInterface $logger) => new TischeService($c, $logger),
-    'drucker' => fn (ContainerInterface $c, LoggerInterface $logger) => new DruckerService($c, $logger),
-    'grundprodukte' => fn (ContainerInterface $c, LoggerInterface $logger) => new GrundprodukteService($c, $logger),
-    'produktbereiche' => fn (ContainerInterface $c, LoggerInterface $logger) => new ProduktbereicheService($c, $logger),
-    'produktkategorien' => fn (ContainerInterface $c, LoggerInterface $logger) => new ProduktkategorienService($c, $logger),
-    'produkteinteilungen' => fn (ContainerInterface $c, LoggerInterface $logger) => new ProdukteinteilungenService($c, $logger),
-    'produkte' => fn (ContainerInterface $c, LoggerInterface $logger) => new ProdukteService($c, $logger),
-    'eigenschaften' => fn (ContainerInterface $c, LoggerInterface $logger) => new EigenschaftenService($c, $logger),
-    'bestellungen' => fn (ContainerInterface $c, LoggerInterface $logger) => new BestellungenService($c, $logger),
-    'bestellpositionen' => fn (ContainerInterface $c, LoggerInterface $logger) => new BestellpositionenService($c, $logger),
-    'bons' => fn (ContainerInterface $c, LoggerInterface $logger) => new BonsService($c, $logger),
-    'bonsDruck' => fn (ContainerInterface $c, LoggerInterface $logger) => new BonsDruckService($c, $logger),
-    'constants' => fn (ContainerInterface $c, LoggerInterface $logger) => new ConstantsService($c, $logger),
-    'print' => fn (ContainerInterface $c, LoggerInterface $logger) => new PrintService($c, $logger),
-    'printBons' => fn (ContainerInterface $c, LoggerInterface $logger) => new PrintBonsService($c, $logger),
-    'statistiken' => fn (ContainerInterface $c, LoggerInterface $logger) => new StatistikenService($c, $logger),
-    'celebration' => fn (ContainerInterface $c, LoggerInterface $logger) => new CelebrationService($c, $logger),
-    'notifications' => fn (ContainerInterface $c, LoggerInterface $logger) => new NotificationsService($c, $logger),
-    'logs' => fn (ContainerInterface $c, LoggerInterface $logger) => new LogsService($c, $logger),
-    'setup' => fn (ContainerInterface $c, LoggerInterface $logger) => new SetupService($c, $logger)
+    'adminNotifications' => fn(ContainerInterface $c, LoggerInterface $logger) => new AdminNotificationsService($c, $logger),
+    'abrechnungen' => fn(ContainerInterface $c, LoggerInterface $logger) => new AbrechnungenService($c, $logger),
+    'personen' => fn(ContainerInterface $c, LoggerInterface $logger) => new PersonenService($c, $logger),
+    'tischkategorien' => fn(ContainerInterface $c, LoggerInterface $logger) => new TischkategorienService($c, $logger),
+    'tische' => fn(ContainerInterface $c, LoggerInterface $logger) => new TischeService($c, $logger),
+    'drucker' => fn(ContainerInterface $c, LoggerInterface $logger) => new DruckerService($c, $logger),
+    'grundprodukte' => fn(ContainerInterface $c, LoggerInterface $logger) => new GrundprodukteService($c, $logger),
+    'produktbereiche' => fn(ContainerInterface $c, LoggerInterface $logger) => new ProduktbereicheService($c, $logger),
+    'produktkategorien' => fn(ContainerInterface $c, LoggerInterface $logger) => new ProduktkategorienService($c, $logger),
+    'produkteinteilungen' => fn(ContainerInterface $c, LoggerInterface $logger) => new ProdukteinteilungenService($c, $logger),
+    'produkte' => fn(ContainerInterface $c, LoggerInterface $logger) => new ProdukteService($c, $logger),
+    'eigenschaften' => fn(ContainerInterface $c, LoggerInterface $logger) => new EigenschaftenService($c, $logger),
+    'bestellungen' => fn(ContainerInterface $c, LoggerInterface $logger) => new BestellungenService($c, $logger),
+    'bestellpositionen' => fn(ContainerInterface $c, LoggerInterface $logger) => new BestellpositionenService($c, $logger),
+    'bons' => fn(ContainerInterface $c, LoggerInterface $logger) => new BonsService($c, $logger),
+    'bonsDruck' => fn(ContainerInterface $c, LoggerInterface $logger) => new BonsDruckService($c, $logger),
+    'constants' => fn(ContainerInterface $c, LoggerInterface $logger) => new ConstantsService($c, $logger),
+    'print' => fn(ContainerInterface $c, LoggerInterface $logger) => new PrintService($c, $logger),
+    'printBons' => fn(ContainerInterface $c, LoggerInterface $logger) => new PrintBonsService($c, $logger),
+    'statistiken' => fn(ContainerInterface $c, LoggerInterface $logger) => new StatistikenService($c, $logger),
+    'celebration' => fn(ContainerInterface $c, LoggerInterface $logger) => new CelebrationService($c, $logger),
+    'notifications' => fn(ContainerInterface $c, LoggerInterface $logger) => new NotificationsService($c, $logger),
+    'logs' => fn(ContainerInterface $c, LoggerInterface $logger) => new LogsService($c, $logger),
+    'setup' => fn(ContainerInterface $c, LoggerInterface $logger) => new SetupService($c, $logger)
 ]);
 
 $containerBuilder->addDefinitions([

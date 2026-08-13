@@ -44,7 +44,7 @@ final class StatistikenController extends BaseController
 
     public function produkte(Request $request, Response $response): Response
     {
-        $data = $this->statistikenService->produkte();
+        $data = $this->statistikenService->produkte(200);
         return $this->responseAsJson($response, $data);
     }
 }
